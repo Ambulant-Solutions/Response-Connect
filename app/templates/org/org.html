@@ -1,0 +1,667 @@
+{% extends "base.html" %}
+
+{% block title %}Organisation workspace · Response Connect{% endblock %}
+
+{% block meta_description %}
+Organisation operations, staffing, vehicles, compliance and service delivery
+in Response Connect.
+{% endblock %}
+
+{% block main_class %}main-content main-content--org-dashboard{% endblock %}
+
+{% block content %}
+<section class="org-dashboard" aria-labelledby="org-dashboard-title">
+    <header class="dashboard-heading org-dashboard-heading">
+        <a class="workspace-return" href="/">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 12H5" />
+                <path d="m11 18-6-6 6-6" />
+            </svg>
+            <span>All workspaces</span>
+        </a>
+
+        <div class="dashboard-heading__title-row">
+            <div>
+                <span class="eyebrow">Organisation workspace</span>
+                <h1 id="org-dashboard-title">
+                    {{ organisation.name|default(installation_name)|default('Ambulant Healthcare Group') }}
+                </h1>
+                <p>
+                    Operational overview for
+                    {{ dashboard_date_label|default('today') }}.
+                </p>
+            </div>
+
+            <div class="availability-status availability-status--available">
+                <span class="availability-status__dot" aria-hidden="true"></span>
+                <span>{{ service_status_label|default('Service operational') }}</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="org-dashboard-layout">
+        <div class="org-dashboard-main">
+            <section class="org-kpi-grid" aria-label="Organisation overview">
+                <a class="org-kpi-card" href="{{ shifts_url|default('/org/shifts') }}">
+                    <span class="org-kpi-card__icon org-kpi-card__icon--teal">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="16" rx="2" />
+                            <path d="M8 3v4M16 3v4M3 10h18" />
+                        </svg>
+                    </span>
+                    <span class="org-kpi-card__body">
+                        <small>Active shifts</small>
+                        <strong>{{ active_shifts|default(6) }}</strong>
+                        <span>{{ shifts_filled|default(5) }} fully staffed</span>
+                    </span>
+                </a>
+
+                <a class="org-kpi-card" href="{{ staff_url|default('/org/staff') }}">
+                    <span class="org-kpi-card__icon org-kpi-card__icon--accent">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="9" cy="8" r="3" />
+                            <circle cx="17" cy="9" r="2.5" />
+                            <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                            <path d="M15 14c3.4.1 5.2 2.1 5.8 6" />
+                        </svg>
+                    </span>
+                    <span class="org-kpi-card__body">
+                        <small>Staff on duty</small>
+                        <strong>{{ staff_on_duty|default(18) }}</strong>
+                        <span>{{ staff_available|default(4) }} additional available</span>
+                    </span>
+                </a>
+
+                <a class="org-kpi-card" href="{{ vehicles_url|default('/org/vehicles') }}">
+                    <span class="org-kpi-card__icon org-kpi-card__icon--success">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                            <path d="M17 10h2l2 3v4h-3M3 17h3M10 17h5" />
+                            <circle cx="8" cy="17" r="2" />
+                            <circle cx="17" cy="17" r="2" />
+                            <path d="M7 10h6M10 7v6" />
+                        </svg>
+                    </span>
+                    <span class="org-kpi-card__body">
+                        <small>Vehicles ready</small>
+                        <strong>{{ vehicles_ready|default(9) }}</strong>
+                        <span>{{ vehicles_unavailable|default(1) }} unavailable</span>
+                    </span>
+                </a>
+
+                <a class="org-kpi-card" href="{{ compliance_url|default('/org/compliance') }}">
+                    <span class="org-kpi-card__icon org-kpi-card__icon--warning">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3 2.8 20h18.4L12 3Z" />
+                            <path d="M12 9v5M12 17.5h.01" />
+                        </svg>
+                    </span>
+                    <span class="org-kpi-card__body">
+                        <small>Compliance alerts</small>
+                        <strong>{{ compliance_alert_count|default(4) }}</strong>
+                        <span>{{ urgent_compliance_alerts|default(1) }} require urgent action</span>
+                    </span>
+                </a>
+            </section>
+
+            <section class="dashboard-card operational-section" aria-labelledby="operations-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Service delivery</span>
+                        <h2 id="operations-title">Today's operations</h2>
+                    </div>
+
+                    <div class="card-heading__actions">
+                        <a
+                            class="button button--secondary button--compact"
+                            href="{{ operations_url|default('/org/operations') }}"
+                        >
+                            View operations
+                        </a>
+                        <a
+                            class="button button--primary button--compact"
+                            href="{{ create_operation_url|default('/org/operations/new') }}"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            New operation
+                        </a>
+                    </div>
+                </div>
+
+                <div class="org-operation-list">
+                    {% if operations %}
+                        {% for operation in operations %}
+                            <a
+                                class="org-operation"
+                                href="{{ operation.url|default(operations_url|default('/org/operations')) }}"
+                            >
+                                <span class="org-operation__time">
+                                    <strong>{{ operation.start_time }}</strong>
+                                    <small>{{ operation.end_time }}</small>
+                                </span>
+
+                                <span class="org-operation__type org-operation__type--{{ operation.type_code|default('event') }}">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 3v18M3 12h18" />
+                                    </svg>
+                                </span>
+
+                                <span class="org-operation__details">
+                                    <span class="org-operation__title-row">
+                                        <strong>{{ operation.title }}</strong>
+                                        <span class="status-pill status-pill--{{ operation.status_code|default('confirmed') }}">
+                                            {{ operation.status|default('Confirmed') }}
+                                        </span>
+                                    </span>
+
+                                    <span class="org-operation__meta">
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                                <circle cx="12" cy="10" r="2.5" />
+                                            </svg>
+                                            {{ operation.location }}
+                                        </span>
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <circle cx="9" cy="8" r="3" />
+                                                <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                            </svg>
+                                            {{ operation.staffing }}
+                                        </span>
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                                                <circle cx="8" cy="17" r="2" />
+                                                <circle cx="17" cy="17" r="2" />
+                                            </svg>
+                                            {{ operation.resource }}
+                                        </span>
+                                    </span>
+                                </span>
+
+                                <span class="org-operation__arrow" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M5 12h14" />
+                                        <path d="m13 6 6 6-6 6" />
+                                    </svg>
+                                </span>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <a class="org-operation" href="{{ operations_url|default('/org/operations') }}">
+                            <span class="org-operation__time">
+                                <strong>07:00</strong>
+                                <small>19:00</small>
+                            </span>
+                            <span class="org-operation__type org-operation__type--response">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 3v18M3 12h18" />
+                                </svg>
+                            </span>
+                            <span class="org-operation__details">
+                                <span class="org-operation__title-row">
+                                    <strong>Frontline ambulance deployment</strong>
+                                    <span class="status-pill status-pill--confirmed">Active</span>
+                                </span>
+                                <span class="org-operation__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        Central Operations Base
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="9" cy="8" r="3" />
+                                            <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                        </svg>
+                                        8 staff
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                                            <circle cx="8" cy="17" r="2" />
+                                            <circle cx="17" cy="17" r="2" />
+                                        </svg>
+                                        4 ambulances
+                                    </span>
+                                </span>
+                            </span>
+                            <span class="org-operation__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+
+                        <a class="org-operation" href="{{ operations_url|default('/org/operations') }}">
+                            <span class="org-operation__time">
+                                <strong>09:30</strong>
+                                <small>17:30</small>
+                            </span>
+                            <span class="org-operation__type org-operation__type--transport">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 12h16M12 4v16" />
+                                </svg>
+                            </span>
+                            <span class="org-operation__details">
+                                <span class="org-operation__title-row">
+                                    <strong>Patient transport service</strong>
+                                    <span class="status-pill status-pill--confirmed">Active</span>
+                                </span>
+                                <span class="org-operation__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        North Station
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="9" cy="8" r="3" />
+                                            <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                        </svg>
+                                        4 staff
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                                            <circle cx="8" cy="17" r="2" />
+                                            <circle cx="17" cy="17" r="2" />
+                                        </svg>
+                                        2 PTS vehicles
+                                    </span>
+                                </span>
+                            </span>
+                            <span class="org-operation__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+
+                        <a class="org-operation" href="{{ operations_url|default('/org/operations') }}">
+                            <span class="org-operation__time">
+                                <strong>15:00</strong>
+                                <small>23:30</small>
+                            </span>
+                            <span class="org-operation__type org-operation__type--event">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 18V8l8-4 8 4v10" />
+                                    <path d="M8 18v-5h8v5" />
+                                </svg>
+                            </span>
+                            <span class="org-operation__details">
+                                <span class="org-operation__title-row">
+                                    <strong>Riverside Arena medical cover</strong>
+                                    <span class="status-pill status-pill--pending">Staffing</span>
+                                </span>
+                                <span class="org-operation__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        Riverside Arena
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="9" cy="8" r="3" />
+                                            <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                        </svg>
+                                        5 of 6 staff
+                                    </span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                                            <circle cx="8" cy="17" r="2" />
+                                            <circle cx="17" cy="17" r="2" />
+                                        </svg>
+                                        1 ambulance
+                                    </span>
+                                </span>
+                            </span>
+                            <span class="org-operation__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="dashboard-card operational-section" aria-labelledby="org-compliance-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Governance</span>
+                        <h2 id="org-compliance-title">Compliance and readiness</h2>
+                    </div>
+
+                    <a
+                        class="text-link"
+                        href="{{ compliance_url|default('/org/compliance') }}"
+                    >
+                        Compliance centre
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="org-compliance-grid">
+                    <a class="org-compliance-score" href="{{ compliance_url|default('/org/compliance') }}">
+                        <span class="org-compliance-score__ring" style="--score: {{ compliance_score|default(92) }};">
+                            <strong>{{ compliance_score|default(92) }}%</strong>
+                        </span>
+                        <span>
+                            <strong>Organisation compliance</strong>
+                            <small>Records currently valid and complete</small>
+                        </span>
+                    </a>
+
+                    <div class="org-alert-list">
+                        {% if organisation_alerts %}
+                            {% for alert in organisation_alerts %}
+                                <a
+                                    class="record-alert"
+                                    href="{{ alert.url|default(compliance_url|default('/org/compliance')) }}"
+                                >
+                                    <span class="record-alert__icon record-alert__icon--{{ alert.level|default('warning') }}">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                            <path d="M12 9v5M12 17.5h.01" />
+                                        </svg>
+                                    </span>
+                                    <span class="record-alert__body">
+                                        <strong>{{ alert.title }}</strong>
+                                        <small>{{ alert.message }}</small>
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <a class="record-alert" href="{{ vehicles_url|default('/org/vehicles') }}">
+                                <span class="record-alert__icon record-alert__icon--danger">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                        <path d="M12 9v5M12 17.5h.01" />
+                                    </svg>
+                                </span>
+                                <span class="record-alert__body">
+                                    <strong>Vehicle RC07 defect unresolved</strong>
+                                    <small>Vehicle remains unavailable until reviewed.</small>
+                                </span>
+                            </a>
+
+                            <a class="record-alert" href="{{ staff_url|default('/org/staff') }}">
+                                <span class="record-alert__icon record-alert__icon--warning">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                        <path d="M12 9v5M12 17.5h.01" />
+                                    </svg>
+                                </span>
+                                <span class="record-alert__body">
+                                    <strong>Six staff records require evidence</strong>
+                                    <small>Qualifications or identity documents are incomplete.</small>
+                                </span>
+                            </a>
+
+                            <a class="record-alert" href="{{ equipment_url|default('/org/equipment') }}">
+                                <span class="record-alert__icon record-alert__icon--notice">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="M12 8v5M12 16.5h.01" />
+                                    </svg>
+                                </span>
+                                <span class="record-alert__body">
+                                    <strong>Monthly equipment audit due</strong>
+                                    <small>Complete by 31 July.</small>
+                                </span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-card operational-section" aria-labelledby="management-actions-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Management</span>
+                        <h2 id="management-actions-title">Actions requiring attention</h2>
+                    </div>
+
+                    <a class="text-link" href="{{ tasks_url|default('/org/tasks') }}">
+                        View all
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="task-list">
+                    {% if management_tasks %}
+                        {% for task in management_tasks %}
+                            <a
+                                class="task-list-item"
+                                href="{{ task.url|default(tasks_url|default('/org/tasks')) }}"
+                            >
+                                <span class="task-list-item__check" aria-hidden="true"></span>
+                                <span class="task-list-item__body">
+                                    <strong>{{ task.title }}</strong>
+                                    <small>{{ task.description }}</small>
+                                </span>
+                                <span class="task-list-item__due task-list-item__due--{{ task.urgency|default('normal') }}">
+                                    {{ task.due_label }}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <a class="task-list-item" href="{{ operations_url|default('/org/operations') }}">
+                            <span class="task-list-item__check" aria-hidden="true"></span>
+                            <span class="task-list-item__body">
+                                <strong>Fill Riverside Arena shift vacancy</strong>
+                                <small>One qualified clinician is still required for this evening.</small>
+                            </span>
+                            <span class="task-list-item__due task-list-item__due--urgent">Due 12:00</span>
+                        </a>
+
+                        <a class="task-list-item" href="{{ vehicles_url|default('/org/vehicles') }}">
+                            <span class="task-list-item__check" aria-hidden="true"></span>
+                            <span class="task-list-item__body">
+                                <strong>Review vehicle RC07 defect report</strong>
+                                <small>Engineering notes have been added for management review.</small>
+                            </span>
+                            <span class="task-list-item__due">Due today</span>
+                        </a>
+
+                        <a class="task-list-item" href="{{ staff_url|default('/org/staff') }}">
+                            <span class="task-list-item__check" aria-hidden="true"></span>
+                            <span class="task-list-item__body">
+                                <strong>Approve three new staff records</strong>
+                                <small>Pre-employment checks have been submitted.</small>
+                            </span>
+                            <span class="task-list-item__due">Due 28 Jul</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+
+        <aside class="org-dashboard-sidebar" aria-label="Organisation tools">
+            <article class="dashboard-card org-profile-card">
+                <div class="org-profile-card__identity">
+                    <span class="org-profile-card__logo" aria-hidden="true">
+                        {{ organisation.initials|default('AH') }}
+                    </span>
+                    <div>
+                        <span class="card-heading__eyebrow">Current organisation</span>
+                        <h2>
+                            {{ organisation.name|default(installation_name)|default('Ambulant Healthcare Group') }}
+                        </h2>
+                        <p>{{ organisation.service_type|default('Ambulance and medical services') }}</p>
+                    </div>
+                </div>
+
+                {% if organisation.provider_reference %}
+                    <dl class="org-profile-card__details">
+                        <div>
+                            <dt>Provider reference</dt>
+                            <dd>{{ organisation.provider_reference }}</dd>
+                        </div>
+                        {% if organisation.primary_location %}
+                            <div>
+                                <dt>Primary location</dt>
+                                <dd>{{ organisation.primary_location }}</dd>
+                            </div>
+                        {% endif %}
+                    </dl>
+                {% endif %}
+
+                <div class="profile-progress">
+                    <div class="profile-progress__label">
+                        <span>Organisation setup</span>
+                        <strong>{{ organisation_setup_completion|default(88) }}%</strong>
+                    </div>
+                    <div
+                        class="progress-bar"
+                        role="progressbar"
+                        aria-label="Organisation setup completion"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="{{ organisation_setup_completion|default(88) }}"
+                    >
+                        <span style="width: {{ organisation_setup_completion|default(88) }}%"></span>
+                    </div>
+                    <p>
+                        Complete service locations, governance records and
+                        operational settings.
+                    </p>
+                </div>
+
+                <a
+                    class="button button--secondary button--full"
+                    href="{{ organisation_settings_url|default('/org/settings') }}"
+                >
+                    Organisation settings
+                </a>
+            </article>
+
+            <section class="dashboard-card sidebar-actions" aria-labelledby="org-quick-actions-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Create and manage</span>
+                        <h2 id="org-quick-actions-title">Quick actions</h2>
+                    </div>
+                </div>
+
+                <div class="sidebar-action-list">
+                    <a class="quick-action quick-action--sidebar" href="{{ create_operation_url|default('/org/operations/new') }}">
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="5" width="18" height="16" rx="2" />
+                                <path d="M8 3v4M16 3v4M3 10h18M12 13v5M9.5 15.5h5" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Create operation</strong>
+                            <small>Event, transport or deployment</small>
+                        </span>
+                    </a>
+
+                    <a class="quick-action quick-action--sidebar" href="{{ create_shift_url|default('/org/shifts/new') }}">
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="9" cy="8" r="3" />
+                                <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                <path d="M18 7v6M15 10h6" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Schedule shift</strong>
+                            <small>Assign staff and resources</small>
+                        </span>
+                    </a>
+
+                    <a class="quick-action quick-action--sidebar" href="{{ create_staff_url|default('/org/staff/new') }}">
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="9" cy="8" r="3" />
+                                <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                                <path d="M18 7v6M15 10h6" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Add staff member</strong>
+                            <small>Create a personnel record</small>
+                        </span>
+                    </a>
+
+                    <a class="quick-action quick-action--sidebar" href="{{ vehicle_check_url|default('/org/vehicles/checks/new') }}">
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                                <circle cx="8" cy="17" r="2" />
+                                <circle cx="17" cy="17" r="2" />
+                                <path d="m18 5 1.5 1.5L22 4" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Vehicle check</strong>
+                            <small>Record readiness or defects</small>
+                        </span>
+                    </a>
+
+                    <a class="quick-action quick-action--sidebar" href="{{ broadcast_url|default('/org/messages/new') }}">
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 5h16v11H8l-4 4V5Z" />
+                                <path d="M8 9h8M8 12h5" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Send staff message</strong>
+                            <small>Publish an operational update</small>
+                        </span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="dashboard-card org-notice-card" aria-labelledby="org-notices-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Updates</span>
+                        <h2 id="org-notices-title">Organisation notices</h2>
+                    </div>
+                </div>
+
+                <div class="org-notice-list">
+                    <a href="{{ notifications_url|default('/org/notifications') }}">
+                        <span class="org-notice-list__dot"></span>
+                        <span>
+                            <strong>{{ unread_org_notifications|default(7) }} unread notifications</strong>
+                            <small>Operational and system messages</small>
+                        </span>
+                    </a>
+                    <a href="{{ audit_url|default('/org/audit') }}">
+                        <span class="org-notice-list__dot org-notice-list__dot--accent"></span>
+                        <span>
+                            <strong>Audit activity available</strong>
+                            <small>Review recent changes and approvals</small>
+                        </span>
+                    </a>
+                </div>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}

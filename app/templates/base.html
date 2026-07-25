@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Response Connect{% endblock %}</title>
+    <meta
+        name="description"
+        content="{% block meta_description %}Response Connect ambulance service management system{% endblock %}"
+    >
+    <meta name="theme-color" content="#0B1D3A">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/response-connect.css') }}"
+    >
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="topbar__inner">
+                <a
+                    class="brand"
+                    href="{{ home_url|default('/') }}"
+                    aria-label="Response Connect home"
+                >
+                    <span class="brand__mark" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" role="img">
+                            <path
+                                class="brand__outline"
+                                d="M24 3.5 40.8 13v19L24 41.5 7.2 32V13L24 3.5Z"
+                            />
+                            <circle class="brand__hub" cx="24" cy="24" r="4.5" />
+                            <path class="brand__link brand__link--top" d="M24 19.5V12.5" />
+                            <path class="brand__link brand__link--left" d="m20.2 26.5-6.1 3.6" />
+                            <path class="brand__link brand__link--right" d="m27.8 26.5 6.1 3.6" />
+                            <circle class="brand__node brand__node--top" cx="24" cy="10" r="2.8" />
+                            <circle class="brand__node brand__node--left" cx="12" cy="31.5" r="2.8" />
+                            <circle class="brand__node brand__node--right" cx="36" cy="31.5" r="2.8" />
+                        </svg>
+                    </span>
+
+                    <span class="brand__wordmark">
+                        <span>Response</span>
+                        <span>Connect</span>
+                    </span>
+                </a>
+
+                <div class="topbar__context">
+                    {% if installation_name %}
+                        <span class="installation-name">{{ installation_name }}</span>
+                    {% endif %}
+                </div>
+
+                <nav class="topbar__actions" aria-label="Account navigation">
+                    {% block topbar_actions %}
+                        <a
+                            class="icon-button"
+                            href="{{ help_url|default('/help') }}"
+                            aria-label="Help"
+                            title="Help"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M9.7 9.1a2.6 2.6 0 0 1 5 .9c0 2-2.7 2.2-2.7 4" />
+                                <path d="M12 17.4h.01" />
+                            </svg>
+                        </a>
+
+                        <details class="account-menu">
+                            <summary aria-label="Open account menu">
+                                <span class="account-menu__avatar" aria-hidden="true">
+                                    {{ current_user.initials|default('RC') }}
+                                </span>
+                                <span class="account-menu__name">
+                                    {{ current_user.display_name|default('Account') }}
+                                </span>
+                                <svg viewBox="0 0 20 20" aria-hidden="true">
+                                    <path d="m6 8 4 4 4-4" />
+                                </svg>
+                            </summary>
+
+                            <div class="account-menu__panel">
+                                <a href="{{ profile_url|default('/personal/profile') }}">
+                                    Profile
+                                </a>
+                                <a href="{{ settings_url|default('/settings') }}">
+                                    Settings
+                                </a>
+                                <a href="{{ logout_url|default('/logout') }}">
+                                    Sign out
+                                </a>
+                            </div>
+                        </details>
+                    {% endblock %}
+                </nav>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-region" aria-live="polite" aria-atomic="true">
+                    {% for category, message in messages %}
+                        <div class="flash flash--{{ category|default('info') }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main id="main-content" class="{% block main_class %}main-content{% endblock %}">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="app-footer">
+            <div class="app-footer__inner">
+                <div class="app-footer__brand">
+                    <span class="app-footer__mark" aria-hidden="true">
+                        <svg viewBox="0 0 48 48">
+                            <path
+                                class="brand__outline"
+                                d="M24 3.5 40.8 13v19L24 41.5 7.2 32V13L24 3.5Z"
+                            />
+                            <circle class="brand__hub" cx="24" cy="24" r="4.5" />
+                            <path class="brand__link brand__link--top" d="M24 19.5V12.5" />
+                            <path class="brand__link brand__link--left" d="m20.2 26.5-6.1 3.6" />
+                            <path class="brand__link brand__link--right" d="m27.8 26.5 6.1 3.6" />
+                            <circle class="brand__node brand__node--top" cx="24" cy="10" r="2.8" />
+                            <circle class="brand__node brand__node--left" cx="12" cy="31.5" r="2.8" />
+                            <circle class="brand__node brand__node--right" cx="36" cy="31.5" r="2.8" />
+                        </svg>
+                    </span>
+
+                    <span>
+                        <strong>Response <em>Connect</em></strong>
+                        <small>
+                            {{ installation_name|default('Ambulance service management') }}
+                        </small>
+                    </span>
+                </div>
+
+                <nav class="app-footer__links" aria-label="Footer navigation">
+                    {% block footer_links %}
+                        <a href="{{ help_url|default('/help') }}">Help</a>
+                        <a href="{{ accessibility_url|default('/accessibility') }}">
+                            Accessibility
+                        </a>
+                        <a href="{{ privacy_url|default('/privacy') }}">Privacy</a>
+                        <a href="{{ about_url|default('/about') }}">About</a>
+                    {% endblock %}
+                </nav>
+
+                <p class="app-footer__copyright">
+                    &copy; {{ current_year|default(2026) }} Response Connect.
+                    Open-source ambulance service management.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script
+        src="{{ url_for('static', filename='vendor/htmx.min.js') }}"
+        defer
+    ></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+
+{% block title %}Personal workspace · Response Connect{% endblock %}
+
+{% block meta_description %}
+Your personal Response Connect workspace for shifts, qualifications,
+documents and account tasks.
+{% endblock %}
+
+{% block main_class %}main-content main-content--dashboard{% endblock %}
+
+{% block content %}
+<section class="personal-dashboard" aria-labelledby="personal-dashboard-title">
+    <header class="dashboard-heading">
+        <a class="workspace-return" href="{{ workspace_url|default('/') }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 12H5" />
+                <path d="m11 18-6-6 6-6" />
+            </svg>
+            <span>All workspaces</span>
+        </a>
+
+        <div class="dashboard-heading__title-row">
+            <div>
+                <span class="eyebrow">Personal workspace</span>
+                <h1 id="personal-dashboard-title">
+                    Good {{ greeting_period|default('morning') }},
+                    {{ current_user.first_name}}
+                </h1>
+                <p>Your current operational and account overview.</p>
+            </div>
+
+            <div class="availability-status availability-status--{{ availability_code|default('available') }}">
+                <span class="availability-status__dot" aria-hidden="true"></span>
+                <span>{{ availability_label|default('Available') }}</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="personal-dashboard-layout">
+        <div class="personal-dashboard-main">
+            <section class="dashboard-card operational-section" aria-labelledby="upcoming-shifts-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Your rota</span>
+                        <h2 id="upcoming-shifts-title">Upcoming shifts</h2>
+                    </div>
+
+                    <a
+                        class="text-link"
+                        href="{{ shifts_url|default('/personal/shifts') }}"
+                    >
+                        View all shifts
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </a>
+                </div>
+
+                {% if upcoming_shifts %}
+                    <div class="upcoming-shifts-list">
+                        {% for shift in upcoming_shifts %}
+                            <a
+                                class="upcoming-shift-card"
+                                href="{{ shift.url|default(shifts_url|default('/personal/shifts')) }}"
+                            >
+                                <span class="upcoming-shift-card__date">
+                                    <small>{{ shift.date_day|default(shift.day)|default('MON') }}</small>
+                                    <strong>{{ shift.date_number|default(shift.date)|default('27') }}</strong>
+                                    <span>{{ shift.date_month|default(shift.month)|default('JUL') }}</span>
+                                </span>
+
+                                <span class="upcoming-shift-card__details">
+                                    <span class="status-pill status-pill--{{ shift.status_code|default('confirmed') }}">
+                                        {{ shift.status|default('Confirmed') }}
+                                    </span>
+
+                                    <strong>{{ shift.title|default('Frontline ambulance duty') }}</strong>
+
+                                    <span class="upcoming-shift-card__meta">
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="9" />
+                                                <path d="M12 7v5l3 2" />
+                                            </svg>
+                                            {{ shift.start_time|default('07:00') }}
+                                            – {{ shift.end_time|default('19:00') }}
+                                        </span>
+
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                                <circle cx="12" cy="10" r="2.5" />
+                                            </svg>
+                                            {{ shift.location|default('Central Operations Base') }}
+                                        </span>
+                                    </span>
+                                </span>
+
+                                <span class="upcoming-shift-card__arrow" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M5 12h14" />
+                                        <path d="m13 6 6 6-6 6" />
+                                    </svg>
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="upcoming-shifts-list">
+                        <a class="upcoming-shift-card upcoming-shift-card--featured" href="{{ shifts_url|default('/personal/shifts') }}">
+                            <span class="upcoming-shift-card__date">
+                                <small>MON</small>
+                                <strong>27</strong>
+                                <span>JUL</span>
+                            </span>
+
+                            <span class="upcoming-shift-card__details">
+                                <span class="status-pill status-pill--confirmed">Confirmed</span>
+                                <strong>Frontline ambulance duty</strong>
+
+                                <span class="upcoming-shift-card__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="9" />
+                                            <path d="M12 7v5l3 2" />
+                                        </svg>
+                                        07:00–19:00
+                                    </span>
+
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        Central Operations Base
+                                    </span>
+                                </span>
+                            </span>
+
+                            <span class="upcoming-shift-card__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+
+                        <a class="upcoming-shift-card" href="{{ shifts_url|default('/personal/shifts') }}">
+                            <span class="upcoming-shift-card__date">
+                                <small>THU</small>
+                                <strong>30</strong>
+                                <span>JUL</span>
+                            </span>
+
+                            <span class="upcoming-shift-card__details">
+                                <span class="status-pill status-pill--pending">Pending</span>
+                                <strong>Event medical cover</strong>
+
+                                <span class="upcoming-shift-card__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="9" />
+                                            <path d="M12 7v5l3 2" />
+                                        </svg>
+                                        15:00–23:30
+                                    </span>
+
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        Riverside Arena
+                                    </span>
+                                </span>
+                            </span>
+
+                            <span class="upcoming-shift-card__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+
+                        <a class="upcoming-shift-card" href="{{ shifts_url|default('/personal/shifts') }}">
+                            <span class="upcoming-shift-card__date">
+                                <small>SUN</small>
+                                <strong>02</strong>
+                                <span>AUG</span>
+                            </span>
+
+                            <span class="upcoming-shift-card__details">
+                                <span class="status-pill status-pill--confirmed">Confirmed</span>
+                                <strong>Patient transport duty</strong>
+
+                                <span class="upcoming-shift-card__meta">
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="9" />
+                                            <path d="M12 7v5l3 2" />
+                                        </svg>
+                                        08:00–18:00
+                                    </span>
+
+                                    <span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                            <circle cx="12" cy="10" r="2.5" />
+                                        </svg>
+                                        North Station
+                                    </span>
+                                </span>
+                            </span>
+
+                            <span class="upcoming-shift-card__arrow" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14" />
+                                    <path d="m13 6 6 6-6 6" />
+                                </svg>
+                            </span>
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card operational-section" aria-labelledby="compliance-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Compliance</span>
+                        <h2 id="compliance-title">Qualifications and records</h2>
+                    </div>
+
+                    <a
+                        class="text-link"
+                        href="{{ qualifications_url|default('/personal/qualifications') }}"
+                    >
+                        View all
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="compliance-summary-grid" aria-label="Compliance summary">
+                    <a
+                        class="compliance-summary"
+                        href="{{ qualifications_url|default('/personal/qualifications') }}"
+                    >
+                        <span class="summary-stat__icon summary-stat__icon--teal">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m5 12 4 4L19 6" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>{{ current_qualifications|default(8) }}</strong>
+                            <small>Current</small>
+                        </span>
+                    </a>
+
+                    <a
+                        class="compliance-summary"
+                        href="{{ qualifications_url|default('/personal/qualifications') }}"
+                    >
+                        <span class="summary-stat__icon summary-stat__icon--warning">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                <path d="M12 9v5M12 17.5h.01" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>{{ expiring_qualifications|default(2) }}</strong>
+                            <small>Expiring soon</small>
+                        </span>
+                    </a>
+
+                    <a
+                        class="compliance-summary"
+                        href="{{ documents_url|default('/personal/documents') }}"
+                    >
+                        <span class="summary-stat__icon summary-stat__icon--accent">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 2.8h8l4 4V21H6Z" />
+                                <path d="M14 3v5h5" />
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>{{ document_count|default(12) }}</strong>
+                            <small>Documents</small>
+                        </span>
+                    </a>
+                </div>
+
+                {% if qualification_alerts %}
+                    <div class="dashboard-list compliance-alerts">
+                        {% for qualification in qualification_alerts %}
+                            <a
+                                class="record-alert"
+                                href="{{ qualification.url|default(qualifications_url|default('/personal/qualifications')) }}"
+                            >
+                                <span class="record-alert__icon record-alert__icon--{{ qualification.level|default('warning') }}">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                        <path d="M12 9v5M12 17.5h.01" />
+                                    </svg>
+                                </span>
+
+                                <span class="record-alert__body">
+                                    <strong>{{ qualification.name }}</strong>
+                                    <small>{{ qualification.message }}</small>
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="dashboard-list compliance-alerts">
+                        <a class="record-alert" href="{{ qualifications_url|default('/personal/qualifications') }}">
+                            <span class="record-alert__icon record-alert__icon--warning">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 3 2.8 20h18.4L12 3Z" />
+                                    <path d="M12 9v5M12 17.5h.01" />
+                                </svg>
+                            </span>
+
+                            <span class="record-alert__body">
+                                <strong>Safeguarding Adults – Level 2</strong>
+                                <small>Expires in 28 days</small>
+                            </span>
+                        </a>
+
+                        <a class="record-alert" href="{{ qualifications_url|default('/personal/qualifications') }}">
+                            <span class="record-alert__icon record-alert__icon--notice">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <path d="M12 8v5M12 16.5h.01" />
+                                </svg>
+                            </span>
+
+                            <span class="record-alert__body">
+                                <strong>Driving licence check</strong>
+                                <small>Evidence review due in 54 days</small>
+                            </span>
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card operational-section" aria-labelledby="personal-actions-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Action required</span>
+                        <h2 id="personal-actions-title">Your actions</h2>
+                    </div>
+
+                    <a
+                        class="text-link"
+                        href="{{ tasks_url|default('/personal/tasks') }}"
+                    >
+                        View all
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </a>
+                </div>
+
+                {% if personal_tasks %}
+                    <div class="task-list">
+                        {% for task in personal_tasks %}
+                            <a
+                                class="task-list-item"
+                                href="{{ task.url|default(tasks_url|default('/personal/tasks')) }}"
+                            >
+                                <span class="task-list-item__check" aria-hidden="true"></span>
+
+                                <span class="task-list-item__body">
+                                    <strong>{{ task.title }}</strong>
+                                    <small>{{ task.description }}</small>
+                                </span>
+
+                                <span class="task-list-item__due task-list-item__due--{{ task.urgency|default('normal') }}">
+                                    {{ task.due_label }}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="task-list">
+                        <a class="task-list-item" href="{{ profile_url|default('/personal/profile') }}">
+                            <span class="task-list-item__check" aria-hidden="true"></span>
+
+                            <span class="task-list-item__body">
+                                <strong>Confirm your emergency contact</strong>
+                                <small>Review the contact information held on your profile.</small>
+                            </span>
+
+                            <span class="task-list-item__due task-list-item__due--urgent">
+                                Due today
+                            </span>
+                        </a>
+
+                        <a class="task-list-item" href="{{ documents_url|default('/personal/documents') }}">
+                            <span class="task-list-item__check" aria-hidden="true"></span>
+
+                            <span class="task-list-item__body">
+                                <strong>Upload renewed safeguarding certificate</strong>
+                                <small>Add the latest certificate to your personal documents.</small>
+                            </span>
+
+                            <span class="task-list-item__due">Due 31 Jul</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <aside class="personal-dashboard-sidebar" aria-label="Personal account sidebar">
+            <article class="dashboard-card profile-summary profile-summary--sidebar">
+                <div class="profile-summary__identity">
+                    <span class="profile-summary__avatar" aria-hidden="true">
+                        {{ current_user.initials|default('AS') }}
+                    </span>
+
+                    <div>
+                        <h2>{{ current_user.display_name|default('Alex Smith') }}</h2>
+                        <p>{{ current_user.job_title|default('Emergency Care Assistant') }}</p>
+
+                        {% if current_user.employee_number %}
+                            <span class="profile-summary__reference">
+                                Staff ID {{ current_user.employee_number }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-progress">
+                    <div class="profile-progress__label">
+                        <span>Profile completion</span>
+                        <strong>{{ profile_completion|default(82) }}%</strong>
+                    </div>
+
+                    <div
+                        class="progress-bar"
+                        role="progressbar"
+                        aria-label="Profile completion"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="{{ profile_completion|default(82) }}"
+                    >
+                        <span style="width: {{ profile_completion|default(82) }}%"></span>
+                    </div>
+
+                    <p>
+                        Keep your contact details, emergency information and
+                        employment records up to date.
+                    </p>
+                </div>
+
+                <a
+                    class="button button--secondary button--full"
+                    href="{{ profile_url|default('/personal/profile') }}"
+                >
+                    Review your profile
+                </a>
+            </article>
+
+            <section class="dashboard-card sidebar-actions" aria-labelledby="quick-actions-title">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">Common tasks</span>
+                        <h2 id="quick-actions-title">Quick actions</h2>
+                    </div>
+                </div>
+
+                <div class="sidebar-action-list">
+                    <a
+                        class="quick-action quick-action--sidebar"
+                        href="{{ availability_url|default('/personal/availability') }}"
+                    >
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="5" width="18" height="16" rx="2" />
+                                <path d="M8 3v4M16 3v4M3 10h18M8 15h3M13 15h3" />
+                            </svg>
+                        </span>
+
+                        <span>
+                            <strong>Availability</strong>
+                            <small>Set when you can work</small>
+                        </span>
+                    </a>
+
+                    <a
+                        class="quick-action quick-action--sidebar"
+                        href="{{ qualifications_url|default('/personal/qualifications') }}"
+                    >
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z" />
+                                <path d="M7 10v5.5c3 2 7 2 10 0V10" />
+                                <path d="M20 8v6" />
+                            </svg>
+                        </span>
+
+                        <span>
+                            <strong>Qualifications</strong>
+                            <small>Review training records</small>
+                        </span>
+                    </a>
+
+                    <a
+                        class="quick-action quick-action--sidebar"
+                        href="{{ documents_url|default('/personal/documents') }}"
+                    >
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 2.8h8l4 4V21H6Z" />
+                                <path d="M14 3v5h5M9 13h6M9 17h5" />
+                            </svg>
+                        </span>
+
+                        <span>
+                            <strong>Documents</strong>
+                            <small>Access personal files</small>
+                        </span>
+                    </a>
+
+                    <a
+                        class="quick-action quick-action--sidebar"
+                        href="{{ expenses_url|default('/personal/expenses') }}"
+                    >
+                        <span class="quick-action__icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="5" width="18" height="14" rx="2" />
+                                <path d="M3 9h18M7 15h3" />
+                            </svg>
+                        </span>
+
+                        <span>
+                            <strong>Expenses</strong>
+                            <small>Submit a new claim</small>
+                        </span>
+                    </a>
+                </div>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}

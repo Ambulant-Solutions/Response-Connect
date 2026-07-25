@@ -6,10 +6,35 @@ A Flask application scaffold that uses blueprints, SQLAlchemy, and Docker Compos
 
 1. Copy the example environment file:
    `cp .env.example .env`
-2. Start the stack:
+2. Start the production stack:
    `docker compose up --build`
 3. Open the app at:
    `http://localhost:8000/`
+
+For local development with live reloading, use the development override file:
+`docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
+
+The development override bind-mounts the repository into the web container and starts Flask in debug mode, so changes to Python, templates, and static assets are reloaded automatically.
+
+## Migration workflow
+
+This project uses Alembic for database schema versioning.
+
+The Alembic environment loads the same `.env` values as the Flask app, so the database connection is driven by the same secrets and configuration. Do not hardcode credentials in the repo.
+
+Apply the latest schema:
+`alembic upgrade head`
+
+Create a new migration after changing a model:
+`alembic revision --autogenerate -m "describe your change"`
+
+## Initial admin bootstrap
+
+Create the first administrator account from the command line:
+
+`docker compose exec web flask create-admin --email admin@example.com --password ChangeMe123! --first-name System --last-name Administrator`
+
+This command seeds the hardwired permission catalog, creates the default `admin` and `staff` roles, and assigns the admin role to the initial user.
 
 ## Application structure
 

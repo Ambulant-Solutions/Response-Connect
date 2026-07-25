@@ -1,8 +1,12 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template
 
 from app.blueprints.org.models import Organisation  # noqa: F401
 
 org_bp = Blueprint("org", __name__, url_prefix="/org")
+
+@org_bp.get("/")
+def org():
+    return render_template("org/org.html", current_user=None, organisation=None)
 
 
 @org_bp.get("/admin")
