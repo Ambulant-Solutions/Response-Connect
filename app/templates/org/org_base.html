@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block app_subnav %}
+<nav class="org-admin-nav" aria-label="Organisation administration">
+    <div class="org-admin-nav__scroll">
+        <div class="org-admin-nav__inner">
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'overview' %} is-active{% endif %}"
+                href="{{ org_home_url|default('/org') }}"
+                aria-label="Overview"
+                {% if active_org_section|default('overview') == 'overview' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Overview</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Overview</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'operations' %} is-active{% endif %}"
+                href="{{ operations_url|default('/org/operations') }}"
+                aria-label="Operations"
+                {% if active_org_section|default('overview') == 'operations' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M8 3v4M16 3v4M3 10h18" />
+                        <path d="M8 14h3M13 14h3M8 17h3" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Operations</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Operations</span>
+                {% if operations_alert_count|default(0) %}
+                    <span class="org-admin-nav__badge">
+                        {{ operations_alert_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'people' %} is-active{% endif %}"
+                href="{{ staff_url|default('/org/staff') }}"
+                aria-label="People"
+                {% if active_org_section|default('overview') == 'people' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="9" cy="8" r="3" />
+                        <circle cx="17" cy="9" r="2.5" />
+                        <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
+                        <path d="M15 14c3.4.1 5.2 2.1 5.8 6" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">People</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">People</span>
+                {% if people_alert_count|default(0) %}
+                    <span class="org-admin-nav__badge">
+                        {{ people_alert_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'vehicles' %} is-active{% endif %}"
+                href="{{ vehicles_url|default('/org/vehicles') }}"
+                aria-label="Vehicles"
+                {% if active_org_section|default('overview') == 'vehicles' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
+                        <path d="M17 10h2l2 3v4h-3M3 17h3M10 17h5" />
+                        <circle cx="8" cy="17" r="2" />
+                        <circle cx="17" cy="17" r="2" />
+                        <path d="M7 10h6M10 7v6" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Vehicles</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Vehicles</span>
+                {% if vehicle_alert_count|default(0) %}
+                    <span class="org-admin-nav__badge org-admin-nav__badge--warning">
+                        {{ vehicle_alert_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'equipment' %} is-active{% endif %}"
+                href="{{ equipment_url|default('/org/equipment') }}"
+                aria-label="Equipment"
+                {% if active_org_section|default('overview') == 'equipment' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 8h14v12H5Z" />
+                        <path d="M8 8V5h8v3M9 13h6M12 10v6" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Equipment</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Equipment</span>
+                {% if equipment_alert_count|default(0) %}
+                    <span class="org-admin-nav__badge org-admin-nav__badge--warning">
+                        {{ equipment_alert_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'compliance' %} is-active{% endif %}"
+                href="{{ compliance_url|default('/org/compliance') }}"
+                aria-label="Compliance"
+                {% if active_org_section|default('overview') == 'compliance' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3 19 6v5c0 4.5-2.5 7.8-7 10-4.5-2.2-7-5.5-7-10V6l7-3Z" />
+                        <path d="m8.5 12 2.2 2.2 4.8-5" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Compliance</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Compliance</span>
+                {% if compliance_alert_count|default(0) %}
+                    <span class="org-admin-nav__badge org-admin-nav__badge--danger">
+                        {{ compliance_alert_count }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'reports' %} is-active{% endif %}"
+                href="{{ reports_url|default('/org/reports') }}"
+                aria-label="Reports"
+                {% if active_org_section|default('overview') == 'reports' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 20V10M12 20V4M19 20v-7" />
+                        <path d="M3 20h18" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Reports</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Reports</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'settings' %} is-active{% endif %}"
+                href="{{ organisation_settings_url|default('/org/settings') }}"
+                aria-label="Settings"
+                {% if active_org_section|default('overview') == 'settings' %}aria-current="page"{% endif %}
+            >
+                <span class="org-admin-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" />
+                    </svg>
+                </span>
+                <span class="org-admin-nav__label">Settings</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Settings</span>
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock %}

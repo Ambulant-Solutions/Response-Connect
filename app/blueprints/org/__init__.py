@@ -6,8 +6,14 @@ org_bp = Blueprint("org", __name__, url_prefix="/org")
 
 @org_bp.get("/")
 def org():
-    return render_template("org/org.html", current_user=None, organisation=None)
-
+    return render_template(
+        "org/org.html",
+        organisation="Test Install",
+        active_org_section="overview",
+        compliance_alert_count=4,
+        vehicle_alert_count=1,
+        operations_alert_count=2,
+    )
 
 @org_bp.get("/admin")
 def admin():

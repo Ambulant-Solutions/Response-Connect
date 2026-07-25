@@ -2866,3 +2866,358 @@ svg {
     }
 }
 
+/* Organisation administration navigation
+   ========================================================================== */
+
+:root {
+    --rc-org-nav-height: 4.75rem;
+}
+
+.org-admin-nav {
+    position: sticky;
+    z-index: 80;
+    top: var(--rc-topbar-height);
+    height: var(--rc-org-nav-height);
+    background:
+        linear-gradient(
+            180deg,
+            rgb(16 34 61 / 98%),
+            rgb(11 29 58 / 96%)
+        );
+    border-bottom: 1px solid rgb(170 183 200 / 12%);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
+    backdrop-filter: blur(16px);
+}
+
+.org-admin-nav__scroll {
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(170 183 200 / 22%) transparent;
+    overscroll-behavior-inline: contain;
+}
+
+.org-admin-nav__scroll::-webkit-scrollbar {
+    height: 0.35rem;
+}
+
+.org-admin-nav__scroll::-webkit-scrollbar-thumb {
+    background: rgb(170 183 200 / 22%);
+    border-radius: 999px;
+}
+
+.org-admin-nav__inner {
+    width: max-content;
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 0.2rem;
+    padding: 0.45rem clamp(1rem, 2.4vw, 2.25rem);
+}
+
+.org-admin-nav__item {
+    position: relative;
+    min-width: 6.25rem;
+    height: 3.75rem;
+    display: grid;
+    grid-template-columns: 1.35rem auto;
+    grid-template-rows: 1fr;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--rc-text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease;
+}
+
+.org-admin-nav__item:hover {
+    color: var(--rc-sky);
+    background: rgb(230 242 247 / 6%);
+    border-color: rgb(230 242 247 / 9%);
+}
+
+.org-admin-nav__item.is-active {
+    color: white;
+    background:
+        linear-gradient(
+            135deg,
+            rgb(14 165 160 / 18%),
+            rgb(99 102 241 / 12%)
+        );
+    border-color: rgb(14 165 160 / 32%);
+    box-shadow:
+        inset 0 -2px 0 var(--rc-teal),
+        0 8px 20px rgb(0 0 0 / 12%);
+}
+
+.org-admin-nav__item.is-active::after {
+    content: "";
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.32rem;
+    left: 0.7rem;
+    height: 0.12rem;
+    background: linear-gradient(90deg, var(--rc-teal), var(--rc-accent));
+    border-radius: 999px;
+}
+
+.org-admin-nav__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: grid;
+    place-items: center;
+    color: currentColor;
+}
+
+.org-admin-nav__icon svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.org-admin-nav__label {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.005em;
+}
+
+.org-admin-nav__badge {
+    position: absolute;
+    top: 0.26rem;
+    right: 0.28rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    display: grid;
+    place-items: center;
+    padding-inline: 0.25rem;
+    color: white;
+    background: var(--rc-accent);
+    border: 2px solid #10223d;
+    border-radius: 999px;
+    font-size: 0.58rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.org-admin-nav__badge--warning {
+    color: #261600;
+    background: #f5b942;
+}
+
+.org-admin-nav__badge--danger {
+    background: var(--rc-danger);
+}
+
+.org-admin-nav ~ .flash-region {
+    top: calc(
+        var(--rc-topbar-height) +
+        var(--rc-org-nav-height) +
+        1rem
+    );
+}
+
+@media (max-width: 760px) {
+    :root {
+        --rc-org-nav-height: 4.45rem;
+    }
+
+    .org-admin-nav__inner {
+        justify-content: flex-start;
+        padding-inline: 0.75rem;
+    }
+
+    .org-admin-nav__item {
+        min-width: 4.75rem;
+        height: 3.45rem;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1.25rem auto;
+        gap: 0.2rem;
+        padding: 0.4rem 0.55rem;
+        text-align: center;
+    }
+
+    .org-admin-nav__icon {
+        justify-self: center;
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .org-admin-nav__label {
+        font-size: 0.65rem;
+    }
+
+    .org-admin-nav__badge {
+        top: 0.15rem;
+        right: 0.15rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .org-admin-nav__item {
+        min-width: 4.4rem;
+    }
+}
+
+/* Organisation icon-only navigation revision
+   ========================================================================== */
+
+:root {
+    --rc-org-nav-height: 5.6rem;
+}
+
+.org-admin-nav {
+    overflow: visible;
+}
+
+.org-admin-nav__scroll {
+    overflow-y: visible;
+}
+
+.org-admin-nav__inner {
+    align-items: center;
+    gap: 0.55rem;
+    overflow: visible;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+}
+
+.org-admin-nav__item {
+    position: relative;
+    min-width: 4.35rem;
+    width: 4.35rem;
+    height: 4.35rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    place-items: center;
+    padding: 0;
+    border-radius: 1rem;
+}
+
+.org-admin-nav__item.is-active::after {
+    right: 0.7rem;
+    bottom: 0.28rem;
+    left: 0.7rem;
+}
+
+.org-admin-nav__icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.org-admin-nav__item.is-active .org-admin-nav__icon {
+    transform: scale(1.08);
+}
+
+.org-admin-nav__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    margin: -1px;
+    padding: 0;
+    white-space: nowrap;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    border: 0;
+}
+
+.org-admin-nav__tooltip {
+    position: absolute;
+    z-index: 120;
+    top: calc(100% + 0.65rem);
+    left: 50%;
+    min-width: max-content;
+    max-width: 14rem;
+    padding: 0.5rem 0.7rem;
+    color: var(--rc-text);
+    background: #071426;
+    border: 1px solid rgb(170 183 200 / 18%);
+    border-radius: 0.55rem;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 32%);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -0.25rem);
+    transition:
+        opacity 130ms ease,
+        transform 130ms ease;
+}
+
+.org-admin-nav__tooltip::before {
+    content: "";
+    position: absolute;
+    top: -0.32rem;
+    left: 50%;
+    width: 0.58rem;
+    height: 0.58rem;
+    background: #071426;
+    border-top: 1px solid rgb(170 183 200 / 18%);
+    border-left: 1px solid rgb(170 183 200 / 18%);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.org-admin-nav__item:hover .org-admin-nav__tooltip,
+.org-admin-nav__item:focus-visible .org-admin-nav__tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.org-admin-nav__badge {
+    top: 0.2rem;
+    right: 0.2rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.6rem;
+}
+
+@media (max-width: 760px) {
+    :root {
+        --rc-org-nav-height: 5rem;
+    }
+
+    .org-admin-nav__inner {
+        gap: 0.4rem;
+        padding-inline: 0.75rem;
+    }
+
+    .org-admin-nav__item {
+        min-width: 3.85rem;
+        width: 3.85rem;
+        height: 3.85rem;
+    }
+
+    .org-admin-nav__icon {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .org-admin-nav__tooltip {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .org-admin-nav__item {
+        min-width: 3.7rem;
+        width: 3.7rem;
+    }
+}
