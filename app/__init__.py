@@ -16,6 +16,8 @@ from app.blueprints.personal import personal_bp
 from app.config import Config
 from app.extensions import db, login_manager, migrate
 
+from app.blueprints.org.services import get_current_organisation
+
 
 HARDWIRED_PERMISSIONS = (
     ("auth:manage_users", "Manage users and access control", "auth"),
@@ -46,6 +48,12 @@ def create_app() -> Flask:
             return db.session.get(UserAccount, uuid.UUID(str(user_id)))
         except (TypeError, ValueError):
             return None
+
+    @app.context_processor
+    def inject_organisation():
+        return {
+            "current_organisation": get_current_organisation(),
+        }
 
     @app.cli.command("create-admin")
     @click.option("--email", required=True, prompt=True, help="Primary email address for the initial administrator account.")

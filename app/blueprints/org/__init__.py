@@ -45,10 +45,7 @@ def org():
     return render_template(
         "org/org.html",
         organisation="Test Install",
-        active_org_section="overview",
-        compliance_alert_count=4,
-        vehicle_alert_count=1,
-        operations_alert_count=2,
+        active_org_section="overview"
     )
 
 @org_bp.get("/admin")

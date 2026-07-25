@@ -25,6 +25,6 @@ def fleet():
             "Insurance and compliance documents",
             "Vehicle allocation to operations",
         ],
-        return_url=url_for("org.admin"),
+        return_url=url_for("org.org"),
         return_label="Return to organisation overview",
     )
