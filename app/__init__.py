@@ -14,7 +14,7 @@ from app.blueprints.main import main_bp
 from app.blueprints.org import org_bp
 from app.blueprints.personal import personal_bp
 from app.config import Config
-from app.extensions import db, login_manager
+from app.extensions import db, login_manager, migrate
 
 
 HARDWIRED_PERMISSIONS = (
@@ -34,6 +34,7 @@ def create_app() -> Flask:
     app.config.from_object(Config)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Please sign in to continue."

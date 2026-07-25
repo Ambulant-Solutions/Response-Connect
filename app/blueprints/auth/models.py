@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 
 from flask_login import UserMixin
-from sqlalchemy import Boolean, ForeignKey, String, Table
+from sqlalchemy import Boolean, Column, ForeignKey, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,16 +13,35 @@ from app.extensions import db
 user_roles = Table(
     "user_roles",
     db.metadata,
-    mapped_column("user_id", UUID(as_uuid=True), ForeignKey("user_accounts.id"), primary_key=True),
-    mapped_column("role_id", UUID(as_uuid=True), ForeignKey("roles.id"), primary_key=True),
+    Column(
+        "user_id",
+        UUID(as_uuid=True),
+        ForeignKey("user_accounts.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "role_id",
+        UUID(as_uuid=True),
+        ForeignKey("roles.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
-
 
 role_permissions = Table(
     "role_permissions",
     db.metadata,
-    mapped_column("role_id", UUID(as_uuid=True), ForeignKey("roles.id"), primary_key=True),
-    mapped_column("permission_id", UUID(as_uuid=True), ForeignKey("permissions.id"), primary_key=True),
+    Column(
+        "role_id",
+        UUID(as_uuid=True),
+        ForeignKey("roles.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "permission_id",
+        UUID(as_uuid=True),
+        ForeignKey("permissions.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 
