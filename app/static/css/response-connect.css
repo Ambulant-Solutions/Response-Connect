@@ -2980,16 +2980,6 @@ svg {
     color: currentColor;
 }
 
-.org-admin-nav__icon svg {
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
 .org-admin-nav__label {
     font-size: 0.74rem;
     font-weight: 800;
@@ -3206,8 +3196,11 @@ svg {
     }
 
     .org-admin-nav__icon {
-        width: 1.75rem;
-        height: 1.75rem;
+        display: block;
+        width: 2.25rem;
+        height: 2.25rem;
+        color: currentColor;
+        font-size: 2.25rem;
     }
 
     .org-admin-nav__tooltip {
@@ -3219,5 +3212,212 @@ svg {
     .org-admin-nav__item {
         min-width: 3.7rem;
         width: 3.7rem;
+    }
+}
+
+/* Tooltip overflow fix
+   The scroll wrapper must not create a clipping region on desktop.
+   Horizontal scrolling is restored only on narrow touch layouts. */
+
+.org-admin-nav__scroll {
+    overflow: visible;
+}
+
+.org-admin-nav__inner {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 760px) {
+    .org-admin-nav__scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .org-admin-nav__inner {
+        width: max-content;
+        min-width: 100%;
+    }
+}
+
+/* Iconify component support
+   ==========================================================================
+   Load the Iconify web component in base.html, then use:
+   <iconify-icon icon="tabler:layout-dashboard" aria-hidden="true"></iconify-icon>
+   ========================================================================== */
+
+iconify-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    color: currentColor;
+    font-size: inherit;
+    line-height: 1;
+    vertical-align: -0.125em;
+}
+
+/* Icon-only controls */
+
+.icon-button iconify-icon {
+    width: 1.3rem;
+    height: 1.3rem;
+    font-size: 1.3rem;
+}
+
+.account-menu summary > iconify-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    transition: transform 150ms ease;
+}
+
+.account-menu[open] summary > iconify-icon {
+    transform: rotate(180deg);
+}
+
+/* Workspace selector */
+
+.workspace-card__icon iconify-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 2.35rem;
+}
+
+.workspace-card__arrow iconify-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    font-size: 1.2rem;
+}
+
+/* Shared links and buttons */
+
+.workspace-return iconify-icon,
+.text-link iconify-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+}
+
+.button iconify-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    font-size: 1.2rem;
+}
+
+.button--compact iconify-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+}
+
+/* Authentication */
+
+.auth-layout__assurance iconify-icon,
+.form-control-icon iconify-icon,
+.form-alert iconify-icon,
+.check-control__box iconify-icon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+}
+
+.auth-card__icon iconify-icon {
+    width: 1.45rem;
+    height: 1.45rem;
+    font-size: 1.45rem;
+}
+
+.form-alert iconify-icon {
+    flex: 0 0 auto;
+    margin-top: 0.05rem;
+}
+
+/* Personal dashboard */
+
+.card-heading__icon iconify-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 1.35rem;
+}
+
+.next-shift__location iconify-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex: 0 0 auto;
+    font-size: 0.95rem;
+}
+
+.quick-action__icon iconify-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 1.6rem;
+}
+
+.summary-stat__icon iconify-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
+}
+
+.record-alert__icon iconify-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    font-size: 1.2rem;
+}
+
+.upcoming-shift-card__meta iconify-icon,
+.upcoming-shift-card__arrow iconify-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+    font-size: 0.95rem;
+}
+
+/* Organisation dashboard */
+
+.org-kpi-card__icon iconify-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.org-operation__type iconify-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
+}
+
+.org-operation__meta iconify-icon,
+.org-operation__arrow iconify-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    font-size: 0.9rem;
+}
+
+/* Organisation administration selector */
+
+.org-admin-nav__item > iconify-icon,
+.org-admin-nav__item > .org-admin-nav__icon {
+    display: block;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: currentColor;
+    font-size: 2.25rem;
+    transition:
+        color 150ms ease,
+        transform 150ms ease;
+}
+
+.org-admin-nav__item.is-active > iconify-icon,
+.org-admin-nav__item.is-active > .org-admin-nav__icon {
+    transform: scale(1.08);
+}
+
+@media (max-width: 760px) {
+    .org-admin-nav__item > iconify-icon,
+    .org-admin-nav__item > .org-admin-nav__icon {
+        width: 2rem;
+        height: 2rem;
+        font-size: 2rem;
     }
 }

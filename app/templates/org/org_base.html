@@ -10,14 +10,11 @@
                 aria-label="Overview"
                 {% if active_org_section|default('overview') == 'overview' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="7" height="7" rx="1" />
-                        <rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" />
-                        <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:layout-dashboard"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Overview</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Overview</span>
             </a>
@@ -28,13 +25,11 @@
                 aria-label="Operations"
                 {% if active_org_section|default('overview') == 'operations' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="3" y="5" width="18" height="16" rx="2" />
-                        <path d="M8 3v4M16 3v4M3 10h18" />
-                        <path d="M8 14h3M13 14h3M8 17h3" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:calendar-event"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Operations</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Operations</span>
                 {% if operations_alert_count|default(0) %}
@@ -50,14 +45,11 @@
                 aria-label="People"
                 {% if active_org_section|default('overview') == 'people' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <circle cx="9" cy="8" r="3" />
-                        <circle cx="17" cy="9" r="2.5" />
-                        <path d="M3.5 20c.8-4.7 3.1-7 7-7s6.2 2.3 7 7" />
-                        <path d="M15 14c3.4.1 5.2 2.1 5.8 6" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:users"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">People</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">People</span>
                 {% if people_alert_count|default(0) %}
@@ -73,15 +65,11 @@
                 aria-label="Vehicles"
                 {% if active_org_section|default('overview') == 'vehicles' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3 15V8.5A2.5 2.5 0 0 1 5.5 6h9A2.5 2.5 0 0 1 17 8.5V15" />
-                        <path d="M17 10h2l2 3v4h-3M3 17h3M10 17h5" />
-                        <circle cx="8" cy="17" r="2" />
-                        <circle cx="17" cy="17" r="2" />
-                        <path d="M7 10h6M10 7v6" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:ambulance"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Vehicles</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Vehicles</span>
                 {% if vehicle_alert_count|default(0) %}
@@ -97,12 +85,11 @@
                 aria-label="Equipment"
                 {% if active_org_section|default('overview') == 'equipment' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M5 8h14v12H5Z" />
-                        <path d="M8 8V5h8v3M9 13h6M12 10v6" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:medical-cross"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Equipment</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Equipment</span>
                 {% if equipment_alert_count|default(0) %}
@@ -118,12 +105,11 @@
                 aria-label="Compliance"
                 {% if active_org_section|default('overview') == 'compliance' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 3 19 6v5c0 4.5-2.5 7.8-7 10-4.5-2.2-7-5.5-7-10V6l7-3Z" />
-                        <path d="m8.5 12 2.2 2.2 4.8-5" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:shield-check"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Compliance</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Compliance</span>
                 {% if compliance_alert_count|default(0) %}
