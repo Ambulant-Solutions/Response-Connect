@@ -11,34 +11,6 @@ in Response Connect.
 
 {% block content %}
 <section class="org-dashboard" aria-labelledby="org-dashboard-title">
-    <header class="dashboard-heading org-dashboard-heading">
-        <a class="workspace-return" href="{{ workspace_url|default('/') }}">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M19 12H5" />
-                <path d="m11 18-6-6 6-6" />
-            </svg>
-            <span>All workspaces</span>
-        </a>
-
-        <div class="dashboard-heading__title-row">
-            <div>
-                <span class="eyebrow">Organisation workspace</span>
-                <h1 id="org-dashboard-title">
-                    {{ organisation.name|default(installation_name)|default('Ambulant Healthcare Group') }}
-                </h1>
-                <p>
-                    Operational overview for
-                    {{ dashboard_date_label|default('today') }}.
-                </p>
-            </div>
-
-            <div class="availability-status availability-status--available">
-                <span class="availability-status__dot" aria-hidden="true"></span>
-                <span>{{ service_status_label|default('Service operational') }}</span>
-            </div>
-        </div>
-    </header>
-
     <div class="org-dashboard-layout">
         <div class="org-dashboard-main">
             <section class="org-kpi-grid" aria-label="Organisation overview">

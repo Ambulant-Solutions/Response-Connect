@@ -61,17 +61,17 @@
 
             <a
                 class="org-admin-nav__item{% if active_org_section|default('overview') == 'vehicles' %} is-active{% endif %}"
-                href="{{ vehicles_url|default('/org/vehicles') }}"
+                href="{{ vehicles_url|default('/org/fleet') }}"
                 aria-label="Vehicles"
-                {% if active_org_section|default('overview') == 'vehicles' %}aria-current="page"{% endif %}
+                {% if active_org_section|default('overview') == 'fleet' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
                     icon="tabler:ambulance"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">Vehicles</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">Vehicles</span>
+                <span class="org-admin-nav__label">Fleet</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Fleet</span>
                 {% if vehicle_alert_count|default(0) %}
                     <span class="org-admin-nav__badge org-admin-nav__badge--warning">
                         {{ vehicle_alert_count }}
@@ -125,12 +125,11 @@
                 aria-label="Reports"
                 {% if active_org_section|default('overview') == 'reports' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M5 20V10M12 20V4M19 20v-7" />
-                        <path d="M3 20h18" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:chart-bar"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Reports</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Reports</span>
             </a>
@@ -141,12 +140,11 @@
                 aria-label="Settings"
                 {% if active_org_section|default('overview') == 'settings' %}aria-current="page"{% endif %}
             >
-                <span class="org-admin-nav__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" />
-                    </svg>
-                </span>
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:settings"
+                    aria-hidden="true"
+                ></iconify-icon>
                 <span class="org-admin-nav__label">Settings</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Settings</span>
             </a>

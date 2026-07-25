@@ -2,7 +2,11 @@ from flask import Blueprint, jsonify, render_template
 
 from app.blueprints.org.models import Organisation  # noqa: F401
 
+from app.blueprints.org.fleet import fleet_bp  # noqa: F401
+
 org_bp = Blueprint("org", __name__, url_prefix="/org")
+
+org_bp.register_blueprint(fleet_bp)
 
 @org_bp.get("/")
 def org():
