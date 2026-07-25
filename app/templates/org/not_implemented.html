@@ -1,0 +1,132 @@
+{% extends "org/org_base.html" %}
+
+{% block title %}
+    {{ section_title|default("Section not implemented") }} · Response Connect
+{% endblock %}
+
+{% block meta_description %}
+    {{ section_description|default(
+        "This Response Connect organisation section is not yet implemented."
+    ) }}
+{% endblock %}
+
+{% block main_class %}main-content main-content--not-implemented{% endblock %}
+
+{% block content %}
+<section
+    class="not-implemented-page"
+    aria-labelledby="not-implemented-title"
+>
+    <article class="not-implemented-card">
+        <div class="not-implemented-card__visual" aria-hidden="true">
+            <span class="not-implemented-card__glow"></span>
+
+            <span class="not-implemented-card__icon">
+                <iconify-icon
+                    icon="{{ section_icon|default('tabler:tools') }}"
+                ></iconify-icon>
+            </span>
+
+            <span class="not-implemented-card__visual-label">
+                Response Connect
+            </span>
+        </div>
+
+        <div class="not-implemented-card__content">
+            <span class="not-implemented-status">
+                <iconify-icon
+                    icon="tabler:clock-code"
+                    aria-hidden="true"
+                ></iconify-icon>
+                {{ status_label|default("Coming soon") }}
+            </span>
+
+            <span class="eyebrow">
+                {{ section_eyebrow|default("Organisation administration") }}
+            </span>
+
+            <h1 id="not-implemented-title">
+                {{ section_title|default("This section is not yet available") }}
+            </h1>
+
+            <p class="not-implemented-card__description">
+                {{ section_description|default(
+                    "This part of Response Connect is planned, but has not "
+                    "yet been implemented. You can continue using the other "
+                    "organisation areas while development is completed."
+                ) }}
+            </p>
+
+            {% if release_note %}
+                <div class="not-implemented-note">
+                    <iconify-icon
+                        icon="tabler:calendar-time"
+                        aria-hidden="true"
+                    ></iconify-icon>
+
+                    <span>
+                        <strong>Development status</strong>
+                        <small>{{ release_note }}</small>
+                    </span>
+                </div>
+            {% endif %}
+
+            {% if planned_features %}
+                <div class="not-implemented-features">
+                    <h2>{{ features_title|default("Planned capabilities") }}</h2>
+
+                    <ul>
+                        {% for feature in planned_features %}
+                            <li>
+                                <iconify-icon
+                                    icon="tabler:circle-dashed-check"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                                <span>{{ feature }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="not-implemented-actions">
+                <a
+                    class="button button--primary"
+                    href="{{ return_url|default('/org') }}"
+                >
+                    <iconify-icon
+                        icon="tabler:arrow-left"
+                        aria-hidden="true"
+                    ></iconify-icon>
+                    {{ return_label|default("Return to organisation overview") }}
+                </a>
+
+                {% if secondary_url %}
+                    <a
+                        class="button button--secondary"
+                        href="{{ secondary_url }}"
+                    >
+                        <iconify-icon
+                            icon="{{ secondary_icon|default('tabler:map') }}"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                        {{ secondary_label|default("View development roadmap") }}
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if support_message %}
+                <p class="not-implemented-support">
+                    {{ support_message }}
+
+                    {% if support_url %}
+                        <a href="{{ support_url }}">
+                            {{ support_label|default("Contact support") }}
+                        </a>
+                    {% endif %}
+                </p>
+            {% endif %}
+        </div>
+    </article>
+</section>
+{% endblock %}

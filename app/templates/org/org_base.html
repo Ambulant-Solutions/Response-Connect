@@ -20,54 +20,104 @@
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'operations' %} is-active{% endif %}"
-                href="{{ operations_url|default('/org/operations') }}"
-                aria-label="Operations"
-                {% if active_org_section|default('overview') == 'operations' %}aria-current="page"{% endif %}
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'audit' %} is-active{% endif %}"
+                href="/org/audit"
+                aria-label="Audit"
+                {% if active_org_section|default('overview') == 'audit' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
-                    icon="tabler:calendar-event"
+                    icon="tabler:edit"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">Operations</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">Operations</span>
-                {% if operations_alert_count|default(0) %}
-                    <span class="org-admin-nav__badge">
-                        {{ operations_alert_count }}
-                    </span>
-                {% endif %}
+                <span class="org-admin-nav__label">Audit</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Audit</span>
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'people' %} is-active{% endif %}"
-                href="{{ staff_url|default('/org/staff') }}"
-                aria-label="People"
-                {% if active_org_section|default('overview') == 'people' %}aria-current="page"{% endif %}
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'cad' %} is-active{% endif %}"
+                href="/org/cad"
+                aria-label="CAD"
+                {% if active_org_section|default('overview') == 'cad' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
-                    icon="tabler:users"
+                    icon="tabler:gps"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">People</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">People</span>
-                {% if people_alert_count|default(0) %}
-                    <span class="org-admin-nav__badge">
-                        {{ people_alert_count }}
-                    </span>
-                {% endif %}
+                <span class="org-admin-nav__label">CAD</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">CAD</span>
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'vehicles' %} is-active{% endif %}"
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'courses' %} is-active{% endif %}"
+                href="/org/courses"
+                aria-label="Courses"
+                {% if active_org_section|default('overview') == 'courses' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:certificate"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Courses</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Courses</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'crm' %} is-active{% endif %}"
+                href="/org/crm"
+                aria-label="CRM"
+                {% if active_org_section|default('overview') == 'crm' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:device-desktop-analytics"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">CRM</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">CRM</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'epcr' %} is-active{% endif %}"
+                href="/org/epcr"
+                aria-label="ePCR"
+                {% if active_org_section|default('overview') == 'epcr' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:report-medical"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">ePCR</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">ePCR</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'events' %} is-active{% endif %}"
+                href="/org/events"
+                aria-label="Events"
+                {% if active_org_section|default('overview') == 'events' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:building-circus"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Events</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Events</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'fleet' %} is-active{% endif %}"
                 href="{{ vehicles_url|default('/org/fleet') }}"
                 aria-label="Vehicles"
                 {% if active_org_section|default('overview') == 'fleet' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
-                    icon="tabler:ambulance"
+                    icon="tabler:bus"
                     aria-hidden="true"
                 ></iconify-icon>
                 <span class="org-admin-nav__label">Fleet</span>
@@ -80,48 +130,98 @@
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'equipment' %} is-active{% endif %}"
-                href="{{ equipment_url|default('/org/equipment') }}"
-                aria-label="Equipment"
-                {% if active_org_section|default('overview') == 'equipment' %}aria-current="page"{% endif %}
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'hr' %} is-active{% endif %}"
+                href="/org/hr"
+                aria-label="HR"
+                {% if active_org_section|default('overview') == 'hr' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
-                    icon="tabler:medical-cross"
+                    icon="tabler:user-circle"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">Equipment</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">Equipment</span>
-                {% if equipment_alert_count|default(0) %}
-                    <span class="org-admin-nav__badge org-admin-nav__badge--warning">
-                        {{ equipment_alert_count }}
-                    </span>
-                {% endif %}
+                <span class="org-admin-nav__label">HR</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">HR</span>
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'compliance' %} is-active{% endif %}"
-                href="{{ compliance_url|default('/org/compliance') }}"
-                aria-label="Compliance"
-                {% if active_org_section|default('overview') == 'compliance' %}aria-current="page"{% endif %}
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'incidents' %} is-active{% endif %}"
+                href="/org/incidents"
+                aria-label="Incidents"
+                {% if active_org_section|default('overview') == 'incidents' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:alert-triangle"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Incidents</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Incidents</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'medications' %} is-active{% endif %}"
+                href="/org/medications"
+                aria-label="Medications"
+                {% if active_org_section|default('overview') == 'medications' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:pill"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Medications</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Medications</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'patients' %} is-active{% endif %}"
+                href="/org/patients"
+                aria-label="Patients"
+                {% if active_org_section|default('overview') == 'patients' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:empathize"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Patients</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Patients</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'pts' %} is-active{% endif %}"
+                href="/org/pts"
+                aria-label="Patient Transport"
+                {% if active_org_section|default('overview') == 'pts' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:ambulance"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Patient Transport</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Patient Transport</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'quality' %} is-active{% endif %}"
+                href="/org/quality"
+                aria-label="Quality"
+                {% if active_org_section|default('overview') == 'quality' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
                     icon="tabler:shield-check"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">Compliance</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">Compliance</span>
-                {% if compliance_alert_count|default(0) %}
-                    <span class="org-admin-nav__badge org-admin-nav__badge--danger">
-                        {{ compliance_alert_count }}
-                    </span>
-                {% endif %}
+                <span class="org-admin-nav__label">Quality</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Quality</span>
             </a>
 
             <a
                 class="org-admin-nav__item{% if active_org_section|default('overview') == 'reports' %} is-active{% endif %}"
-                href="{{ reports_url|default('/org/reports') }}"
+                href="/org/reports"
                 aria-label="Reports"
                 {% if active_org_section|default('overview') == 'reports' %}aria-current="page"{% endif %}
             >
@@ -135,18 +235,48 @@
             </a>
 
             <a
-                class="org-admin-nav__item{% if active_org_section|default('overview') == 'settings' %} is-active{% endif %}"
-                href="{{ organisation_settings_url|default('/org/settings') }}"
-                aria-label="Settings"
-                {% if active_org_section|default('overview') == 'settings' %}aria-current="page"{% endif %}
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'safeguarding' %} is-active{% endif %}"
+                href="/org/safeguarding"
+                aria-label="Safeguarding"
+                {% if active_org_section|default('overview') == 'safeguarding' %}aria-current="page"{% endif %}
             >
                 <iconify-icon
                     class="org-admin-nav__icon"
-                    icon="tabler:settings"
+                    icon="tabler:user-shield"
                     aria-hidden="true"
                 ></iconify-icon>
-                <span class="org-admin-nav__label">Settings</span>
-                <span class="org-admin-nav__tooltip" role="tooltip">Settings</span>
+                <span class="org-admin-nav__label">Safeguarding</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Safeguarding</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'scheduling' %} is-active{% endif %}"
+                href="/org/scheduling"
+                aria-label="Scheduling"
+                {% if active_org_section|default('overview') == 'scheduling' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:calendar-week"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Scheduling</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Scheduling</span>
+            </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'stock' %} is-active{% endif %}"
+                href="/org/stock"
+                aria-label="Stock"
+                {% if active_org_section|default('overview') == 'stock' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:stack-3"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Stock</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Stock</span>
             </a>
         </div>
     </div>
