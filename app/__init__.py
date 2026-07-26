@@ -14,7 +14,7 @@ from app.blueprints.main import main_bp
 from app.blueprints.org import org_bp
 from app.blueprints.personal import personal_bp
 from app.config import Config
-from app.extensions import db, login_manager, migrate
+from app.extensions import csrf, db, login_manager, migrate
 
 from app.blueprints.org.services import get_current_organisation
 
@@ -38,6 +38,7 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Please sign in to continue."
     login_manager.login_message_category = "info"

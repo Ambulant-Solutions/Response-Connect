@@ -19,6 +19,7 @@ from app.blueprints.org.reports import reports_bp  # noqa: F401
 from app.blueprints.org.safeguarding import safeguarding_bp  # noqa: F401
 from app.blueprints.org.scheduling import scheduling_bp  # noqa: F401
 from app.blueprints.org.stock import stock_bp  # noqa: F401
+from app.blueprints.org.settings import settings_bp
 
 org_bp = Blueprint("org", __name__, url_prefix="/org")
 
@@ -38,6 +39,7 @@ org_bp.register_blueprint(quality_bp)
 org_bp.register_blueprint(reports_bp)
 org_bp.register_blueprint(safeguarding_bp)
 org_bp.register_blueprint(scheduling_bp)
+org_bp.register_blueprint(settings_bp)
 org_bp.register_blueprint(stock_bp)
 
 @org_bp.get("/")
@@ -48,11 +50,6 @@ def org():
         active_org_section="overview"
     )
 
-@org_bp.get("/admin")
-def admin():
-    return jsonify({"message": "Organisation admin routes can be added here."}), 200
 
 
-@org_bp.get("/settings")
-def settings():
-    return jsonify({"message": "Organisation settings routes can be added here."}), 200
+

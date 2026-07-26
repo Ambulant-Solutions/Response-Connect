@@ -13,3 +13,6 @@ class Config:
         f"@{os.getenv('DB_HOST', 'db')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'response_connect')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # CSRF will initially be applied selectively to settings writes.
+    WTF_CSRF_CHECK_DEFAULT = False

@@ -21,6 +21,9 @@
         href="{{ url_for('static', filename='css/response-connect.css') }}"
     >
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
     {% block head %}{% endblock %}
 </head>
 
@@ -92,13 +95,13 @@
                             </summary>
 
                             <div class="account-menu__panel">
-                                <a href="{{ profile_url|default('/personal/profile') }}">
+                                <a href="/personal/profile">
                                     Profile
                                 </a>
-                                <a href="{{ settings_url|default('/settings') }}">
-                                    Settings
+                                <a href="/org/settings">
+                                    System Settings
                                 </a>
-                                <a href="{{ logout_url|default('/logout') }}">
+                                <a href="/auth/logout">
                                     Sign out
                                 </a>
                             </div>
@@ -171,9 +174,14 @@
             </div>
         </footer>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta6/dist/htmx.min.js" integrity="sha384-6lyVbhrs13b9z7mLOpt/N6R76rtkEBWgCjAXRs/DSWyi2AMnQSs10ijWk+PI8n7W" crossorigin="anonymous"></script>
+    
+    <script
+    src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta6/dist/htmx.min.js"
+    integrity="sha384-6lyVbhrs13b9z7mLOpt/N6R76rtkEBWgCjAXRs/DSWyi2AMnQSs10ijWk+PI8n7W"
+    crossorigin="anonymous"
+></script>
 
-
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>

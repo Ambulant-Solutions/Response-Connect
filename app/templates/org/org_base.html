@@ -278,6 +278,21 @@
                 <span class="org-admin-nav__label">Stock</span>
                 <span class="org-admin-nav__tooltip" role="tooltip">Stock</span>
             </a>
+
+            <a
+                class="org-admin-nav__item{% if active_org_section|default('overview') == 'settings' %} is-active{% endif %}"
+                href="/org/settings"
+                aria-label="Settings"
+                {% if active_org_section|default('overview') == 'settings' %}aria-current="page"{% endif %}
+            >
+                <iconify-icon
+                    class="org-admin-nav__icon"
+                    icon="tabler:settings"
+                    aria-hidden="true"
+                ></iconify-icon>
+                <span class="org-admin-nav__label">Settings</span>
+                <span class="org-admin-nav__tooltip" role="tooltip">Settings</span>
+            </a>
         </div>
     </div>
 </nav>

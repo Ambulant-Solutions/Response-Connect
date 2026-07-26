@@ -1,0 +1,248 @@
+{% extends "org/org_base.html" %}
+
+
+{% macro render_field(field, help_text=None) %}
+    <div class="settings-field">
+        {{ field.label }}
+
+        {% set field_class = (
+            "settings-control settings-control--invalid"
+            if field.errors
+            else "settings-control"
+        ) %}
+
+        {{ field(class_=field_class) }}
+
+        {% if help_text %}
+            <p class="settings-field__help">
+                {{ help_text }}
+            </p>
+        {% endif %}
+
+        {% if field.errors %}
+            <ul class="settings-field__errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% block title %}
+    Organisation settings · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page" aria-labelledby="settings-title">
+    <header class="settings-page__header">
+        <div>
+            <span class="eyebrow">
+                Organisation administration
+            </span>
+
+            <h1 id="settings-title">
+                Organisation settings
+            </h1>
+
+            <p>
+                Manage the organisation identity, contact information,
+                primary address and regional defaults.
+            </p>
+        </div>
+    </header>
+
+    <form
+        method="post"
+        action="{{ url_for('org.settings.index') }}"
+        class="settings-form"
+    >
+        {{ form.hidden_tag() }}
+
+        {% if form.csrf_token.errors %}
+            <div
+                class="settings-form__alert"
+                role="alert"
+            >
+                {% for error in form.csrf_token.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="settings-grid">
+            <section class="settings-card">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:building"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Organisation identity</h2>
+                        <p>
+                            Legal, regulatory and service information.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    {{ render_field(form.name) }}
+                    {{ render_field(form.legal_name) }}
+
+                    {{ render_field(
+                        form.service_type,
+                        "For example: Ambulance and medical services."
+                    ) }}
+
+                    {{ render_field(form.provider_reference) }}
+
+                    <div class="settings-row settings-row--three">
+                        {{ render_field(form.company_number) }}
+                        {{ render_field(form.charity_number) }}
+                        {{ render_field(form.vat_number) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-card">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:address-book"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Contact details</h2>
+                        <p>
+                            General organisation contact information.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    {{ render_field(form.general_email) }}
+                    {{ render_field(form.general_phone) }}
+
+                    {{ render_field(
+                        form.website_url,
+                        "Enter the complete address, including https://."
+                    ) }}
+
+                    {{ render_field(
+                        form.region,
+                        "The broad geographical area served."
+                    ) }}
+                </div>
+            </section>
+
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:map-pin"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Primary location</h2>
+                        <p>
+                            The organisation's main registered or
+                            operational address.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-row">
+                        {{ render_field(form.location_name) }}
+                        {{ render_field(form.location_type) }}
+                    </div>
+
+                    {{ render_field(form.address_line_1) }}
+                    {{ render_field(form.address_line_2) }}
+                    {{ render_field(form.address_line_3) }}
+
+                    <div class="settings-row">
+                        {{ render_field(form.town_city) }}
+                        {{ render_field(form.county_region) }}
+                    </div>
+
+                    <div class="settings-row">
+                        {{ render_field(form.postcode) }}
+                        {{ render_field(
+                            form.location_country_code,
+                            "Use the two-letter country code, such as GB."
+                        ) }}
+                    </div>
+
+                    <div class="settings-row">
+                        {{ render_field(form.location_phone) }}
+                        {{ render_field(form.location_email) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:world"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Regional settings</h2>
+                        <p>
+                            Defaults used throughout this installation.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-row settings-row--three">
+                        {{ render_field(
+                            form.country_code,
+                            "For example: GB."
+                        ) }}
+
+                        {{ render_field(
+                            form.timezone,
+                            "For example: Europe/London."
+                        ) }}
+
+                        {{ render_field(
+                            form.locale,
+                            "For example: en-GB."
+                        ) }}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="settings-form__actions">
+            <a
+                href="{{ url_for('org.org') }}"
+                class="button button--secondary"
+            >
+                Cancel
+            </a>
+
+            {{ form.submit(class_="button button--primary") }}
+        </footer>
+    </form>
+</section>
+{% endblock %}
