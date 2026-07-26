@@ -87,9 +87,11 @@ def index():
                         "organisation functions."
                     ),
                     "icon": "tabler:user-shield",
-                    "url": None,
-                    "status": "Planned",
-                    "status_style": "planned",
+                    "url": url_for(
+                        "org.settings.role_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
                     "meta": "Access control",
                 },
                 {

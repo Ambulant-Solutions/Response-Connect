@@ -15,20 +15,10 @@ from app.blueprints.org import org_bp
 from app.blueprints.personal import personal_bp
 from app.config import Config
 from app.extensions import csrf, db, login_manager, migrate
+from app.blueprints.auth.catalogue import ensure_permission_catalogue
 
 from app.blueprints.org.services import get_current_organisation
 
-
-HARDWIRED_PERMISSIONS = (
-    ("auth:manage_users", "Manage users and access control", "auth"),
-    ("personal:read", "Access personal workspace", "personal"),
-    ("org:read", "Access organisation workspace", "org"),
-    ("org:manage", "Manage operational organisation settings", "org"),
-    ("api:read", "Read API resources", "api"),
-    ("api:write", "Write API resources", "api"),
-    ("recruitment:manage", "Manage job applications and recruitment", "recruitment"),
-    ("external:manage", "Manage external forms and complaints", "external"),
-)
 
 
 def create_app() -> Flask:
@@ -63,7 +53,7 @@ def create_app() -> Flask:
     @click.option("--last-name", default="Administrator", show_default=True, help="Administrator last name.")
     def create_admin_command(email: str, password: str, first_name: str, last_name: str) -> None:
         with app.app_context():
-            seed_permission_system()
+            ensure_permission_catalogue()
             user = db.session.scalar(select(UserAccount).where(UserAccount.email == email.strip().lower()))
             if user is None:
                 user = UserAccount(

@@ -1,0 +1,271 @@
+{% extends "org/org_base.html" %}
+
+
+{% macro render_field(field, help_text=None) %}
+    <div class="settings-field">
+        {{ field.label }}
+
+        {{ field(
+            class_=(
+                "settings-control settings-control--invalid"
+                if field.errors
+                else "settings-control"
+            )
+        ) }}
+
+        {% if help_text %}
+            <p class="settings-field__help">
+                {{ help_text }}
+            </p>
+        {% endif %}
+
+        {% if field.errors %}
+            <ul class="settings-field__errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% block title %}
+    {% if role %}
+        Edit {{ role.label }}
+    {% else %}
+        Add role
+    {% endif %}
+    · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page">
+    <header class="settings-page__header">
+        <div>
+            <a
+                class="settings-back-link"
+                href="{{ url_for(
+                    'org.settings.role_index'
+                ) }}"
+            >
+                <iconify-icon
+                    icon="tabler:arrow-left"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Back to roles
+            </a>
+            <br>
+            <span class="eyebrow">
+                Access control
+            </span>
+
+            <h1>
+                {% if role %}
+                    Edit role
+                {% else %}
+                    Add role
+                {% endif %}
+            </h1>
+        </div>
+    </header>
+
+    <form method="post" class="settings-form">
+        {{ form.hidden_tag() }}
+
+        <div class="settings-grid">
+            <section
+                class="settings-card settings-card--wide"
+            >
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:user-shield"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Role identity</h2>
+                        <p>
+                            Give the role a clear name and
+                            stable internal code.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-row">
+                        {{ render_field(
+                            form.display_name
+                        ) }}
+
+                        <div class="settings-field">
+                            {{ form.name.label }}
+
+                            {{ form.name(
+                                class_=(
+                                    "settings-control settings-control--invalid"
+                                    if form.name.errors
+                                    else "settings-control"
+                                ),
+                                readonly=code_locked
+                            ) }}
+
+                            <p class="settings-field__help">
+                                Lowercase letters, numbers and
+                                underscores only.
+                                {% if code_locked %}
+                                    System role codes cannot
+                                    be changed.
+                                {% endif %}
+                            </p>
+
+                            {% if form.name.errors %}
+                                <ul class="settings-field__errors">
+                                    {% for error in form.name.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {{ render_field(form.description) }}
+
+                    {{ render_field(
+                        form.sort_order,
+                        "Lower numbers appear first."
+                    ) }}
+                </div>
+            </section>
+
+            <section
+                class="settings-card settings-card--wide"
+            >
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:key"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Permissions</h2>
+                        <p>
+                            Select the actions users with this
+                            role may perform.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    {% set selected_ids =
+                        form.permission_ids.data or []
+                    %}
+
+                    <div class="permission-groups">
+                        {% for group in permission_groups %}
+                            <fieldset
+                                class="permission-group"
+                            >
+                                <legend>
+                                    {{ group["label"] }}
+                                </legend>
+
+                                <div class="permission-group__items">
+                                    {% for permission in group["permissions"] %}
+                                        {% set permission_id =
+                                            permission.id|string
+                                        %}
+
+                                        <label
+                                            class="
+                                                permission-option
+                                                {% if permissions_locked %}
+                                                    is-disabled
+                                                {% endif %}
+                                            "
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="{{ form.permission_ids.name }}"
+                                                value="{{ permission_id }}"
+                                                {% if permission_id in selected_ids %}
+                                                    checked
+                                                {% endif %}
+                                                {% if permissions_locked %}
+                                                    disabled
+                                                {% endif %}
+                                            >
+
+                                            {% if (
+                                                permissions_locked
+                                                and permission_id
+                                                in selected_ids
+                                            ) %}
+                                                <input
+                                                    type="hidden"
+                                                    name="{{ form.permission_ids.name }}"
+                                                    value="{{ permission_id }}"
+                                                >
+                                            {% endif %}
+
+                                            <span>
+                                                <strong>
+                                                    {{ permission.description }}
+                                                </strong>
+
+                                                <code>
+                                                    {{ permission.name }}
+                                                </code>
+                                            </span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </fieldset>
+                        {% endfor %}
+                    </div>
+
+                    {% if permissions_locked %}
+                        <p class="settings-field__help">
+                            The Administrator role always has
+                            every application permission.
+                        </p>
+                    {% endif %}
+
+                    {% if form.permission_ids.errors %}
+                        <ul class="settings-field__errors">
+                            {% for error in form.permission_ids.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+
+        <footer class="settings-form__actions">
+            <a
+                class="button button--secondary"
+                href="{{ url_for(
+                    'org.settings.role_index'
+                ) }}"
+            >
+                Cancel
+            </a>
+
+            {{ form.submit(
+                class_="button button--primary"
+            ) }}
+        </footer>
+    </form>
+</section>
+{% endblock %}

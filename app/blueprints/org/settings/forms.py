@@ -343,3 +343,48 @@ class LocationActionForm(FlaskForm):
 
 class LocationTypeActionForm(FlaskForm):
     submit = SubmitField("Confirm")
+
+class RoleForm(FlaskForm):
+    name = StringField(
+        "Role code",
+        validators=[
+            DataRequired(),
+            Length(max=120),
+        ],
+    )
+
+    display_name = StringField(
+        "Role name",
+        validators=[
+            DataRequired(),
+            Length(max=120),
+        ],
+    )
+
+    description = TextAreaField(
+        "Description",
+        validators=[
+            DataRequired(),
+            Length(max=255),
+        ],
+    )
+
+    permission_ids = MultiCheckboxField(
+        "Permissions",
+        validators=[Optional()],
+    )
+
+    sort_order = IntegerField(
+        "Display order",
+        validators=[
+            DataRequired(),
+            NumberRange(min=0, max=9999),
+        ],
+        default=100,
+    )
+
+    submit = SubmitField("Save role")
+
+
+class RoleActionForm(FlaskForm):
+    submit = SubmitField("Confirm")

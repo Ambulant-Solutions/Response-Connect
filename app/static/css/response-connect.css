@@ -4815,3 +4815,230 @@ a.settings-hub-card:hover .settings-hub-card__arrow {
         flex-direction: column;
     }
 }
+
+/* Roles and permissions
+   ========================================================================== */
+
+.settings-page__header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.access-role-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.access-role-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: var(--rc-surface);
+    border: 1px solid var(--rc-border);
+    border-radius: var(--rc-radius-lg);
+    box-shadow: var(--rc-shadow-sm);
+}
+
+.access-role-card.is-inactive {
+    opacity: 0.62;
+}
+
+.access-role-card__icon {
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    color: var(--rc-teal);
+    background: rgb(14 165 160 / 10%);
+    border: 1px solid rgb(14 165 160 / 20%);
+    border-radius: 0.8rem;
+}
+
+.access-role-card__icon iconify-icon {
+    font-size: 1.55rem;
+}
+
+.access-role-card__content {
+    min-width: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.access-role-card__content header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.access-role-card__content h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.access-role-card__content code {
+    color: var(--rc-text-muted);
+    font-size: 0.74rem;
+}
+
+.access-role-card__content > p {
+    margin: 0;
+    color: var(--rc-text-muted);
+    font-size: 0.84rem;
+}
+
+.access-role-card__badges,
+.access-role-card__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.access-role-card__summary span {
+    color: var(--rc-text-muted);
+    font-size: 0.75rem;
+}
+
+.access-role-card__summary strong {
+    color: var(--rc-text);
+}
+
+.access-role-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.access-role-card__actions form {
+    margin: 0;
+}
+
+.access-role-card__empty {
+    color: var(--rc-text-muted);
+    font-size: 0.78rem;
+}
+
+.permission-groups,
+.permission-catalogue {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.permission-group {
+    min-width: 0;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--rc-border);
+    border-radius: var(--rc-radius-md);
+}
+
+.permission-group legend {
+    padding: 0 0.4rem;
+    color: var(--rc-text);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.permission-group__items {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.permission-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.75rem;
+    background: rgb(255 255 255 / 2%);
+    border: 1px solid var(--rc-border);
+    border-radius: 0.7rem;
+    cursor: pointer;
+}
+
+.permission-option.is-disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.permission-option span {
+    min-width: 0;
+    display: grid;
+    gap: 0.2rem;
+}
+
+.permission-option strong {
+    font-size: 0.8rem;
+}
+
+.permission-option code {
+    color: var(--rc-text-muted);
+    font-size: 0.68rem;
+}
+
+.permission-catalogue__group {
+    overflow: hidden;
+    background: var(--rc-surface);
+    border: 1px solid var(--rc-border);
+    border-radius: var(--rc-radius-lg);
+}
+
+.permission-catalogue__group > header {
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--rc-border);
+}
+
+.permission-catalogue__group h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.permission-catalogue__items {
+    display: grid;
+}
+
+.permission-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--rc-border);
+}
+
+.permission-card:last-child {
+    border-bottom: 0;
+}
+
+.permission-card h3 {
+    margin: 0;
+    font-size: 0.84rem;
+}
+
+.permission-card code {
+    color: var(--rc-text-muted);
+    font-size: 0.7rem;
+}
+
+@media (max-width: 48rem) {
+    .access-role-card {
+        grid-template-columns:
+            auto minmax(0, 1fr);
+    }
+
+    .access-role-card__actions {
+        grid-column: 1 / -1;
+        flex-direction: row;
+    }
+
+    .access-role-card__content header {
+        flex-direction: column;
+    }
+
+    .permission-group__items {
+        grid-template-columns: 1fr;
+    }
+}
