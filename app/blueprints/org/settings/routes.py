@@ -41,15 +41,31 @@ def index():
                     "meta": "Organisation-wide",
                 },
                 {
+                    "title": "Location types",
+                    "description": (
+                        "Control the types of sites, departments, rooms, "
+                        "cupboards and storage locations that may be created."
+                    ),
+                    "icon": "tabler:category",
+                    "url": url_for(
+                        "org.settings.location_type_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
+                    "meta": "Location hierarchy",
+                },
+                {
                     "title": "Locations",
                     "description": (
-                        "Manage registered offices, operational bases, "
-                        "ambulance stations, warehouses and training centres."
+                        "Manage sites, departments, rooms, cupboards "
+                        "and storage locations."
                     ),
                     "icon": "tabler:map-pin",
-                    "url": None,
-                    "status": "Next",
-                    "status_style": "next",
+                    "url": url_for(
+                        "org.settings.location_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
                     "meta": (
                         f"{active_location_count} active "
                         f"{'location' if active_location_count == 1 else 'locations'}"

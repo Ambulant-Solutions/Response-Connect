@@ -1,0 +1,220 @@
+{% extends "org/org_base.html" %}
+
+
+{% block title %}
+    Location types · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page">
+    <header class="settings-page__header">
+        <div>
+            <a
+                class="settings-back-link"
+                href="{{ url_for('org.settings.index') }}"
+            >
+                <iconify-icon
+                    icon="tabler:arrow-left"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Back to system settings
+            </a>
+            <br>
+            <span class="eyebrow">
+                Location management
+            </span>
+
+            <h1>Location types</h1>
+
+            <p>
+                Control the types of sites, departments, rooms and
+                storage areas that may be added to the organisation.
+            </p>
+        </div>
+
+        <a
+            class="button button--primary"
+            href="{{ url_for(
+                'org.settings.location_type_create'
+            ) }}"
+        >
+            <iconify-icon
+                icon="tabler:plus"
+                aria-hidden="true"
+            ></iconify-icon>
+            Add location type
+        </a>
+    </header>
+
+    <div class="location-type-list">
+        {% for location_type in location_types %}
+            <article
+                class="
+                    location-type-card
+                    {% if not location_type.is_active %}
+                        is-inactive
+                    {% endif %}
+                "
+            >
+                <div class="location-type-card__icon">
+                    <iconify-icon
+                        icon="{{ location_type.icon }}"
+                        aria-hidden="true"
+                    ></iconify-icon>
+                </div>
+
+                <div class="location-type-card__content">
+                    <header>
+                        <div>
+                            <h2>{{ location_type.name }}</h2>
+
+                            <code>{{ location_type.code }}</code>
+                        </div>
+
+                        <div class="location-type-card__badges">
+                            {% if location_type.is_system %}
+                                <span class="status-pill">
+                                    System
+                                </span>
+                            {% endif %}
+
+                            <span
+                                class="
+                                    status-pill
+                                    {% if location_type.is_active %}
+                                        status-pill--success
+                                    {% else %}
+                                        status-pill--muted
+                                    {% endif %}
+                                "
+                            >
+                                {{ "Active" if location_type.is_active else "Inactive" }}
+                            </span>
+                        </div>
+                    </header>
+
+                    <p>
+                        {{ location_type.description or
+                           "No description has been provided." }}
+                    </p>
+
+                    <div class="location-type-card__properties">
+                        <span>
+                            <iconify-icon
+                                icon="tabler:map-pin"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            {{ "Physical" if location_type.is_physical else "Organisational" }}
+                        </span>
+
+                        <span>
+                            <iconify-icon
+                                icon="tabler:hierarchy-2"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            {% if location_type.can_have_children %}
+                                May contain children
+                            {% else %}
+                                Leaf location
+                            {% endif %}
+                        </span>
+
+                        <span>
+                            <iconify-icon
+                                icon="tabler:address-book"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            {% if location_type.requires_address %}
+                                Address required
+                            {% else %}
+                                Address optional
+                            {% endif %}
+                        </span>
+
+                        <span>
+                            <iconify-icon
+                                icon="tabler:map"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            {{ location_type.locations|length }}
+                            locations
+                        </span>
+                    </div>
+
+                    {% if location_type.allowed_capabilities %}
+                        <div class="capability-list">
+                            {% for capability in location_type.allowed_capabilities %}
+                                <span class="capability-pill">
+                                    <iconify-icon
+                                        icon="{{ capability.icon }}"
+                                        aria-hidden="true"
+                                    ></iconify-icon>
+                                    {{ capability.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="location-type-card__empty">
+                            No direct uses are permitted.
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="location-type-card__actions">
+                    <a
+                        class="button button--secondary"
+                        href="{{ url_for(
+                            'org.settings.location_type_edit',
+                            location_type_id=location_type.id
+                        ) }}"
+                    >
+                        Edit
+                    </a>
+
+                    {% if location_type.is_active %}
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'org.settings.location_type_deactivate',
+                                location_type_id=location_type.id
+                            ) }}"
+                        >
+                            {{ action_form.hidden_tag() }}
+
+                            <button
+                                class="button button--danger"
+                                type="submit"
+                            >
+                                Deactivate
+                            </button>
+                        </form>
+                    {% else %}
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'org.settings.location_type_activate',
+                                location_type_id=location_type.id
+                            ) }}"
+                        >
+                            {{ action_form.hidden_tag() }}
+
+                            <button
+                                class="button button--primary"
+                                type="submit"
+                            >
+                                Activate
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

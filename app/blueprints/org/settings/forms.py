@@ -1,23 +1,22 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField
+from wtforms import (
+    BooleanField,
+    IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import (
     DataRequired,
     Email,
     Length,
+    NumberRange,
     Optional,
     URL,
 )
-
-
-LOCATION_TYPE_CHOICES = [
-    ("registered_office", "Registered office"),
-    ("head_office", "Head office"),
-    ("operational_base", "Operational base"),
-    ("ambulance_station", "Ambulance station"),
-    ("warehouse", "Warehouse"),
-    ("training_centre", "Training centre"),
-    ("other", "Other"),
-]
+from wtforms.widgets import CheckboxInput, ListWidget
 
 
 class OrganisationSettingsForm(FlaskForm):
@@ -140,3 +139,207 @@ class OrganisationSettingsForm(FlaskForm):
     )
 
     submit = SubmitField("Save settings")
+
+class MultiCheckboxField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
+
+
+class LocationForm(FlaskForm):
+    name = StringField(
+        "Location name",
+        validators=[
+            DataRequired(),
+            Length(max=255),
+        ],
+    )
+
+    code = StringField(
+        "Location code",
+        validators=[
+            Optional(),
+            Length(max=50),
+        ],
+    )
+
+    description = TextAreaField(
+        "Description",
+        validators=[
+            Optional(),
+            Length(max=2000),
+        ],
+    )
+
+    location_type_id = SelectField(
+        "Location type",
+        validators=[DataRequired()],
+    )
+
+    parent_id = SelectField(
+        "Parent location",
+        validators=[Optional()],
+    )
+
+    capability_ids = MultiCheckboxField(
+        "Permitted uses",
+        validators=[Optional()],
+    )
+
+    sort_order = IntegerField(
+        "Display order",
+        validators=[
+            DataRequired(),
+            NumberRange(min=0, max=9999),
+        ],
+        default=0,
+    )
+
+    has_own_address = BooleanField(
+        "This location has its own postal address"
+    )
+
+    address_line_1 = StringField(
+        "Address line 1",
+        validators=[
+            Optional(),
+            Length(max=255),
+        ],
+    )
+
+    address_line_2 = StringField(
+        "Address line 2",
+        validators=[
+            Optional(),
+            Length(max=255),
+        ],
+    )
+
+    address_line_3 = StringField(
+        "Address line 3",
+        validators=[
+            Optional(),
+            Length(max=255),
+        ],
+    )
+
+    town_city = StringField(
+        "Town or city",
+        validators=[
+            Optional(),
+            Length(max=120),
+        ],
+    )
+
+    county_region = StringField(
+        "County or region",
+        validators=[
+            Optional(),
+            Length(max=120),
+        ],
+    )
+
+    postcode = StringField(
+        "Postcode",
+        validators=[
+            Optional(),
+            Length(max=20),
+        ],
+    )
+
+    country_code = StringField(
+        "Country code",
+        validators=[
+            DataRequired(),
+            Length(min=2, max=2),
+        ],
+        default="GB",
+    )
+
+    phone = StringField(
+        "Telephone",
+        validators=[
+            Optional(),
+            Length(max=50),
+        ],
+    )
+
+    email = StringField(
+        "Email",
+        validators=[
+            Optional(),
+            Email(),
+            Length(max=255),
+        ],
+    )
+
+    submit = SubmitField("Save location")
+
+class LocationTypeForm(FlaskForm):
+    code = StringField(
+        "Type code",
+        validators=[
+            DataRequired(),
+            Length(max=64),
+        ],
+    )
+
+    name = StringField(
+        "Type name",
+        validators=[
+            DataRequired(),
+            Length(max=120),
+        ],
+    )
+
+    description = TextAreaField(
+        "Description",
+        validators=[
+            Optional(),
+            Length(max=500),
+        ],
+    )
+
+    icon = StringField(
+        "Icon",
+        validators=[
+            DataRequired(),
+            Length(max=120),
+        ],
+        default="tabler:map-pin",
+    )
+
+    is_physical = BooleanField(
+        "This represents a physical place"
+    )
+
+    can_have_children = BooleanField(
+        "Locations of this type may contain child locations"
+    )
+
+    requires_address = BooleanField(
+        "Locations of this type require their own postal address"
+    )
+
+    capability_ids = MultiCheckboxField(
+        "Maximum permitted uses",
+        validators=[Optional()],
+    )
+
+    sort_order = IntegerField(
+        "Display order",
+        validators=[
+            DataRequired(),
+            NumberRange(min=0, max=9999),
+        ],
+        default=0,
+    )
+
+    submit = SubmitField("Save location type")
+
+
+class LocationActionForm(FlaskForm):
+    submit = SubmitField("Confirm")
+
+
+class LocationTypeActionForm(FlaskForm):
+    submit = SubmitField("Confirm")

@@ -1,0 +1,359 @@
+{% extends "org/org_base.html" %}
+
+
+{% macro render_field(field, help_text=None) %}
+    <div class="settings-field">
+        {{ field.label }}
+
+        {{ field(
+            class_=(
+                "settings-control settings-control--invalid"
+                if field.errors
+                else "settings-control"
+            )
+        ) }}
+
+        {% if help_text %}
+            <p class="settings-field__help">
+                {{ help_text }}
+            </p>
+        {% endif %}
+
+        {% if field.errors %}
+            <ul class="settings-field__errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% block title %}
+    {% if location %}
+        Edit {{ location.name }}
+    {% elif is_primary %}
+        Create primary location
+    {% else %}
+        Add location
+    {% endif %}
+    · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page">
+    <header class="settings-page__header">
+        <div>
+            <a
+                class="settings-back-link"
+                href="{{ url_for(
+                    'org.settings.location_index',
+                    selected=(
+                        location.id
+                        if location
+                        else request.args.get('parent')
+                    )
+                ) }}"
+            >
+                <iconify-icon
+                    icon="tabler:arrow-left"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Back to locations
+            </a>
+
+            <span class="eyebrow">
+                Location management
+            </span>
+
+            <h1>
+                {% if location %}
+                    Edit location
+                {% elif is_primary %}
+                    Create primary location
+                {% else %}
+                    Add location
+                {% endif %}
+            </h1>
+        </div>
+    </header>
+
+    {% if not location_types %}
+        <div class="settings-form__alert" role="alert">
+            <p>
+                No location types are configured. Seed or create
+                the location types before adding a location.
+            </p>
+        </div>
+    {% endif %}
+
+    <form
+        method="post"
+        class="settings-form"
+        id="location-form"
+    >
+        {{ form.hidden_tag() }}
+
+        <div class="settings-grid">
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:hierarchy-2"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Identity and hierarchy</h2>
+                        <p>
+                            Define where this location sits in the
+                            organisation structure.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-row">
+                        {{ render_field(form.name) }}
+
+                        {{ render_field(
+                            form.code,
+                            "Optional short code, such as HQ-STORE."
+                        ) }}
+                    </div>
+
+                    {{ render_field(form.description) }}
+
+                    <div class="settings-row">
+                        {{ render_field(form.location_type_id) }}
+
+                        {% if is_primary %}
+                            <div class="settings-field">
+                                <label>Parent location</label>
+
+                                <div class="settings-static-value">
+                                    None — this is the primary root.
+                                </div>
+                            </div>
+                        {% else %}
+                            {{ render_field(
+                                form.parent_id,
+                                "Only active locations whose type "
+                                "allows children are shown."
+                            ) }}
+                        {% endif %}
+                    </div>
+
+                    {{ render_field(
+                        form.sort_order,
+                        "Lower numbers appear first."
+                    ) }}
+                </div>
+            </section>
+
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:shield-check"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Permitted uses</h2>
+                        <p>
+                            Control what may be assigned or stored
+                            at this location.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="capability-options">
+                        {% for option in form.capability_ids %}
+                            <label
+                                class="capability-option"
+                                data-capability-option-wrapper
+                            >
+                                {{ option(
+                                    data_capability_option="true"
+                                ) }}
+
+                                <span>
+                                    <strong>
+                                        {{ option.label.text }}
+                                    </strong>
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.capability_ids.errors %}
+                        <ul class="settings-field__errors">
+                            {% for error in form.capability_ids.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:map-pin"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Address and contact</h2>
+                        <p>
+                            Internal rooms normally inherit their
+                            address from the nearest parent site.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-checkbox">
+                        {{ form.has_own_address() }}
+                        {{ form.has_own_address.label }}
+                    </div>
+
+                    <div id="location-address-fields">
+                        {{ render_field(form.address_line_1) }}
+                        {{ render_field(form.address_line_2) }}
+                        {{ render_field(form.address_line_3) }}
+
+                        <div class="settings-row">
+                            {{ render_field(form.town_city) }}
+                            {{ render_field(form.county_region) }}
+                        </div>
+
+                        <div class="settings-row">
+                            {{ render_field(form.postcode) }}
+                            {{ render_field(form.country_code) }}
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        {{ render_field(form.phone) }}
+                        {{ render_field(form.email) }}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="settings-form__actions">
+            <a
+                class="button button--secondary"
+                href="{{ url_for(
+                    'org.settings.location_index',
+                    selected=(
+                        location.id
+                        if location
+                        else request.args.get('parent')
+                    )
+                ) }}"
+            >
+                Cancel
+            </a>
+
+            {{ form.submit(
+                class_="button button--primary",
+                disabled=(not location_types)
+            ) }}
+        </footer>
+    </form>
+</section>
+
+<script type="application/json" id="location-type-data">
+    {{ location_type_data | tojson }}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("location-form");
+        const typeSelect = document.getElementById("location_type_id");
+        const addressToggle = document.getElementById("has_own_address");
+        const addressFields = document.getElementById(
+            "location-address-fields"
+        );
+        const dataElement = document.getElementById(
+            "location-type-data"
+        );
+
+        if (!form || !typeSelect || !dataElement) {
+            return;
+        }
+
+        const typeData = JSON.parse(dataElement.textContent);
+
+        function updateCapabilities() {
+            const currentType = typeData[typeSelect.value] || {};
+            const allowed = new Set(currentType.allowed || []);
+
+            document
+                .querySelectorAll("[data-capability-option]")
+                .forEach(function (checkbox) {
+                    const permitted = allowed.has(checkbox.value);
+                    const wrapper = checkbox.closest(
+                        "[data-capability-option-wrapper]"
+                    );
+
+                    checkbox.disabled = !permitted;
+
+                    if (!permitted) {
+                        checkbox.checked = false;
+                    }
+
+                    wrapper?.classList.toggle(
+                        "is-disabled",
+                        !permitted
+                    );
+                });
+        }
+
+        function updateAddress() {
+            const currentType = typeData[typeSelect.value] || {};
+            const required = Boolean(
+                currentType.requires_address
+            );
+
+            if (required) {
+                addressToggle.checked = true;
+            }
+
+            addressToggle.disabled = required;
+
+            addressFields.hidden = !(
+                required || addressToggle.checked
+            );
+        }
+
+        typeSelect.addEventListener("change", function () {
+            updateCapabilities();
+            updateAddress();
+        });
+
+        addressToggle.addEventListener(
+            "change",
+            updateAddress
+        );
+
+        updateCapabilities();
+        updateAddress();
+    });
+</script>
+{% endblock %}
