@@ -151,54 +151,6 @@
                 <header class="settings-card__header">
                     <span class="settings-card__icon">
                         <iconify-icon
-                            icon="tabler:map-pin"
-                            aria-hidden="true"
-                        ></iconify-icon>
-                    </span>
-
-                    <div>
-                        <h2>Primary location</h2>
-                        <p>
-                            The organisation's main registered or
-                            operational address.
-                        </p>
-                    </div>
-                </header>
-
-                <div class="settings-card__body">
-                    <div class="settings-row">
-                        {{ render_field(form.location_name) }}
-                        {{ render_field(form.location_type) }}
-                    </div>
-
-                    {{ render_field(form.address_line_1) }}
-                    {{ render_field(form.address_line_2) }}
-                    {{ render_field(form.address_line_3) }}
-
-                    <div class="settings-row">
-                        {{ render_field(form.town_city) }}
-                        {{ render_field(form.county_region) }}
-                    </div>
-
-                    <div class="settings-row">
-                        {{ render_field(form.postcode) }}
-                        {{ render_field(
-                            form.location_country_code,
-                            "Use the two-letter country code, such as GB."
-                        ) }}
-                    </div>
-
-                    <div class="settings-row">
-                        {{ render_field(form.location_phone) }}
-                        {{ render_field(form.location_email) }}
-                    </div>
-                </div>
-            </section>
-
-            <section class="settings-card settings-card--wide">
-                <header class="settings-card__header">
-                    <span class="settings-card__icon">
-                        <iconify-icon
                             icon="tabler:world"
                             aria-hidden="true"
                         ></iconify-icon>

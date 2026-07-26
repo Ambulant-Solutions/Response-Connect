@@ -2,13 +2,20 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from enum import StrEnum
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
+    Column,
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     String,
+    Table,
+    Text,
+    UniqueConstraint,
     func,
     text,
 )
@@ -16,6 +23,223 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
+
+class LocationUse(StrEnum):
+    STAFF_BASE = "staff_base"
+    VEHICLE_BASE = "vehicle_base"
+    STOCK_STORAGE = "stock_storage"
+    EQUIPMENT_STORAGE = "equipment_storage"
+    MEDICATION_STORAGE = "medication_storage"
+    CONTROLLED_DRUG_STORAGE = "controlled_drug_storage"
+    DOCUMENT_STORAGE = "document_storage"
+
+
+location_type_capabilities = Table(
+    "location_type_capabilities",
+    db.metadata,
+    Column(
+        "location_type_id",
+        UUID(as_uuid=True),
+        ForeignKey("location_types.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "capability_id",
+        UUID(as_uuid=True),
+        ForeignKey("location_capabilities.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
+
+
+location_capabilities = Table(
+    "organisation_location_capabilities",
+    db.metadata,
+    Column(
+        "location_id",
+        UUID(as_uuid=True),
+        ForeignKey("organisation_locations.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "capability_id",
+        UUID(as_uuid=True),
+        ForeignKey("location_capabilities.id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+)
+
+
+class LocationCapability(db.Model):
+    """
+    A fixed capability understood by application business logic.
+
+    Administrators choose which capabilities apply to types and locations,
+    but capability codes should not be freely renamed because other modules
+    use these codes to validate assignments.
+    """
+
+    __tablename__ = "location_capabilities"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    code: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        unique=True,
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(120),
+        nullable=False,
+        unique=True,
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
+    icon: Mapped[str] = mapped_column(
+        String(120),
+        nullable=False,
+        default="tabler:map-pin",
+        server_default="tabler:map-pin",
+    )
+
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
+    )
+
+    location_types: Mapped[list["LocationType"]] = relationship(
+        secondary=location_type_capabilities,
+        back_populates="allowed_capabilities",
+    )
+
+    locations: Mapped[list["OrganisationLocation"]] = relationship(
+        secondary=location_capabilities,
+        back_populates="capabilities",
+    )
+
+
+class LocationType(db.Model):
+    """
+    A configurable physical or organisational location classification.
+    """
+
+    __tablename__ = "location_types"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "code",
+            name="uq_location_types_code",
+        ),
+        UniqueConstraint(
+            "name",
+            name="uq_location_types_name",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    code: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(120),
+        nullable=False,
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
+    icon: Mapped[str] = mapped_column(
+        String(120),
+        nullable=False,
+        default="tabler:map-pin",
+        server_default="tabler:map-pin",
+    )
+
+    is_physical: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
+    )
+
+    can_have_children: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+    )
+
+    requires_address: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+    )
+
+    is_system: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
+    )
+
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
+
+    allowed_capabilities: Mapped[list[LocationCapability]] = relationship(
+        secondary=location_type_capabilities,
+        back_populates="location_types",
+        order_by="LocationCapability.sort_order",
+    )
+
+    locations: Mapped[list["OrganisationLocation"]] = relationship(
+        back_populates="location_type",
+    )
+
+    @property
+    def allowed_capability_codes(self) -> set[str]:
+        return {
+            capability.code
+            for capability in self.allowed_capabilities
+        }
 
 
 class Organisation(db.Model):
@@ -161,7 +385,10 @@ class Organisation(db.Model):
         back_populates="organisation",
         cascade="all, delete-orphan",
         passive_deletes=True,
-        order_by="OrganisationLocation.name",
+        order_by=lambda: (
+            OrganisationLocation.sort_order,
+            OrganisationLocation.name,
+        ),
     )
 
     @property
@@ -202,21 +429,44 @@ class Organisation(db.Model):
 
 class OrganisationLocation(db.Model):
     """
-    A physical organisation location.
+    A node in the organisation's location hierarchy.
 
-    Examples include a registered office, headquarters, ambulance station,
-    operational base, warehouse or training centre.
+    The primary location is the single root node. Every other location must
+    have a parent, allowing sites, departments, rooms, cupboards and storage
+    areas to form one tree.
     """
 
     __tablename__ = "organisation_locations"
 
     __table_args__ = (
         Index(
-            "uq_organisation_locations_primary_type",
+            "uq_organisation_locations_single_primary",
             "organisation_id",
-            "location_type",
             unique=True,
             postgresql_where=text("is_primary IS TRUE"),
+        ),
+        UniqueConstraint(
+            "organisation_id",
+            "code",
+            name="uq_organisation_locations_org_code",
+        ),
+        CheckConstraint(
+            """
+            (
+                is_primary IS TRUE
+                AND parent_id IS NULL
+            )
+            OR
+            (
+                is_primary IS FALSE
+                AND parent_id IS NOT NULL
+            )
+            """,
+            name="ck_organisation_locations_primary_root",
+        ),
+        CheckConstraint(
+            "sort_order >= 0",
+            name="ck_organisation_locations_sort_order",
         ),
     )
 
@@ -233,23 +483,56 @@ class OrganisationLocation(db.Model):
         index=True,
     )
 
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "organisation_locations.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=True,
+        index=True,
+    )
+
+    location_type_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("location_types.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+
     name: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
     )
 
-    # Examples: registered_office, head_office, operational_base,
-    # ambulance_station, warehouse, training_centre, other.
-    location_type: Mapped[str] = mapped_column(
+    code: Mapped[str | None] = mapped_column(
         String(50),
-        nullable=False,
-        default="operational_base",
-        server_default="operational_base",
+        nullable=True,
     )
 
-    address_line_1: Mapped[str] = mapped_column(
-        String(255),
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
         nullable=False,
+        default=0,
+        server_default="0",
+    )
+
+    # Child locations normally inherit their postal address from an ancestor.
+    has_own_address: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+    )
+
+    address_line_1: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
     )
 
     address_line_2: Mapped[str | None] = mapped_column(
@@ -262,9 +545,9 @@ class OrganisationLocation(db.Model):
         nullable=True,
     )
 
-    town_city: Mapped[str] = mapped_column(
+    town_city: Mapped[str | None] = mapped_column(
         String(120),
-        nullable=False,
+        nullable=True,
     )
 
     county_region: Mapped[str | None] = mapped_column(
@@ -322,22 +605,109 @@ class OrganisationLocation(db.Model):
     )
 
     organisation: Mapped[Organisation] = relationship(
-        "Organisation",
         back_populates="locations",
     )
 
+    location_type: Mapped[LocationType] = relationship(
+        back_populates="locations",
+    )
+
+    parent: Mapped["OrganisationLocation | None"] = relationship(
+        "OrganisationLocation",
+        remote_side="OrganisationLocation.id",
+        back_populates="children",
+        foreign_keys=[parent_id],
+    )
+
+    children: Mapped[list["OrganisationLocation"]] = relationship(
+        "OrganisationLocation",
+        back_populates="parent",
+        foreign_keys=[parent_id],
+        passive_deletes=True,
+        order_by=lambda: (
+            OrganisationLocation.sort_order,
+            OrganisationLocation.name,
+        ),
+    )
+
+    capabilities: Mapped[list[LocationCapability]] = relationship(
+        secondary=location_capabilities,
+        back_populates="locations",
+        order_by="LocationCapability.sort_order",
+    )
+
     @property
-    def formatted_address(self) -> str:
+    def capability_codes(self) -> set[str]:
+        return {
+            capability.code
+            for capability in self.capabilities
+            if capability.is_active
+        }
+
+    def permits(self, capability: str | LocationUse) -> bool:
+        code = (
+            capability.value
+            if isinstance(capability, LocationUse)
+            else capability
+        )
+
+        return self.is_active and code in self.capability_codes
+
+    @property
+    def effective_address_location(
+        self,
+    ) -> "OrganisationLocation | None":
+        current: OrganisationLocation | None = self
+        visited: set[uuid.UUID] = set()
+
+        while current is not None:
+            if current.id in visited:
+                return None
+
+            visited.add(current.id)
+
+            if current.has_own_address and current.address_line_1:
+                return current
+
+            current = current.parent
+
+        return None
+
+    @property
+    def formatted_address(self) -> str | None:
+        source = self.effective_address_location
+
+        if source is None:
+            return None
+
         parts = [
-            self.address_line_1,
-            self.address_line_2,
-            self.address_line_3,
-            self.town_city,
-            self.county_region,
-            self.postcode,
+            source.address_line_1,
+            source.address_line_2,
+            source.address_line_3,
+            source.town_city,
+            source.county_region,
+            source.postcode,
         ]
 
         return ", ".join(part for part in parts if part)
 
+    @property
+    def path(self) -> str:
+        parts: list[str] = []
+        current: OrganisationLocation | None = self
+        visited: set[uuid.UUID] = set()
+
+        while current is not None:
+            if current.id in visited:
+                parts.append("[invalid hierarchy]")
+                break
+
+            visited.add(current.id)
+            parts.append(current.name)
+            current = current.parent
+
+        return " / ".join(reversed(parts))
+
     def __repr__(self) -> str:
-        return f"<OrganisationLocation {self.name!r}>"
+        return f"<OrganisationLocation {self.path!r}>"
+   

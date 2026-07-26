@@ -11,7 +11,6 @@ from sqlalchemy.exc import IntegrityError
 from app.blueprints.org.settings import settings_bp
 from app.blueprints.auth import permission_required
 from app.blueprints.org.settings.forms import OrganisationSettingsForm
-from app.blueprints.org.models import OrganisationLocation
 from app.blueprints.org.services import (
     clear_current_organisation,
     require_current_organisation,
@@ -38,33 +37,18 @@ def optional_text(value: str | None) -> str | None:
 @permission_required("org:manage")
 def organisation():
     organisation = require_current_organisation()
-    location = organisation.primary_location_record
 
     form = OrganisationSettingsForm()
 
     if not form.is_submitted():
         populate_form(
             form=form,
-            organisation=organisation,
-            location=location,
+            organisation=organisation
         )
 
     if form.validate_on_submit():
         update_organisation(
             organisation=organisation,
-            form=form,
-        )
-
-        if location is None:
-            location = OrganisationLocation(
-                organisation=organisation,
-                is_primary=True,
-                is_active=True,
-            )
-            db.session.add(location)
-
-        update_location(
-            location=location,
             form=form,
         )
 
@@ -103,7 +87,6 @@ def populate_form(
     *,
     form: OrganisationSettingsForm,
     organisation,
-    location: OrganisationLocation | None,
 ) -> None:
     """Populate the form for its initial GET request."""
 
@@ -124,25 +107,6 @@ def populate_form(
     form.timezone.data = organisation.timezone
     form.locale.data = organisation.locale
 
-    if location is None:
-        form.location_name.data = "Primary location"
-        form.location_type.data = "registered_office"
-        form.location_country_code.data = (
-            organisation.country_code
-        )
-        return
-
-    form.location_name.data = location.name
-    form.location_type.data = location.location_type
-    form.address_line_1.data = location.address_line_1
-    form.address_line_2.data = location.address_line_2
-    form.address_line_3.data = location.address_line_3
-    form.town_city.data = location.town_city
-    form.county_region.data = location.county_region
-    form.postcode.data = location.postcode
-    form.location_country_code.data = location.country_code
-    form.location_phone.data = location.phone
-    form.location_email.data = location.email
 
 
 def update_organisation(
@@ -195,46 +159,3 @@ def update_organisation(
     organisation.locale = form.locale.data.strip()
 
 
-def update_location(
-    *,
-    location: OrganisationLocation,
-    form: OrganisationSettingsForm,
-) -> None:
-    location.name = form.location_name.data.strip()
-    location.location_type = form.location_type.data
-
-    location.address_line_1 = (
-        form.address_line_1.data.strip()
-    )
-    location.address_line_2 = optional_text(
-        form.address_line_2.data
-    )
-    location.address_line_3 = optional_text(
-        form.address_line_3.data
-    )
-    location.town_city = form.town_city.data.strip()
-    location.county_region = optional_text(
-        form.county_region.data
-    )
-    location.postcode = optional_text(
-        form.postcode.data
-    )
-
-    if location.postcode:
-        location.postcode = location.postcode.upper()
-
-    location.country_code = (
-        form.location_country_code.data.strip().upper()
-    )
-    location.phone = optional_text(
-        form.location_phone.data
-    )
-    location.email = optional_text(
-        form.location_email.data
-    )
-
-    if location.email:
-        location.email = location.email.lower()
-
-    location.is_primary = True
-    location.is_active = True
