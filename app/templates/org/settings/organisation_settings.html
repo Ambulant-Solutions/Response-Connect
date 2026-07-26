@@ -61,7 +61,7 @@
 
     <form
         method="post"
-        action="{{ url_for('org.settings.index') }}"
+        action="{{ url_for('org.settings.organisation') }}"
         class="settings-form"
     >
         {{ form.hidden_tag() }}
@@ -235,7 +235,7 @@
 
         <footer class="settings-form__actions">
             <a
-                href="{{ url_for('org.org') }}"
+                href="{{ url_for('org.settings.index') }}"
                 class="button button--secondary"
             >
                 Cancel

@@ -2,4 +2,5 @@ from flask import Blueprint
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
-import app.blueprints.org.settings.routes, app.blueprints.org.settings.settings
+from app.blueprints.org.settings import routes  # noqa: E402, F401
+from app.blueprints.org.settings import organisation  # noqa: E402, F401

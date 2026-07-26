@@ -1,0 +1,140 @@
+{% extends "org/org_base.html" %}
+
+
+{% macro card_contents(item) %}
+    <span class="settings-hub-card__icon">
+        <iconify-icon
+            icon="{{ item.icon }}"
+            aria-hidden="true"
+        ></iconify-icon>
+    </span>
+
+    <span class="settings-hub-card__content">
+        <span class="settings-hub-card__heading">
+            <span class="settings-hub-card__title">
+                {{ item.title }}
+            </span>
+
+            <span
+                class="
+                    settings-hub-card__status
+                    settings-hub-card__status--{{ item.status_style }}
+                "
+            >
+                {{ item.status }}
+            </span>
+        </span>
+
+        <span class="settings-hub-card__description">
+            {{ item.description }}
+        </span>
+
+        {% if item.meta %}
+            <span class="settings-hub-card__meta">
+                {{ item.meta }}
+            </span>
+        {% endif %}
+    </span>
+
+    {% if item.url %}
+        <iconify-icon
+            class="settings-hub-card__arrow"
+            icon="tabler:chevron-right"
+            aria-hidden="true"
+        ></iconify-icon>
+    {% endif %}
+{% endmacro %}
+
+
+{% block title %}
+    System settings · Response Connect
+{% endblock %}
+
+
+{% block meta_description %}
+    Manage Response Connect organisation and operational settings.
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section
+    class="settings-hub"
+    aria-labelledby="system-settings-title"
+>
+    <header class="settings-hub__header">
+        <div>
+            <span class="eyebrow">
+                Organisation administration
+            </span>
+
+            <h1 id="system-settings-title">
+                System settings
+            </h1>
+
+            <p>
+                Manage the organisation-wide lists, classifications and
+                defaults used throughout Response Connect.
+            </p>
+        </div>
+
+        <div class="settings-hub__organisation">
+            <iconify-icon
+                icon="tabler:building"
+                aria-hidden="true"
+            ></iconify-icon>
+
+            <span>
+                <small>Current organisation</small>
+                <strong>{{ organisation.name }}</strong>
+            </span>
+        </div>
+    </header>
+
+    <div class="settings-hub__sections">
+        {% for section in settings_sections %}
+            <section
+                class="settings-hub-section"
+                aria-labelledby="settings-section-{{ section.id }}"
+            >
+                <header class="settings-hub-section__header">
+                    <div>
+                        <h2 id="settings-section-{{ section.id }}">
+                            {{ section.title }}
+                        </h2>
+
+                        <p>{{ section.description }}</p>
+                    </div>
+                </header>
+
+                <div class="settings-hub-grid">
+                    {% for item in section["items"] %}
+                        {% if item.url %}
+                            <a
+                                class="settings-hub-card"
+                                href="{{ item.url }}"
+                            >
+                                {{ card_contents(item) }}
+                            </a>
+                        {% else %}
+                            <div
+                                class="
+                                    settings-hub-card
+                                    settings-hub-card--disabled
+                                "
+                                aria-disabled="true"
+                            >
+                                {{ card_contents(item) }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

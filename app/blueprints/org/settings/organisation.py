@@ -36,7 +36,7 @@ def optional_text(value: str | None) -> str | None:
     strict_slashes=False,
 )
 @permission_required("org:manage")
-def index():
+def organisation():
     organisation = require_current_organisation()
     location = organisation.primary_location_record
 
@@ -88,7 +88,7 @@ def index():
             )
 
             return redirect(
-                url_for("org.settings.index")
+                url_for("org.settings.organisation")
             )
 
     return render_template(

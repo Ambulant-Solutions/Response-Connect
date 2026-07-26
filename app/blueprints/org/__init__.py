@@ -19,7 +19,7 @@ from app.blueprints.org.reports import reports_bp  # noqa: F401
 from app.blueprints.org.safeguarding import safeguarding_bp  # noqa: F401
 from app.blueprints.org.scheduling import scheduling_bp  # noqa: F401
 from app.blueprints.org.stock import stock_bp  # noqa: F401
-from app.blueprints.org.settings import settings_bp
+from app.blueprints.org.settings import settings_bp # noqa: F401
 
 org_bp = Blueprint("org", __name__, url_prefix="/org")
 
