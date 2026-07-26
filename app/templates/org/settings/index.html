@@ -4,7 +4,7 @@
 {% macro card_contents(item) %}
     <span class="settings-hub-card__icon">
         <iconify-icon
-            icon="{{ item.icon }}"
+            icon="{{ item['icon'] }}"
             aria-hidden="true"
         ></iconify-icon>
     </span>
@@ -12,31 +12,31 @@
     <span class="settings-hub-card__content">
         <span class="settings-hub-card__heading">
             <span class="settings-hub-card__title">
-                {{ item.title }}
+                {{ item["title"] }}
             </span>
 
             <span
                 class="
                     settings-hub-card__status
-                    settings-hub-card__status--{{ item.status_style }}
+                    settings-hub-card__status--{{ item['status_style'] }}
                 "
             >
-                {{ item.status }}
+                {{ item["status"] }}
             </span>
         </span>
 
         <span class="settings-hub-card__description">
-            {{ item.description }}
+            {{ item["description"] }}
         </span>
 
-        {% if item.meta %}
+        {% if item["meta"] %}
             <span class="settings-hub-card__meta">
-                {{ item.meta }}
+                {{ item["meta"] }}
             </span>
         {% endif %}
     </span>
 
-    {% if item.url %}
+    {% if item["url"] %}
         <iconify-icon
             class="settings-hub-card__arrow"
             icon="tabler:chevron-right"
@@ -97,44 +97,44 @@
 
     <div class="settings-hub__sections">
         {% for section in settings_sections %}
-            <section
-                class="settings-hub-section"
-                aria-labelledby="settings-section-{{ section.id }}"
-            >
-                <header class="settings-hub-section__header">
-                    <div>
-                        <h2 id="settings-section-{{ section.id }}">
-                            {{ section.title }}
-                        </h2>
+    <section
+        class="settings-hub-section"
+        aria-labelledby="settings-section-{{ section['id'] }}"
+    >
+        <header class="settings-hub-section__header">
+            <div>
+                <h2 id="settings-section-{{ section['id'] }}">
+                    {{ section["title"] }}
+                </h2>
 
-                        <p>{{ section.description }}</p>
+                <p>{{ section["description"] }}</p>
+            </div>
+        </header>
+
+        <div class="settings-hub-grid">
+            {% for item in section["items"] %}
+                {% if item["url"] %}
+                    <a
+                        class="settings-hub-card"
+                        href="{{ item['url'] }}"
+                    >
+                        {{ card_contents(item) }}
+                    </a>
+                {% else %}
+                    <div
+                        class="
+                            settings-hub-card
+                            settings-hub-card--disabled
+                        "
+                        aria-disabled="true"
+                    >
+                        {{ card_contents(item) }}
                     </div>
-                </header>
-
-                <div class="settings-hub-grid">
-                    {% for item in section["items"] %}
-                        {% if item.url %}
-                            <a
-                                class="settings-hub-card"
-                                href="{{ item.url }}"
-                            >
-                                {{ card_contents(item) }}
-                            </a>
-                        {% else %}
-                            <div
-                                class="
-                                    settings-hub-card
-                                    settings-hub-card--disabled
-                                "
-                                aria-disabled="true"
-                            >
-                                {{ card_contents(item) }}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </section>
-        {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+{% endfor %}
     </div>
 </section>
 {% endblock %}
