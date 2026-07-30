@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import unittest
-from datetime import date
+from datetime import date, timedelta
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from app import create_app
 from app.blueprints.auth.catalogue import (
     ensure_permission_catalogue,
@@ -14,7 +15,13 @@ from app.blueprints.auth.models import (
     role_permissions,
     user_roles,
 )
-from app.blueprints.org.hr.models import StaffMember
+from app.blueprints.org.hr.models import (
+    ClinicalGrade,
+    JobPosition,
+    StaffClinicalGradeAssignment,
+    StaffMember,
+    StaffPositionAssignment,
+)
 from app.blueprints.people.models import Person
 from app.extensions import db
 
@@ -25,6 +32,10 @@ TEST_TABLES = (
     Role.__table__,
     UserAccount.__table__,
     StaffMember.__table__,
+    JobPosition.__table__,
+    ClinicalGrade.__table__,
+    StaffPositionAssignment.__table__,
+    StaffClinicalGradeAssignment.__table__,
     role_permissions,
     user_roles,
 )
@@ -204,6 +215,199 @@ class PeopleAndStaffTestCase(unittest.TestCase):
             "personal:upload_training",
             staff_role.permission_names,
         )
+
+    def test_staff_position_assignment_history(self):
+        today = date.today()
+
+        person = Person(
+            first_name="Jordan",
+            last_name="Taylor",
+        )
+
+        staff_member = StaffMember(
+            person=person,
+            employee_number="RC-0100",
+        )
+
+        responder = JobPosition(
+            name="First Responder",
+            sort_order=10,
+        )
+
+        team_leader = JobPosition(
+            name="Team Leader",
+            sort_order=20,
+        )
+
+        previous_assignment = StaffPositionAssignment(
+            staff_member=staff_member,
+            position=responder,
+            start_date=today - timedelta(days=365),
+            end_date=today - timedelta(days=1),
+        )
+
+        current_assignment = StaffPositionAssignment(
+            staff_member=staff_member,
+            position=team_leader,
+            start_date=today,
+            is_primary=True,
+        )
+
+        db.session.add_all(
+            [
+                staff_member,
+                responder,
+                team_leader,
+                previous_assignment,
+                current_assignment,
+            ]
+        )
+        db.session.commit()
+
+        self.assertFalse(previous_assignment.is_current)
+        self.assertTrue(current_assignment.is_current)
+        self.assertTrue(current_assignment.is_primary)
+
+        self.assertIn(
+            previous_assignment,
+            staff_member.position_assignments,
+        )
+        self.assertIn(
+            current_assignment,
+            staff_member.position_assignments,
+        )
+        self.assertIn(
+            current_assignment,
+            team_leader.staff_assignments,
+        )
+
+
+    def test_staff_clinical_grade_history(self):
+        today = date.today()
+
+        person = Person(
+            first_name="Morgan",
+            last_name="Lewis",
+        )
+
+        staff_member = StaffMember(
+            person=person,
+            employee_number="RC-0101",
+        )
+
+        responder_grade = ClinicalGrade(
+            name="First Responder",
+            abbreviation="FR",
+            sort_order=10,
+        )
+
+        technician_grade = ClinicalGrade(
+            name="Emergency Medical Technician",
+            abbreviation="EMT",
+            sort_order=20,
+        )
+
+        previous_assignment = StaffClinicalGradeAssignment(
+            staff_member=staff_member,
+            clinical_grade=responder_grade,
+            start_date=today - timedelta(days=730),
+            end_date=today - timedelta(days=1),
+        )
+
+        current_assignment = StaffClinicalGradeAssignment(
+            staff_member=staff_member,
+            clinical_grade=technician_grade,
+            start_date=today,
+            is_primary=True,
+        )
+
+        db.session.add_all(
+            [
+                staff_member,
+                responder_grade,
+                technician_grade,
+                previous_assignment,
+                current_assignment,
+            ]
+        )
+        db.session.commit()
+
+        self.assertFalse(previous_assignment.is_current)
+        self.assertTrue(current_assignment.is_current)
+        self.assertTrue(current_assignment.is_primary)
+
+        self.assertIn(
+            previous_assignment,
+            staff_member.clinical_grade_assignments,
+        )
+        self.assertIn(
+            current_assignment,
+            staff_member.clinical_grade_assignments,
+        )
+        self.assertIn(
+            current_assignment,
+            technician_grade.staff_assignments,
+        )
+
+
+    def test_assignment_end_date_cannot_precede_start_date(self):
+        today = date.today()
+
+        person = Person(
+            first_name="Casey",
+            last_name="Williams",
+        )
+
+        staff_member = StaffMember(
+            person=person,
+            employee_number="RC-0102",
+        )
+
+        position = JobPosition(
+            name="Operations Manager",
+        )
+
+        clinical_grade = ClinicalGrade(
+            name="Paramedic",
+            abbreviation="Para",
+        )
+
+        db.session.add_all(
+            [
+                staff_member,
+                position,
+                clinical_grade,
+            ]
+        )
+        db.session.commit()
+
+        invalid_position_assignment = StaffPositionAssignment(
+            staff_member=staff_member,
+            position=position,
+            start_date=today,
+            end_date=today - timedelta(days=1),
+        )
+
+        db.session.add(invalid_position_assignment)
+
+        with self.assertRaises(IntegrityError):
+            db.session.commit()
+
+        db.session.rollback()
+
+        invalid_grade_assignment = StaffClinicalGradeAssignment(
+            staff_member=staff_member,
+            clinical_grade=clinical_grade,
+            start_date=today,
+            end_date=today - timedelta(days=1),
+        )
+
+        db.session.add(invalid_grade_assignment)
+
+        with self.assertRaises(IntegrityError):
+            db.session.commit()
+
+        db.session.rollback()
 
 
 if __name__ == "__main__":
