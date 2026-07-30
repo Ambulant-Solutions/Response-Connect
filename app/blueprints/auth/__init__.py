@@ -90,6 +90,37 @@ def permission_required(permission_name: str):
 
     return decorator
 
+def any_permission_required(
+    *permission_names: str,
+):
+    if not permission_names:
+        raise ValueError(
+            "At least one permission name is required."
+        )
+
+    def decorator(view_func):
+        @wraps(view_func)
+        @login_required
+        def wrapped(*args, **kwargs):
+            if not any(
+                current_user.has_permission(name)
+                for name in permission_names
+            ):
+                flash(
+                    "You do not have permission to access "
+                    "this section.",
+                    "danger",
+                )
+                return redirect(
+                    url_for("main.index")
+                )
+
+            return view_func(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
+
 
 @auth_bp.get("/permissions")
 @permission_required("auth:manage_users")

@@ -1,0 +1,223 @@
+{% extends "org/org_base.html" %}
+
+
+{% set can_manage = current_user.has_permission("hr:manage") %}
+
+
+{% block title %}
+    Job positions · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page">
+    <header class="settings-page__header">
+        <div>
+            <a
+                class="settings-back-link"
+                href="{{ url_for('org.hr.hr') }}"
+            >
+                <iconify-icon
+                    icon="tabler:arrow-left"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Back to HR
+            </a>
+
+            <br>
+
+            <span class="eyebrow">
+                Workforce configuration
+            </span>
+
+            <h1>Job positions</h1>
+
+            <p>
+                Define the organisational positions that may be
+                assigned to staff members.
+            </p>
+        </div>
+
+        {% if can_manage %}
+            <a
+                class="button button--primary"
+                href="{{ url_for(
+                    'org.hr.job_position_create'
+                ) }}"
+            >
+                <iconify-icon
+                    icon="tabler:plus"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Add position
+            </a>
+        {% endif %}
+    </header>
+
+    {% if positions %}
+        <div class="hr-catalogue-list">
+            {% for position in positions %}
+                {% set current_assignment_count = (
+                    position.staff_assignments
+                    | selectattr("is_current")
+                    | list
+                    | length
+                ) %}
+
+                <article
+                    class="
+                        hr-catalogue-card
+                        {% if not position.is_active %}
+                            is-inactive
+                        {% endif %}
+                    "
+                >
+                    <div class="hr-catalogue-card__icon">
+                        <iconify-icon
+                            icon="tabler:briefcase"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </div>
+
+                    <div class="hr-catalogue-card__content">
+                        <header>
+                            <h2>{{ position.name }}</h2>
+
+                            <span
+                                class="
+                                    status-pill
+                                    {% if position.is_active %}
+                                        status-pill--success
+                                    {% else %}
+                                        status-pill--muted
+                                    {% endif %}
+                                "
+                            >
+                                {{ "Active" if position.is_active else "Inactive" }}
+                            </span>
+                        </header>
+
+                        <p>
+                            {{ position.description or
+                               "No description has been provided." }}
+                        </p>
+
+                        <div class="hr-catalogue-card__properties">
+                            <span>
+                                <iconify-icon
+                                    icon="tabler:users"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+
+                                {{ current_assignment_count }}
+                                current
+                                assignment{{ "" if current_assignment_count == 1 else "s" }}
+                            </span>
+
+                            <span>
+                                <iconify-icon
+                                    icon="tabler:history"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+
+                                {{ position.staff_assignments|length }}
+                                total
+                                assignment{{ "" if position.staff_assignments|length == 1 else "s" }}
+                            </span>
+
+                            <span>
+                                <iconify-icon
+                                    icon="tabler:sort-ascending"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+
+                                Display order {{ position.sort_order }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if can_manage %}
+                        <div class="hr-catalogue-card__actions">
+                            <a
+                                class="button button--secondary"
+                                href="{{ url_for(
+                                    'org.hr.job_position_edit',
+                                    position_id=position.id
+                                ) }}"
+                            >
+                                Edit
+                            </a>
+
+                            {% if position.is_active %}
+                                <form
+                                    method="post"
+                                    action="{{ url_for(
+                                        'org.hr.job_position_deactivate',
+                                        position_id=position.id
+                                    ) }}"
+                                >
+                                    {{ action_form.hidden_tag() }}
+
+                                    <button
+                                        class="button button--danger"
+                                        type="submit"
+                                    >
+                                        Deactivate
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form
+                                    method="post"
+                                    action="{{ url_for(
+                                        'org.hr.job_position_activate',
+                                        position_id=position.id
+                                    ) }}"
+                                >
+                                    {{ action_form.hidden_tag() }}
+
+                                    <button
+                                        class="button button--primary"
+                                        type="submit"
+                                    >
+                                        Activate
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <section class="hr-catalogue-empty">
+            <iconify-icon
+                icon="tabler:briefcase-off"
+                aria-hidden="true"
+            ></iconify-icon>
+
+            <h2>No job positions configured</h2>
+
+            <p>
+                Create positions before assigning them to members
+                of staff.
+            </p>
+
+            {% if can_manage %}
+                <a
+                    class="button button--primary"
+                    href="{{ url_for(
+                        'org.hr.job_position_create'
+                    ) }}"
+                >
+                    Create first position
+                </a>
+            {% endif %}
+        </section>
+    {% endif %}
+</section>
+{% endblock %}

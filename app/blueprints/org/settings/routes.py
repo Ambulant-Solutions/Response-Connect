@@ -2,13 +2,19 @@ from __future__ import annotations
 
 from flask import render_template, url_for
 
-from app.blueprints.auth import permission_required
+from flask_login import current_user
+
+from app.blueprints.auth import permission_required, any_permission_required
 from app.blueprints.org.services import require_current_organisation
 from app.blueprints.org.settings import settings_bp
 
 
 @settings_bp.get("/", strict_slashes=False)
-@permission_required("org:manage")
+@any_permission_required(
+    "org:manage",
+    "auth:manage_users",
+    "hr:configure",
+)
 def index():
     organisation = require_current_organisation()
 
@@ -93,18 +99,22 @@ def index():
                     "status": "Available",
                     "status_style": "available",
                     "meta": "Access control",
+                    "permission": "auth:manage_users",
                 },
                 {
-                    "title": "Staff grades",
+                    "title": "Workforce configuration",
                     "description": (
-                        "Configure clinical grades, operational roles "
-                        "and staff classifications."
+                        "Configure job positions, clinical grades "
+                        "and other HR reference data."
                     ),
-                    "icon": "tabler:users-group",
-                    "url": None,
-                    "status": "Planned",
-                    "status_style": "planned",
-                    "meta": "HR and scheduling",
+                    "icon": "tabler:users-cog",
+                    "url": url_for(
+                        "org.settings.workforce_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
+                    "meta": "HR configuration",
+                    "permission": "hr:configure",
                 },
                 {
                     "title": "Qualifications and competencies",
@@ -256,6 +266,30 @@ def index():
             ],
         },
     ]
+
+    visible_sections = []
+
+    for section in settings_sections:
+        visible_items = [
+            item
+            for item in section["items"]
+            if current_user.has_permission(
+                item.get(
+                    "permission",
+                    "org:manage",
+                )
+            )
+        ]
+
+        if visible_items:
+            visible_sections.append(
+                {
+                    **section,
+                    "items": visible_items,
+                }
+            )
+
+    settings_sections = visible_sections
 
     return render_template(
         "org/settings/index.html",

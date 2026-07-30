@@ -1,0 +1,830 @@
+{% extends "org/org_base.html" %}
+
+
+{% set active_count = active_staff_count|default(0, true) %}
+{% set starter_count = upcoming_starter_count|default(0, true) %}
+{% set leaver_count = upcoming_leaver_count|default(0, true) %}
+{% set position_gap_count = without_position_count|default(0, true) %}
+{% set grade_gap_count = without_grade_count|default(0, true) %}
+{% set gap_count = assignment_gap_count|default(
+    position_gap_count + grade_gap_count,
+    true
+) %}
+{% set staff_url = staff_directory_url|default("/org/hr/staff", true) %}
+{% set new_staff_url = add_staff_url|default("/org/hr/staff/new", true) %}
+{% set settings_url = workforce_settings_url|default(
+    "/org/settings/workforce",
+    true
+) %}
+{% if can_manage_hr is defined %}
+    {% set can_manage = can_manage_hr %}
+{% elif current_user.is_authenticated %}
+    {% set can_manage = current_user.has_permission("hr:manage") %}
+{% else %}
+    {% set can_manage = false %}
+{% endif %}
+{% if can_configure_hr is defined %}
+    {% set can_configure = can_configure_hr %}
+{% elif current_user.is_authenticated %}
+    {% set can_configure = current_user.has_permission("hr:configure") %}
+{% else %}
+    {% set can_configure = false %}
+{% endif %}
+{% set assignment_requirement_count = active_count * 2 %}
+{% set completed_requirement_count = assignment_requirement_count - gap_count %}
+{% if completed_requirement_count < 0 %}
+    {% set completed_requirement_count = 0 %}
+{% endif %}
+{% if assignment_requirement_count %}
+    {% set assignment_score = (
+        completed_requirement_count * 100
+        // assignment_requirement_count
+    ) %}
+{% else %}
+    {% set assignment_score = 0 %}
+{% endif %}
+
+
+{% block title %}
+    Human resources · Response Connect
+{% endblock %}
+
+
+{% block meta_description %}
+    Monitor staffing, workforce changes and HR records in Response Connect.
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-dashboard
+{% endblock %}
+
+
+{% block content %}
+<section
+    class="org-dashboard hr-dashboard"
+    aria-labelledby="hr-dashboard-title"
+>
+    <header class="dashboard-heading hr-dashboard__heading">
+        <div class="dashboard-heading__title-row">
+            <div>
+                <span class="eyebrow">Workforce management</span>
+
+                <h1 id="hr-dashboard-title">
+                    Human resources
+                </h1>
+
+                <p>
+                    Monitor your workforce, act on incomplete records
+                    and manage upcoming staff changes.
+                </p>
+            </div>
+
+            <div class="hr-dashboard__heading-actions">
+                <a
+                    class="button button--secondary"
+                    href="{{ staff_url }}"
+                >
+                    <iconify-icon
+                        icon="tabler:users"
+                        aria-hidden="true"
+                    ></iconify-icon>
+                    Staff directory
+                </a>
+
+                {% if can_manage %}
+                    <a
+                        class="button button--primary"
+                        href="{{ new_staff_url }}"
+                    >
+                        <iconify-icon
+                            icon="tabler:user-plus"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                        Add staff member
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section
+        class="org-kpi-grid"
+        aria-label="Workforce overview"
+    >
+        <a
+            class="org-kpi-card"
+            href="{{ staff_url }}"
+        >
+            <span
+                class="
+                    org-kpi-card__icon
+                    org-kpi-card__icon--teal
+                "
+            >
+                <iconify-icon
+                    icon="tabler:users-group"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </span>
+
+            <span class="org-kpi-card__body">
+                <small>Active staff</small>
+                <strong>{{ active_count }}</strong>
+                <span>Current workforce</span>
+            </span>
+        </a>
+
+        <a
+            class="org-kpi-card"
+            href="{{ staff_url }}?view=upcoming-starters"
+        >
+            <span
+                class="
+                    org-kpi-card__icon
+                    org-kpi-card__icon--success
+                "
+            >
+                <iconify-icon
+                    icon="tabler:user-plus"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </span>
+
+            <span class="org-kpi-card__body">
+                <small>Upcoming starters</small>
+                <strong>{{ starter_count }}</strong>
+                <span>Joining in the next 30 days</span>
+            </span>
+        </a>
+
+        <a
+            class="org-kpi-card"
+            href="{{ staff_url }}?view=upcoming-leavers"
+        >
+            <span
+                class="
+                    org-kpi-card__icon
+                    org-kpi-card__icon--accent
+                "
+            >
+                <iconify-icon
+                    icon="tabler:user-minus"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </span>
+
+            <span class="org-kpi-card__body">
+                <small>Upcoming leavers</small>
+                <strong>{{ leaver_count }}</strong>
+                <span>Leaving in the next 30 days</span>
+            </span>
+        </a>
+
+        <a
+            class="org-kpi-card"
+            href="{{ staff_url }}?view=assignment-gaps"
+        >
+            <span
+                class="
+                    org-kpi-card__icon
+                    {% if gap_count %}
+                        org-kpi-card__icon--warning
+                    {% else %}
+                        org-kpi-card__icon--success
+                    {% endif %}
+                "
+            >
+                <iconify-icon
+                    icon="{{
+                        'tabler:alert-triangle'
+                        if gap_count
+                        else 'tabler:circle-check'
+                    }}"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </span>
+
+            <span class="org-kpi-card__body">
+                <small>Assignment gaps</small>
+                <strong>{{ gap_count }}</strong>
+                <span>
+                    {% if gap_count %}
+                        Records requiring attention
+                    {% else %}
+                        No current gaps detected
+                    {% endif %}
+                </span>
+            </span>
+        </a>
+    </section>
+
+    <div class="org-dashboard-layout">
+        <div class="org-dashboard-main">
+            <section
+                class="dashboard-card operational-section"
+                aria-labelledby="hr-priorities-title"
+            >
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">
+                            Action centre
+                        </span>
+
+                        <h2 id="hr-priorities-title">
+                            Workforce priorities
+                        </h2>
+                    </div>
+
+                    <a class="text-link" href="{{ staff_url }}">
+                        Open staff directory
+                        <iconify-icon
+                            icon="tabler:arrow-right"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </a>
+                </div>
+
+                <div class="hr-priority-list">
+                    {% if position_gap_count %}
+                        <a
+                            class="hr-priority"
+                            href="{{ staff_url }}?view=missing-position"
+                        >
+                            <span
+                                class="
+                                    record-alert__icon
+                                    record-alert__icon--danger
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:briefcase-off"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span class="hr-priority__body">
+                                <strong>
+                                    Assign missing job positions
+                                </strong>
+                                <small>
+                                    {{ position_gap_count }}
+                                    active staff
+                                    record{{
+                                        "" if position_gap_count == 1 else "s"
+                                    }}
+                                    do not have a current position.
+                                </small>
+                            </span>
+
+                            <span class="hr-priority__count">
+                                {{ position_gap_count }}
+                            </span>
+
+                            <iconify-icon
+                                class="hr-priority__arrow"
+                                icon="tabler:chevron-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+                    {% endif %}
+
+                    {% if grade_gap_count %}
+                        <a
+                            class="hr-priority"
+                            href="{{ staff_url }}?view=missing-primary-grade"
+                        >
+                            <span class="record-alert__icon">
+                                <iconify-icon
+                                    icon="tabler:stethoscope-off"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span class="hr-priority__body">
+                                <strong>
+                                    Assign primary clinical grades
+                                </strong>
+                                <small>
+                                    {{ grade_gap_count }}
+                                    active staff
+                                    record{{
+                                        "" if grade_gap_count == 1 else "s"
+                                    }}
+                                    do not have a primary grade.
+                                </small>
+                            </span>
+
+                            <span class="hr-priority__count">
+                                {{ grade_gap_count }}
+                            </span>
+
+                            <iconify-icon
+                                class="hr-priority__arrow"
+                                icon="tabler:chevron-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+                    {% endif %}
+
+                    {% if starter_count %}
+                        <a
+                            class="hr-priority"
+                            href="{{ staff_url }}?view=upcoming-starters"
+                        >
+                            <span
+                                class="
+                                    record-alert__icon
+                                    record-alert__icon--notice
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:user-check"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span class="hr-priority__body">
+                                <strong>
+                                    Prepare upcoming starters
+                                </strong>
+                                <small>
+                                    Review employment details and
+                                    workforce assignments before their
+                                    start dates.
+                                </small>
+                            </span>
+
+                            <span class="hr-priority__count">
+                                {{ starter_count }}
+                            </span>
+
+                            <iconify-icon
+                                class="hr-priority__arrow"
+                                icon="tabler:chevron-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+                    {% endif %}
+
+                    {% if leaver_count %}
+                        <a
+                            class="hr-priority"
+                            href="{{ staff_url }}?view=upcoming-leavers"
+                        >
+                            <span
+                                class="
+                                    record-alert__icon
+                                    record-alert__icon--notice
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:logout"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span class="hr-priority__body">
+                                <strong>
+                                    Complete leaver actions
+                                </strong>
+                                <small>
+                                    Review access, assignments and
+                                    outstanding records before staff
+                                    leave.
+                                </small>
+                            </span>
+
+                            <span class="hr-priority__count">
+                                {{ leaver_count }}
+                            </span>
+
+                            <iconify-icon
+                                class="hr-priority__arrow"
+                                icon="tabler:chevron-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+                    {% endif %}
+
+                    {% if not (
+                        position_gap_count
+                        or grade_gap_count
+                        or starter_count
+                        or leaver_count
+                    ) %}
+                        <div class="hr-dashboard-empty">
+                            <span
+                                class="
+                                    hr-dashboard-empty__icon
+                                    hr-dashboard-empty__icon--success
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:circle-check"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span>
+                                <strong>No immediate HR actions</strong>
+                                <small>
+                                    Workforce assignments are complete
+                                    and there are no staff changes due
+                                    in the next 30 days.
+                                </small>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section
+                class="dashboard-card operational-section"
+                aria-labelledby="hr-changes-title"
+            >
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">
+                            Next 30 days
+                        </span>
+
+                        <h2 id="hr-changes-title">
+                            Workforce changes
+                        </h2>
+                    </div>
+
+                    <a
+                        class="text-link"
+                        href="{{ staff_url }}?view=workforce-changes"
+                    >
+                        View all changes
+                        <iconify-icon
+                            icon="tabler:arrow-right"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </a>
+                </div>
+
+                {% if workforce_changes|default([]) %}
+                    <div class="hr-change-list">
+                        {% for change in workforce_changes %}
+                            <a
+                                class="hr-change"
+                                href="{{ change.url|default(staff_url) }}"
+                            >
+                                <span
+                                    class="
+                                        hr-change__avatar
+                                        hr-change__avatar--{{
+                                            change.type_code|default('starter')
+                                        }}
+                                    "
+                                    aria-hidden="true"
+                                >
+                                    {% if change.initials|default("") %}
+                                        {{ change.initials }}
+                                    {% else %}
+                                        <iconify-icon
+                                            icon="tabler:user"
+                                        ></iconify-icon>
+                                    {% endif %}
+                                </span>
+
+                                <span class="hr-change__details">
+                                    <span class="hr-change__title">
+                                        <strong>
+                                            {{ change.name }}
+                                        </strong>
+
+                                        <span
+                                            class="
+                                                status-pill
+                                                status-pill--{{
+                                                    'pending'
+                                                    if change.type_code|default('starter') == 'leaver'
+                                                    else 'confirmed'
+                                                }}
+                                            "
+                                        >
+                                            {{
+                                                "Leaver"
+                                                if change.type_code|default('starter') == "leaver"
+                                                else "Starter"
+                                            }}
+                                        </span>
+                                    </span>
+
+                                    <small>
+                                        {{ change.employee_number }}
+                                        {% if change.detail|default("") %}
+                                            · {{ change.detail }}
+                                        {% endif %}
+                                    </small>
+                                </span>
+
+                                <span class="hr-change__date">
+                                    <small>
+                                        {{
+                                            "Leaves"
+                                            if change.type_code|default('starter') == "leaver"
+                                            else "Starts"
+                                        }}
+                                    </small>
+                                    <strong>{{ change.date_label }}</strong>
+                                </span>
+
+                                <iconify-icon
+                                    class="hr-change__arrow"
+                                    icon="tabler:chevron-right"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% elif starter_count or leaver_count %}
+                    <div class="hr-change-summary">
+                        <a
+                            href="{{ staff_url }}?view=upcoming-starters"
+                        >
+                            <span
+                                class="
+                                    hr-change-summary__icon
+                                    hr-change-summary__icon--starter
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:user-plus"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span>
+                                <strong>
+                                    {{ starter_count }}
+                                    upcoming
+                                    starter{{
+                                        "" if starter_count == 1 else "s"
+                                    }}
+                                </strong>
+                                <small>
+                                    Review new-starter records and
+                                    assignments.
+                                </small>
+                            </span>
+
+                            <iconify-icon
+                                icon="tabler:arrow-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+
+                        <a
+                            href="{{ staff_url }}?view=upcoming-leavers"
+                        >
+                            <span
+                                class="
+                                    hr-change-summary__icon
+                                    hr-change-summary__icon--leaver
+                                "
+                            >
+                                <iconify-icon
+                                    icon="tabler:user-minus"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span>
+                                <strong>
+                                    {{ leaver_count }}
+                                    upcoming
+                                    leaver{{
+                                        "" if leaver_count == 1 else "s"
+                                    }}
+                                </strong>
+                                <small>
+                                    Review offboarding requirements
+                                    and end dates.
+                                </small>
+                            </span>
+
+                            <iconify-icon
+                                icon="tabler:arrow-right"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="hr-dashboard-empty">
+                        <span class="hr-dashboard-empty__icon">
+                            <iconify-icon
+                                icon="tabler:calendar-check"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </span>
+
+                        <span>
+                            <strong>No upcoming workforce changes</strong>
+                            <small>
+                                No staff members are currently due to
+                                start or leave within the next 30 days.
+                            </small>
+                        </span>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <aside
+            class="org-dashboard-sidebar hr-dashboard-sidebar"
+            aria-label="HR tools"
+        >
+            <article class="dashboard-card hr-health-card">
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">
+                            Record quality
+                        </span>
+
+                        <h2>Workforce health</h2>
+                    </div>
+
+                    <span
+                        class="
+                            hr-health-card__status
+                            {% if gap_count %}
+                                hr-health-card__status--attention
+                            {% endif %}
+                        "
+                    >
+                        {{ "Attention" if gap_count else "On track" }}
+                    </span>
+                </div>
+
+                <div class="hr-health-card__score">
+                    <span
+                        class="hr-health-ring"
+                        style="--score: {{ assignment_score }};"
+                        role="img"
+                        aria-label="{{
+                            assignment_score
+                        }} percent assignment completeness"
+                    >
+                        <strong>{{ assignment_score }}%</strong>
+                    </span>
+
+                    <span>
+                        <strong>Assignment completeness</strong>
+                        <small>
+                            Current job-position and primary-grade
+                            assignments across active staff.
+                        </small>
+                    </span>
+                </div>
+
+                <dl class="hr-health-card__details">
+                    <div>
+                        <dt>Active workforce</dt>
+                        <dd>{{ active_count }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Position gaps</dt>
+                        <dd>{{ position_gap_count }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Clinical-grade gaps</dt>
+                        <dd>{{ grade_gap_count }}</dd>
+                    </div>
+                </dl>
+            </article>
+
+            <section
+                class="dashboard-card sidebar-actions"
+                aria-labelledby="hr-quick-actions-title"
+            >
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">
+                            Create and manage
+                        </span>
+
+                        <h2 id="hr-quick-actions-title">
+                            Quick actions
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="sidebar-action-list">
+                    <a
+                        class="quick-action quick-action--sidebar"
+                        href="{{ staff_url }}"
+                    >
+                        <span class="quick-action__icon">
+                            <iconify-icon
+                                icon="tabler:address-book"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                        </span>
+
+                        <span>
+                            <strong>Staff directory</strong>
+                            <small>
+                                Find and manage staff records
+                            </small>
+                        </span>
+                    </a>
+
+                    {% if can_manage %}
+                        <a
+                            class="quick-action quick-action--sidebar"
+                            href="{{ new_staff_url }}"
+                        >
+                            <span class="quick-action__icon">
+                                <iconify-icon
+                                    icon="tabler:user-plus"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span>
+                                <strong>Add staff member</strong>
+                                <small>
+                                    Create a new personnel record
+                                </small>
+                            </span>
+                        </a>
+                    {% endif %}
+
+                    {% if can_configure %}
+                        <a
+                            class="quick-action quick-action--sidebar"
+                            href="{{ settings_url }}"
+                        >
+                            <span class="quick-action__icon">
+                                <iconify-icon
+                                    icon="tabler:users-cog"
+                                    aria-hidden="true"
+                                ></iconify-icon>
+                            </span>
+
+                            <span>
+                                <strong>Workforce settings</strong>
+                                <small>
+                                    Positions, grades and HR defaults
+                                </small>
+                            </span>
+                        </a>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section
+                class="dashboard-card hr-period-card"
+                aria-labelledby="hr-period-title"
+            >
+                <div class="card-heading card-heading--bordered">
+                    <div>
+                        <span class="card-heading__eyebrow">
+                            Planning window
+                        </span>
+
+                        <h2 id="hr-period-title">
+                            Next 30 days
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="hr-period-card__stats">
+                    <a
+                        href="{{ staff_url }}?view=upcoming-starters"
+                    >
+                        <span>
+                            <iconify-icon
+                                icon="tabler:login"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            Joining
+                        </span>
+                        <strong>{{ starter_count }}</strong>
+                    </a>
+
+                    <a
+                        href="{{ staff_url }}?view=upcoming-leavers"
+                    >
+                        <span>
+                            <iconify-icon
+                                icon="tabler:logout"
+                                aria-hidden="true"
+                            ></iconify-icon>
+                            Leaving
+                        </span>
+                        <strong>{{ leaver_count }}</strong>
+                    </a>
+                </div>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}

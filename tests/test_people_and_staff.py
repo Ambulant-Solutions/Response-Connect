@@ -196,6 +196,11 @@ class PeopleAndStaffTestCase(unittest.TestCase):
             staff_role.permission_names,
         )
 
+        self.assertNotIn(
+            "hr:configure",
+            staff_role.permission_names,
+        )
+
         self.assertIn(
             "personal:upload_training",
             staff_role.permission_names,

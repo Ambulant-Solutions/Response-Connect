@@ -73,6 +73,14 @@ PERMISSION_DEFINITIONS = (
         "category": "hr",   
     },
     {
+        "name": "hr:configure",
+        "description": (
+            "Configure job positions, clinical grades "
+            "and HR reference data"
+        ),
+        "category": "hr",
+    },
+    {
         "name": "hr:manage_training",
         "description": (
             "Manage mandatory training courses and requirements"
