@@ -67,3 +67,11 @@ services:
 
     ports:
       - "5555:5555"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+    expose:
+      - "1025"

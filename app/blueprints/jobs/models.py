@@ -17,6 +17,9 @@ class JobStatus:
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
 
+class JobType:
+    EMAIL_SEND = "EMAIL_SEND"
+
 
 class Job(db.Model):
     __tablename__ = "jobs"

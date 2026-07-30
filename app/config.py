@@ -30,3 +30,30 @@ class Config:
     CELERY_TASK_TRACK_STARTED = True
 
     CELERY_TASK_TIME_LIMIT = 30 * 60
+
+    # Outgoing email
+    MAIL_SERVER = os.getenv("MAIL_SERVER", "")
+    MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME", "")
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
+
+    MAIL_USE_TLS = os.getenv("MAIL_USE_TLS", "true").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+    MAIL_USE_SSL = os.getenv("MAIL_USE_SSL", "false").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+    MAIL_DEFAULT_SENDER = os.getenv(
+        "MAIL_DEFAULT_SENDER",
+        "Response Connect <noreply@example.org>",
+    )
+
+    MAIL_TIMEOUT = int(os.getenv("MAIL_TIMEOUT", "30"))

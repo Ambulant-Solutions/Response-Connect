@@ -13,6 +13,7 @@ def make_celery(app=None):
         include=[
             "app.tasks.test",
             "app.blueprints.jobs.tasks",
+            "app.blueprints.email.handlers",
         ],
     )
 
