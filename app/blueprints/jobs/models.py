@@ -88,8 +88,3 @@ class Job(db.Model):
         Text,
         nullable=True,
     )
-
-    created_by: Mapped["UserAccount | None"] = relationship(
-        "UserAccount",
-        foreign_keys=[created_by_id],
-    )

@@ -12,6 +12,7 @@ def make_celery(app=None):
         backend=app.config["CELERY_RESULT_BACKEND"],
         include=[
             "app.tasks.test",
+            "app.blueprints.jobs.tasks",
         ],
     )
 
