@@ -151,7 +151,9 @@
                     <span>
                         <strong>Response <em>Connect</em></strong>
                         <small>
-                            {{ installation_name|default('Ambulance service management') }}
+                            {% if current_organisation %}
+                                <span class="installation-name">{{ current_organisation.name }}</span>
+                            {% endif %}
                         </small>
                     </span>
                 </div>
