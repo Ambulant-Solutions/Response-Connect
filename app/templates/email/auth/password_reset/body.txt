@@ -1,0 +1,17 @@
+Hello {{ recipient_name }},
+
+We received a request to reset the password for your {{ email_brand_name }} account.
+
+Use the link below to choose a new password:
+
+{{ reset_url }}
+
+This link expires in {{ expires_in_minutes }} minutes.
+
+If you did not request a password reset, you can ignore this email. Your current password will remain unchanged.
+
+For security, do not forward this email or share the reset link with anyone.
+
+Regards,
+
+{{ email_brand_name }}

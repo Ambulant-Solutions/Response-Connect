@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template
-
+from flask_login import login_required
 from app.blueprints.org.models import Organisation  # noqa: F401
 
 from app.blueprints.org.audit import audit_bp  # noqa: F401
@@ -43,6 +43,7 @@ org_bp.register_blueprint(settings_bp)
 org_bp.register_blueprint(stock_bp)
 
 @org_bp.get("/")
+@login_required
 def org():
     return render_template(
         "org/org.html",

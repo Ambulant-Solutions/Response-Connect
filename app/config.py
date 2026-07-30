@@ -73,3 +73,12 @@ class Config:
         "MAIL_PUBLIC_URL",
         "",
     )
+
+    PASSWORD_RESET_TOKEN_MAX_AGE = int(
+        os.getenv("PASSWORD_RESET_TOKEN_MAX_AGE", "3600")
+    )
+
+    PASSWORD_RESET_SALT = os.getenv(
+        "PASSWORD_RESET_SALT",
+        "response-connect-password-reset",
+    )

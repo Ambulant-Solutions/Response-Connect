@@ -7,7 +7,8 @@ from app.extensions import db
 
 main_bp = Blueprint("main", __name__)
 
-@login_required
+
 @main_bp.get("/")
+@login_required
 def index():
-    return render_template("index.html", current_user=current_user)
+    return render_template("index.html")
