@@ -9,6 +9,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
 
+class JobStatus:
+    PENDING = "PENDING"
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
 
 class Job(db.Model):
     __tablename__ = "jobs"
@@ -27,7 +35,7 @@ class Job(db.Model):
     status: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
-        default="QUEUED",
+        default=JobStatus.PENDING,
     )
 
     priority: Mapped[int] = mapped_column(

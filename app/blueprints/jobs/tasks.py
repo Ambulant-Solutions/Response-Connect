@@ -7,7 +7,7 @@ from typing import Any
 
 from app.celery import celery
 from app.extensions import db
-from app.blueprints.jobs.models import Job
+from app.blueprints.jobs.models import Job, JobStatus
 from app.blueprints.jobs.registry import get_handler
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def execute_job(self, job_id: str) -> dict[str, Any]:
         raise JobNotFoundError(f"Job {job_id} does not exist.")
 
     # Do not execute a job that has been cancelled before the worker receives it.
-    if job.status == "CANCELLED":
+    if job.status == JobStatus.CANCELLED:
         logger.info("Job %s was cancelled before execution.", job.id)
 
         return {
@@ -67,7 +67,7 @@ def execute_job(self, job_id: str) -> dict[str, Any]:
         }
 
     # Avoid accidentally executing an already completed job again.
-    if job.status == "COMPLETED":
+    if job.status == JobStatus.COMPLETED:
         logger.warning("Job %s has already completed.", job.id)
 
         return {
@@ -101,7 +101,7 @@ def execute_job(self, job_id: str) -> dict[str, Any]:
         db.session.refresh(job)
 
         # A running handler may cancel the job deliberately.
-        if job.status == "CANCELLED":
+        if job.status == JobStatus.CANCELLED:
             logger.info("Job %s was cancelled during execution.", job.id)
 
             return {
@@ -171,7 +171,7 @@ def _parse_job_id(job_id: str) -> uuid.UUID:
 
 def _mark_job_running(job: Job, celery_task_id: str | None) -> None:
     """Mark a job as running and record the current execution attempt."""
-    job.status = "RUNNING"
+    job.status = JobStatus.RUNNING
     job.started_at = datetime.utcnow()
     job.completed_at = None
     job.error_message = None
@@ -183,7 +183,7 @@ def _mark_job_running(job: Job, celery_task_id: str | None) -> None:
 
 def _mark_job_completed(job: Job) -> None:
     """Mark a job as successfully completed."""
-    job.status = "COMPLETED"
+    job.status = JobStatus.COMPLETED
     job.completed_at = datetime.utcnow()
     job.error_message = None
 
@@ -192,7 +192,7 @@ def _mark_job_completed(job: Job) -> None:
 
 def _mark_job_failed(job: Job, error: Exception) -> None:
     """Persist failure information against a job."""
-    job.status = "FAILED"
+    job.status = JobStatus.FAILED
     job.completed_at = datetime.utcnow()
     job.error_message = _format_error(error)
 
