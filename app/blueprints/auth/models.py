@@ -19,6 +19,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.blueprints.people.models import Person
 from app.extensions import db
 
 
@@ -169,17 +170,47 @@ class Role(db.Model):
 class UserAccount(UserMixin, db.Model):
     __tablename__ = "user_accounts"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    first_name: Mapped[str] = mapped_column(String(120), nullable=False, default="")
-    last_name: Mapped[str] = mapped_column(String(120), nullable=False, default="")
-    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    person_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("persons.id", ondelete="RESTRICT"),
+        nullable=False,
+        unique=True,
+    )
+
+    email: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        unique=True,
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+    )
+
+    person: Mapped[Person] = relationship(
+        "Person",
+        back_populates="user_account",
+    )
+
     roles: Mapped[list[Role]] = relationship(
         "Role",
         secondary=user_roles,
         back_populates="users",
     )
+
     jobs: Mapped[list["Job"]] = relationship(
         "Job",
         back_populates="created_by",
@@ -187,21 +218,21 @@ class UserAccount(UserMixin, db.Model):
 
     @property
     def display_name(self) -> str:
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}".strip()
-        if self.first_name:
-            return self.first_name
-        if self.last_name:
-            return self.last_name
-        return self.email.split("@")[0].replace(".", " ").title()
+        return (
+            self.person.display_name
+            or self.email.split("@")[0].replace(".", " ").title()
+        )
+
+    @property
+    def greeting_name(self) -> str:
+        return (
+            self.person.greeting_name
+            or self.display_name
+        )
 
     @property
     def initials(self) -> str:
-        names = [piece for piece in [self.first_name, self.last_name] if piece]
-        if not names:
-            return "RC"
-        initials = "".join(piece[0].upper() for piece in names[:2])
-        return initials or "RC"
+        return self.person.initials or "RC"
 
     def has_permission(
         self,

@@ -19,12 +19,18 @@ from app.extensions import csrf, db, login_manager, migrate
 from app.blueprints.auth.catalogue import ensure_permission_catalogue
 
 from app.blueprints.org.services import get_current_organisation
+from app.blueprints.people.models import Person
 
 
 
-def create_app() -> Flask:
+def create_app(
+    config_overrides: dict | None = None,
+) -> Flask:
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    if config_overrides:
+        app.config.update(config_overrides)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -57,17 +63,25 @@ def create_app() -> Flask:
             ensure_permission_catalogue()
             user = db.session.scalar(select(UserAccount).where(UserAccount.email == email.strip().lower()))
             if user is None:
-                user = UserAccount(
-                    email=email.strip().lower(),
+                person = Person(
                     first_name=(first_name or "").strip(),
                     last_name=(last_name or "").strip(),
+                )
+
+                user = UserAccount(
+                    person=person,
+                    email=email.strip().lower(),
                     password_hash=generate_password_hash(password),
                     is_active=True,
                 )
+
                 db.session.add(user)
             else:
-                user.first_name = (first_name or "").strip()
-                user.last_name = (last_name or "").strip()
+                if user.person is None:
+                    user.person = Person()
+
+                user.person.first_name = (first_name or "").strip()
+                user.person.last_name = (last_name or "").strip()
                 user.password_hash = generate_password_hash(password)
                 user.is_active = True
 

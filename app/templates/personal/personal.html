@@ -416,22 +416,25 @@ documents and account tasks.
                 {% endif %}
             </section>
         </div>
-
+        {% set staff_member = current_user.person.staff_member %}
         <aside class="personal-dashboard-sidebar" aria-label="Personal account sidebar">
             <article class="dashboard-card profile-summary profile-summary--sidebar">
                 <div class="profile-summary__identity">
                     <span class="profile-summary__avatar" aria-hidden="true">
-                        {{ current_user.initials|default('AS') }}
+                        {{ current_user.initials }}
                     </span>
 
                     <div>
-                        <h2>{{ current_user.display_name|default('Alex Smith') }}</h2>
-                        <p>{{ current_user.job_title|default('Emergency Care Assistant') }}</p>
+                        <h2>{{ current_user.display_name }}</h2>
 
-                        {% if current_user.employee_number %}
+                        {% if staff_member %}
+                            <p>Staff member</p>
+
                             <span class="profile-summary__reference">
-                                Staff ID {{ current_user.employee_number }}
+                                Staff ID {{ staff_member.employee_number }}
                             </span>
+                        {% else %}
+                            <p>Account holder</p>
                         {% endif %}
                     </div>
                 </div>

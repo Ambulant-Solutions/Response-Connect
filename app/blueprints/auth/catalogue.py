@@ -59,6 +59,41 @@ PERMISSION_DEFINITIONS = (
         "category": "recruitment",
     },
     {
+        "name": "hr:read",
+        "description": (
+            "View staff records and HR compliance information"
+        ),
+        "category": "hr",
+    },
+    {
+        "name": "hr:manage",
+        "description": (
+            "Manage staff records, positions and clinical grades"
+        ),
+        "category": "hr",   
+    },
+    {
+        "name": "hr:manage_training",
+        "description": (
+            "Manage mandatory training courses and requirements"
+        ),
+        "category": "hr",
+    },
+    {
+        "name": "hr:verify_training",
+        "description": (
+            "Verify or reject staff training certificates"
+        ),
+        "category": "hr",
+    },
+    {
+        "name": "personal:upload_training",
+        "description": (
+            "Upload training certificates to the current staff record"
+        ),
+        "category": "personal",
+    },
+    {
         "name": "external:manage",
         "description": (
             "Manage external forms and complaints"
@@ -74,12 +109,14 @@ PERMISSION_CATEGORY_LABELS = {
     "org": "Organisation administration",
     "api": "API access",
     "recruitment": "Recruitment",
+    "hr": "Human resources",
     "external": "External services",
 }
 
 
 DEFAULT_STAFF_PERMISSIONS = {
     "personal:read",
+    "personal:upload_training",
     "org:read",
 }
 
@@ -183,14 +220,6 @@ def ensure_permission_catalogue(
             sort_order=20,
         )
 
-        staff_role.permissions = [
-            permission
-            for permission_name, permission
-            in existing_permissions.items()
-            if permission_name
-            in DEFAULT_STAFF_PERMISSIONS
-        ]
-
         db.session.add(staff_role)
         roles_created += 1
     else:
@@ -199,6 +228,17 @@ def ensure_permission_catalogue(
         )
         staff_role.is_system = True
         staff_role.is_active = True
+
+    # Add any missing mandatory permissions without removing
+    # additional permissions that administrators have assigned.
+    for permission_name in DEFAULT_STAFF_PERMISSIONS:
+        permission = existing_permissions.get(permission_name)
+
+        if (
+            permission is not None
+            and permission not in staff_role.permissions
+        ):
+            staff_role.permissions.append(permission)
 
     db.session.commit()
 
