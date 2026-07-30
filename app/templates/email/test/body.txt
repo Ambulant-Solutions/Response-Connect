@@ -1,0 +1,14 @@
+Hello {{ recipient_name }},
+
+This is a test of the {{ email_brand_name }} email template system.
+
+The message was successfully rendered using a Jinja template and delivered through the background job system.
+
+{% if action_url %}
+Open Response Connect:
+{{ action_url }}
+{% endif %}
+
+Regards,
+
+{{ email_brand_name }}

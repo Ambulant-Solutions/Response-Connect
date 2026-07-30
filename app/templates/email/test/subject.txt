@@ -1,0 +1,1 @@
+{{ email_brand_name }} template test

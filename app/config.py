@@ -57,3 +57,19 @@ class Config:
     )
 
     MAIL_TIMEOUT = int(os.getenv("MAIL_TIMEOUT", "30"))
+
+    # Email template branding
+    MAIL_BRAND_NAME = os.getenv(
+        "MAIL_BRAND_NAME",
+        "Response Connect",
+    )
+
+    MAIL_SUPPORT_EMAIL = os.getenv(
+        "MAIL_SUPPORT_EMAIL",
+        "",
+    )
+
+    MAIL_PUBLIC_URL = os.getenv(
+        "MAIL_PUBLIC_URL",
+        "",
+    )

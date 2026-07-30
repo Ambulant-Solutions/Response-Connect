@@ -297,3 +297,45 @@ def _payload_address_value(
         return value
 
     return list(value)
+
+def queue_templated_email(
+    *,
+    template_name: str,
+    to: str | Iterable[str],
+    context: dict | None = None,
+    cc: str | Iterable[str] | None = None,
+    bcc: str | Iterable[str] | None = None,
+    reply_to: str | None = None,
+    sender: str | None = None,
+    created_by_id: uuid.UUID | None = None,
+    priority: int = 5,
+) -> Job:
+    """Create and queue an email rendered from named Jinja templates."""
+
+    from app.blueprints.jobs.models import JobType
+    from app.blueprints.jobs.services import create_and_queue_job
+
+    payload = {
+        "template_name": template_name,
+        "context": context or {},
+        "to": _payload_address_value(to),
+    }
+
+    if cc is not None:
+        payload["cc"] = _payload_address_value(cc)
+
+    if bcc is not None:
+        payload["bcc"] = _payload_address_value(bcc)
+
+    if reply_to is not None:
+        payload["reply_to"] = reply_to
+
+    if sender is not None:
+        payload["sender"] = sender
+
+    return create_and_queue_job(
+        job_type=JobType.EMAIL_SEND,
+        payload=payload,
+        created_by_id=created_by_id,
+        priority=priority,
+    )
