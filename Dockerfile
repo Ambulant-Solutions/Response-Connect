@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "flask --app wsgi:app db upgrade && gunicorn --bind 0.0.0.0:8000 wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wsgi:app"]

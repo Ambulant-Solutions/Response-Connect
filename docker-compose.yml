@@ -1,30 +1,80 @@
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+  restart: unless-stopped
+
+  env_file:
+    - .env
+
+  environment:
+    DB_HOST: db
+    DB_PORT: 5432
+    DB_NAME: ${POSTGRES_DB:-response_connect}
+    DB_USER: ${POSTGRES_USER:-response_connect}
+    DB_PASSWORD: ${POSTGRES_PASSWORD:-response_connect}
+
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+  depends_on:
+    db:
+      condition: service_healthy
+
+    redis:
+      condition: service_healthy
+
+
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      network: host
+    <<: *app
+
     container_name: response-connect-web
-    env_file:
-      - .env
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB:-response_connect}
-      DB_USER: ${POSTGRES_USER:-response_connect}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-response_connect}
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
+
+    command:
+      gunicorn --bind 0.0.0.0:8000 wsgi:app
+
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
+
+  worker:
+    <<: *app
+
+    container_name: response-connect-worker
+
+    command:
+      celery -A app.celery worker --loglevel=INFO
+
+  beat:
+    <<: *app
+
+    container_name: response-connect-beat
+
+    command:
+      celery -A app.celery beat --loglevel=INFO
+
+  redis:
+    image: redis:8-alpine
+
+    container_name: response-connect-redis
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   db:
     image: postgres:16-alpine
     container_name: response-connect-db
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -34,8 +84,6 @@ services:
     dns:
       - 1.1.1.1
       - 8.8.8.8
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

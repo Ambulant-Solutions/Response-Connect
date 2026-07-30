@@ -1,10 +1,69 @@
 services:
+
   web:
-    environment:
-      FLASK_APP: wsgi:app
-      FLASK_DEBUG: "1"
-    command: >
-      sh -c "flask --app wsgi:app db upgrade &&
-             flask --app wsgi:app run --host 0.0.0.0 --port 8000 --debug"
     volumes:
       - .:/app
+
+    environment:
+      FLASK_ENV: development
+
+    dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+    command: >
+      sh -c "
+      flask db upgrade &&
+      gunicorn --reload --bind 0.0.0.0:8000 wsgi:app
+      "
+
+  worker:
+    volumes:
+      - .:/app
+
+    dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+    command: >
+      celery -A app.celery worker
+      --loglevel=DEBUG
+
+  beat:
+    volumes:
+      - .:/app
+
+    dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+    command: >
+      celery -A app.celery beat
+      --loglevel=DEBUG
+
+  db:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    command: >
+      celery -A app.celery flower
+      --port=5555
+
+    ports:
+      - "5555:5555"
