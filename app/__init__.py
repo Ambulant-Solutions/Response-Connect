@@ -13,6 +13,7 @@ from app.blueprints.job_application import job_application_bp
 from app.blueprints.main import main_bp
 from app.blueprints.org import org_bp
 from app.blueprints.personal import personal_bp
+from app.blueprints.jobs import job_bp
 from app.config import Config
 from app.extensions import csrf, db, login_manager, migrate
 from app.blueprints.auth.catalogue import ensure_permission_catalogue
@@ -83,6 +84,7 @@ def create_app() -> Flask:
     app.register_blueprint(org_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(job_application_bp)
+    app.register_blueprint(job_bp)
     app.register_blueprint(external_bp)
 
     return app

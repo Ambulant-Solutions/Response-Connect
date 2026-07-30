@@ -180,6 +180,10 @@ class UserAccount(UserMixin, db.Model):
         secondary=user_roles,
         back_populates="users",
     )
+    jobs: Mapped[list["Job"]] = relationship(
+        "Job",
+        back_populates="created_by",
+    )
 
     @property
     def display_name(self) -> str:
