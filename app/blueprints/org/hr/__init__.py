@@ -5,6 +5,7 @@ hr_bp = Blueprint("hr", __name__, url_prefix="/hr")
 from app.blueprints.org.hr.models import (  # noqa: E402, F401
     ClinicalGrade,
     JobPosition,
+    MandatoryTrainingCourse,
     StaffClinicalGradeAssignment,
     StaffMember,
     StaffPositionAssignment,

@@ -311,6 +311,74 @@ class ClinicalGrade(db.Model):
     def __repr__(self) -> str:
         return f"<ClinicalGrade {self.name!r}>"
 
+class MandatoryTrainingCourse(db.Model):
+    """Mandatory training course defined by the organisation."""
+
+    __tablename__ = "mandatory_training_courses"
+
+    __table_args__ = (
+        CheckConstraint(
+            "requalification_period_years >= 1",
+            name="requalification_period_years_positive",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(160),
+        nullable=False,
+        unique=True,
+    )
+
+    description: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        default="",
+        server_default="",
+    )
+
+    requalification_period_years: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default="1",
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
+    )
+
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    def __repr__(self) -> str:
+        return f"<MandatoryTrainingCourse {self.name!r}>"
+
 
 class StaffClinicalGradeAssignment(db.Model):
     """A dated clinical-grade assignment for a staff member."""
@@ -415,3 +483,4 @@ class StaffClinicalGradeAssignment(db.Model):
             f"{self.staff_member_id} -> "
             f"{self.clinical_grade_id}>"
         )
+
