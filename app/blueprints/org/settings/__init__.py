@@ -8,3 +8,4 @@ from app.blueprints.org.settings import locations  # noqa: E402, F401
 from app.blueprints.org.settings import location_types  # noqa: E402, F401
 from app.blueprints.org.settings import roles  # noqa: E402, F401
 from app.blueprints.org.settings import workforce  # noqa: E402, F401
+from app.blueprints.org.settings import mandatory_training  # noqa: E402, F401

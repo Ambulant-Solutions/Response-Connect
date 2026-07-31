@@ -10,6 +10,7 @@ from wtforms import (
 )
 from wtforms.validators import (
     DataRequired,
+    InputRequired,
     Email,
     Length,
     NumberRange,
@@ -387,4 +388,46 @@ class RoleForm(FlaskForm):
 
 
 class RoleActionForm(FlaskForm):
+    submit = SubmitField("Confirm")
+
+
+class MandatoryTrainingCourseForm(FlaskForm):
+    name = StringField(
+        "Course name",
+        validators=[
+            DataRequired(),
+            Length(max=160),
+        ],
+    )
+
+    description = TextAreaField(
+        "Description",
+        validators=[
+            Optional(),
+            Length(max=2000),
+        ],
+    )
+
+    requalification_period_years = IntegerField(
+        "Requalification period (years)",
+        validators=[
+            InputRequired(),
+            NumberRange(min=1),
+        ],
+        default=1,
+    )
+
+    sort_order = IntegerField(
+        "Display order",
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=9999),
+        ],
+        default=0,
+    )
+
+    submit = SubmitField("Save course")
+
+
+class MandatoryTrainingCourseActionForm(FlaskForm):
     submit = SubmitField("Confirm")
