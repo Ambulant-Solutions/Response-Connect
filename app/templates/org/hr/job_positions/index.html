@@ -60,7 +60,7 @@
     </header>
 
     {% if positions %}
-        <div class="hr-catalogue-list">
+        <div class="access-role-list">
             {% for position in positions %}
                 {% set current_assignment_count = (
                     position.staff_assignments
@@ -71,20 +71,20 @@
 
                 <article
                     class="
-                        hr-catalogue-card
+                        access-role-card
                         {% if not position.is_active %}
                             is-inactive
                         {% endif %}
                     "
                 >
-                    <div class="hr-catalogue-card__icon">
+                    <div class="access-role-card__icon">
                         <iconify-icon
                             icon="tabler:briefcase"
                             aria-hidden="true"
                         ></iconify-icon>
                     </div>
 
-                    <div class="hr-catalogue-card__content">
+                    <div class="access-role-card__content">
                         <header>
                             <h2>{{ position.name }}</h2>
 
@@ -107,7 +107,7 @@
                                "No description has been provided." }}
                         </p>
 
-                        <div class="hr-catalogue-card__properties">
+                        <div class="access-role-card__summary">
                             <span>
                                 <iconify-icon
                                     icon="tabler:users"
@@ -142,7 +142,7 @@
                     </div>
 
                     {% if can_manage %}
-                        <div class="hr-catalogue-card__actions">
+                        <div class="access-role-card__actions">
                             <a
                                 class="button button--secondary"
                                 href="{{ url_for(
@@ -194,7 +194,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <section class="hr-catalogue-empty">
+        <section class="access-role-empty">
             <iconify-icon
                 icon="tabler:briefcase-off"
                 aria-hidden="true"
