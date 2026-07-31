@@ -1,7 +1,7 @@
 {% extends "org/org_base.html" %}
 
 
-{% set can_manage = current_user.has_permission("hr:manage") %}
+{% set can_manage = current_user.has_permission("hr:configure") %}
 
 
 {% block title %}
@@ -20,13 +20,13 @@
         <div>
             <a
                 class="settings-back-link"
-                href="{{ url_for('org.hr.hr') }}"
+                href="{{ url_for('org.settings.index') }}"
             >
                 <iconify-icon
                     icon="tabler:arrow-left"
                     aria-hidden="true"
                 ></iconify-icon>
-                Back to HR
+                Back to system settings
             </a>
 
             <br>
@@ -47,7 +47,7 @@
             <a
                 class="button button--primary"
                 href="{{ url_for(
-                    'org.hr.job_position_create'
+                    'org.settings.job_position_create'
                 ) }}"
             >
                 <iconify-icon
@@ -146,7 +146,7 @@
                             <a
                                 class="button button--secondary"
                                 href="{{ url_for(
-                                    'org.hr.job_position_edit',
+                                    'org.settings.job_position_edit',
                                     position_id=position.id
                                 ) }}"
                             >
@@ -157,7 +157,7 @@
                                 <form
                                     method="post"
                                     action="{{ url_for(
-                                        'org.hr.job_position_deactivate',
+                                        'org.settings.job_position_deactivate',
                                         position_id=position.id
                                     ) }}"
                                 >
@@ -174,7 +174,7 @@
                                 <form
                                     method="post"
                                     action="{{ url_for(
-                                        'org.hr.job_position_activate',
+                                        'org.settings.job_position_activate',
                                         position_id=position.id
                                     ) }}"
                                 >
@@ -211,7 +211,7 @@
                 <a
                     class="button button--primary"
                     href="{{ url_for(
-                        'org.hr.job_position_create'
+                        'org.settings.job_position_create'
                     ) }}"
                 >
                     Create first position

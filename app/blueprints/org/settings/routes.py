@@ -4,7 +4,7 @@ from flask import render_template, url_for
 
 from flask_login import current_user
 
-from app.blueprints.auth import permission_required, any_permission_required
+from app.blueprints.auth import any_permission_required
 from app.blueprints.org.services import require_current_organisation
 from app.blueprints.org.settings import settings_bp
 
@@ -87,33 +87,44 @@ def index():
             ),
             "items": [
                 {
-                    "title": "Roles and permissions",
+                    "title": "Job positions",
                     "description": (
-                        "Control administrative roles and access to "
-                        "organisation functions."
+                        "Define the organisational positions that may "
+                        "be assigned to staff members."
                     ),
-                    "icon": "tabler:user-shield",
+                    "icon": "tabler:briefcase",
                     "url": url_for(
-                        "org.settings.role_index"
+                        "org.settings.job_position_index"
                     ),
                     "status": "Available",
                     "status_style": "available",
-                    "meta": "Access control",
-                    "permission": "auth:manage_users",
+                    "meta": "Organisational structure",
+                    "permission": "hr:configure",
                 },
                 {
-                    "title": "Workforce configuration",
+                    "title": "Clinical grades",
                     "description": (
-                        "Configure job positions, clinical grades "
-                        "and other HR reference data."
+                        "Configure clinical grades and operational "
+                        "clinical levels."
                     ),
-                    "icon": "tabler:users-cog",
-                    "url": url_for(
-                        "org.settings.workforce_index"
+                    "icon": "tabler:stethoscope",
+                    "url": None,
+                    "status": "Next",
+                    "status_style": "next",
+                    "meta": "Clinical workforce",
+                    "permission": "hr:configure",
+                },
+                {
+                    "title": "Employment statuses",
+                    "description": (
+                        "Configure the employment states available "
+                        "for staff records."
                     ),
-                    "status": "Available",
-                    "status_style": "available",
-                    "meta": "HR configuration",
+                    "icon": "tabler:user-cog",
+                    "url": None,
+                    "status": "Planned",
+                    "status_style": "planned",
+                    "meta": "Employment records",
                     "permission": "hr:configure",
                 },
                 {
@@ -127,6 +138,22 @@ def index():
                     "status": "Planned",
                     "status_style": "planned",
                     "meta": "Training and compliance",
+                    "permission": "hr:configure",
+                },
+                {
+                    "title": "Roles and permissions",
+                    "description": (
+                        "Control administrative roles and access to "
+                        "organisation functions."
+                    ),
+                    "icon": "tabler:user-shield",
+                    "url": url_for(
+                        "org.settings.role_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
+                    "meta": "Access control",
+                    "permission": "auth:manage_users",
                 },
             ],
         },
