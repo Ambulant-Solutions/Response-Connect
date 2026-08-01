@@ -16,6 +16,12 @@ from app.files.processing_policies import (
     FileProcessingPolicySynchroniser,
 )
 
+from app.files.commands import (
+    CreateFileProcessingPolicyCommand,
+    ReplaceFileProcessingRulesCommand,
+    UpdateFileProcessingPolicyCommand,
+)
+
 
 def get_file_provider() -> S3FileProvider:
     if "file_provider" not in g:
@@ -65,13 +71,16 @@ def get_file_processing_policy_synchroniser(
 
 
 __all__ = [
+    "CreateFileProcessingPolicyCommand",
     "FileManager",
     "FileObject",
     "FileProcessingPolicyService",
+    "FileProcessingPolicySynchroniser",
+    "ReplaceFileProcessingRulesCommand",
     "S3FileProvider",
+    "UpdateFileProcessingPolicyCommand",
     "get_file_manager",
     "get_file_processing_policy_service",
-    "get_file_provider",
-    "FileProcessingPolicySynchroniser",
     "get_file_processing_policy_synchroniser",
+    "get_file_provider",
 ]

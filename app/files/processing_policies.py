@@ -44,6 +44,12 @@ from app.reference_data.exceptions import (
     ReferenceDataSynchronisationError,
 )
 
+from app.files.commands import (
+    CreateFileProcessingPolicyCommand,
+    ReplaceFileProcessingRulesCommand,
+    UpdateFileProcessingPolicyCommand,
+)
+
 
 _EXTENSION_PATTERN = re.compile(
     r"^[a-z0-9][a-z0-9_-]*$"
@@ -165,36 +171,18 @@ class FileProcessingPolicyService(
 
     def create(
         self,
-        *,
-        code: str,
-        name: str,
-        category: FileCategory | str,
-        max_size_bytes: int,
-        extensions: Iterable[str],
-        mime_types: Iterable[str],
-        description: str | None = None,
-        icon: str = "tabler:file-settings",
-        colour: str = "#334155",
-        sort_order: int = 0,
-        requires_virus_scan: bool = True,
-        generate_thumbnail: bool = False,
-        generate_preview: bool = False,
-        enable_ocr: bool = False,
-        optimise_image: bool = False,
-        extract_metadata: bool = False,
-        is_system: bool = False,
-        is_active: bool = True,
+        command: CreateFileProcessingPolicyCommand,
     ) -> FileProcessingPolicy:
         values = self._validate_policy_values(
-            code=code,
-            name=name,
-            category=category,
-            max_size_bytes=max_size_bytes,
-            extensions=extensions,
-            mime_types=mime_types,
-            icon=icon,
-            colour=colour,
-            sort_order=sort_order,
+            code=command.code,
+            name=command.name,
+            category=command.category,
+            max_size_bytes=command.max_size_bytes,
+            extensions=command.extensions,
+            mime_types=command.mime_types,
+            icon=command.icon,
+            colour=command.colour,
+            sort_order=command.sort_order,
         )
 
         self._ensure_code_available(
@@ -209,23 +197,31 @@ class FileProcessingPolicyService(
             code=values["code"],
             name=values["name"],
             description=self._clean_description(
-                description
+                command.description
             ),
             icon=values["icon"],
             colour=values["colour"],
             sort_order=values["sort_order"],
-            is_system=is_system,
-            is_active=is_active,
+            is_system=command.is_system,
+            is_active=command.is_active,
             category=values["category"],
             max_size_bytes=values[
                 "max_size_bytes"
             ],
-            requires_virus_scan=requires_virus_scan,
-            generate_thumbnail=generate_thumbnail,
-            generate_preview=generate_preview,
-            enable_ocr=enable_ocr,
-            optimise_image=optimise_image,
-            extract_metadata=extract_metadata,
+            requires_virus_scan=(
+                command.requires_virus_scan
+            ),
+            generate_thumbnail=(
+                command.generate_thumbnail
+            ),
+            generate_preview=(
+                command.generate_preview
+            ),
+            enable_ocr=command.enable_ocr,
+            optimise_image=command.optimise_image,
+            extract_metadata=(
+                command.extract_metadata
+            ),
         )
 
         policy.extension_rules = [
@@ -243,6 +239,7 @@ class FileProcessingPolicyService(
         ]
 
         self.session.add(policy)
+
         self._commit_policy_change(
             "The file processing policy could not "
             "be created."
@@ -250,38 +247,24 @@ class FileProcessingPolicyService(
 
         return policy
 
+
     def update(
         self,
         policy_id: uuid.UUID,
-        *,
-        name: str,
-        category: FileCategory | str,
-        max_size_bytes: int,
-        extensions: Iterable[str],
-        mime_types: Iterable[str],
-        description: str | None = None,
-        icon: str,
-        colour: str,
-        sort_order: int,
-        requires_virus_scan: bool,
-        generate_thumbnail: bool,
-        generate_preview: bool,
-        enable_ocr: bool,
-        optimise_image: bool,
-        extract_metadata: bool,
+        command: UpdateFileProcessingPolicyCommand,
     ) -> FileProcessingPolicy:
         policy = self.get(policy_id)
 
         values = self._validate_policy_values(
             code=policy.code,
-            name=name,
-            category=category,
-            max_size_bytes=max_size_bytes,
-            extensions=extensions,
-            mime_types=mime_types,
-            icon=icon,
-            colour=colour,
-            sort_order=sort_order,
+            name=command.name,
+            category=command.category,
+            max_size_bytes=command.max_size_bytes,
+            extensions=command.extensions,
+            mime_types=command.mime_types,
+            icon=command.icon,
+            colour=command.colour,
+            sort_order=command.sort_order,
         )
 
         self._ensure_name_available(
@@ -291,7 +274,9 @@ class FileProcessingPolicyService(
 
         policy.name = values["name"]
         policy.description = (
-            self._clean_description(description)
+            self._clean_description(
+                command.description
+            )
         )
         policy.icon = values["icon"]
         policy.colour = values["colour"]
@@ -300,19 +285,22 @@ class FileProcessingPolicyService(
         policy.max_size_bytes = values[
             "max_size_bytes"
         ]
+
         policy.requires_virus_scan = (
-            requires_virus_scan
+            command.requires_virus_scan
         )
         policy.generate_thumbnail = (
-            generate_thumbnail
+            command.generate_thumbnail
         )
         policy.generate_preview = (
-            generate_preview
+            command.generate_preview
         )
-        policy.enable_ocr = enable_ocr
-        policy.optimise_image = optimise_image
+        policy.enable_ocr = command.enable_ocr
+        policy.optimise_image = (
+            command.optimise_image
+        )
         policy.extract_metadata = (
-            extract_metadata
+            command.extract_metadata
         )
 
         self._replace_extension_rules(
@@ -390,18 +378,20 @@ class FileProcessingPolicyService(
     def replace_rules(
         self,
         policy_id: uuid.UUID,
-        *,
-        extensions: Iterable[str],
-        mime_types: Iterable[str],
+        command: ReplaceFileProcessingRulesCommand,
     ) -> FileProcessingPolicy:
         policy = self.get(policy_id)
 
         normalised_extensions = (
-            self._normalise_extensions(extensions)
+            self._normalise_extensions(
+                command.extensions
+            )
         )
 
         normalised_mime_types = (
-            self._normalise_mime_types(mime_types)
+            self._normalise_mime_types(
+                command.mime_types
+            )
         )
 
         self._validate_rule_presence(
@@ -683,11 +673,26 @@ class FileProcessingPolicyService(
         policy: FileProcessingPolicy,
         extensions: Iterable[str],
     ) -> None:
+        """
+        Reconcile extension rules without recreating unchanged records.
+
+        Preserving matching child records avoids temporary unique-constraint
+        conflicts during SQLAlchemy flush operations.
+        """
+
+        requested = set(extensions)
+
+        existing_by_value = {
+            rule.extension: rule
+            for rule in policy.extension_rules
+        }
+
         policy.extension_rules = [
-            FileProcessingExtensionRule(
+            existing_by_value.get(extension)
+            or FileProcessingExtensionRule(
                 extension=extension
             )
-            for extension in extensions
+            for extension in sorted(requested)
         ]
 
     @staticmethod
@@ -695,11 +700,23 @@ class FileProcessingPolicyService(
         policy: FileProcessingPolicy,
         mime_types: Iterable[str],
     ) -> None:
+        """
+        Reconcile MIME-type rules without recreating unchanged records.
+        """
+
+        requested = set(mime_types)
+
+        existing_by_value = {
+            rule.mime_type: rule
+            for rule in policy.mime_type_rules
+        }
+
         policy.mime_type_rules = [
-            FileProcessingMimeTypeRule(
+            existing_by_value.get(mime_type)
+            or FileProcessingMimeTypeRule(
                 mime_type=mime_type
             )
-            for mime_type in mime_types
+            for mime_type in sorted(requested)
         ]
 
     def _commit_policy_change(
