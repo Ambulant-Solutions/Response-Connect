@@ -82,3 +82,51 @@ class Config:
         "PASSWORD_RESET_SALT",
         "response-connect-password-reset",
     )
+
+    # S3-compatible object storage
+    S3_ENDPOINT_URL = os.getenv(
+        "S3_ENDPOINT_URL",
+        "http://minio:9000",
+    )
+
+    S3_REGION = os.getenv(
+        "S3_REGION",
+        "us-east-1",
+    )
+
+    S3_ACCESS_KEY = os.getenv(
+        "S3_ACCESS_KEY",
+        "",
+    )
+
+    S3_SECRET_KEY = os.getenv(
+        "S3_SECRET_KEY",
+        "",
+    )
+
+    S3_BUCKET = os.getenv(
+        "S3_BUCKET",
+        "response-connect-files",
+    )
+
+    S3_USE_SSL = os.getenv(
+        "S3_USE_SSL",
+        "false",
+    ).lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+    S3_ADDRESSING_STYLE = os.getenv(
+        "S3_ADDRESSING_STYLE",
+        "path",
+    )
+
+    S3_PRESIGNED_URL_EXPIRY = int(
+        os.getenv(
+            "S3_PRESIGNED_URL_EXPIRY",
+            "300",
+        )
+    )

@@ -21,6 +21,8 @@ from app.blueprints.auth.catalogue import ensure_permission_catalogue
 from app.blueprints.org.services import get_current_organisation
 from app.blueprints.people.models import Person
 
+from app.storage import get_storage_service
+
 
 
 def create_app(
@@ -91,6 +93,20 @@ def create_app(
 
             db.session.commit()
             click.echo(f"Admin account ready: {user.email}")
+
+    
+    @app.cli.command("storage-init")
+    def storage_init_command() -> None:
+        """
+        Verify object storage and create the configured bucket if required.
+        """
+
+        storage = get_storage_service()
+        storage.initialise_bucket()
+
+        click.echo(
+            f"Object storage is ready. Bucket: {storage.bucket}"
+        )
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
