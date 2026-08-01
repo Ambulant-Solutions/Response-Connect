@@ -43,6 +43,7 @@ Ambulance and healthcare functionality is an important initial use case, but the
 2. [Project structure](02-project-structure.md)
 3. [Module conventions](03-module-conventions.md)
 4. [Service-layer conventions](04-service-layer-conventions.md)
+5. [Core Concepts](05-core-concepts.md)
 5. Catalogue framework
 6. File platform
 7. Audit framework
