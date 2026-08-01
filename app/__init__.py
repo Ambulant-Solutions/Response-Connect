@@ -21,7 +21,8 @@ from app.blueprints.auth.catalogue import ensure_permission_catalogue
 from app.blueprints.org.services import get_current_organisation
 from app.blueprints.people.models import Person
 
-from app.storage import get_storage_service
+from app.files.models import FileObject  # noqa: F401
+from app.files import get_file_provider
 
 
 
@@ -95,17 +96,13 @@ def create_app(
             click.echo(f"Admin account ready: {user.email}")
 
     
-    @app.cli.command("storage-init")
-    def storage_init_command() -> None:
-        """
-        Verify object storage and create the configured bucket if required.
-        """
-
-        storage = get_storage_service()
-        storage.initialise_bucket()
+    @app.cli.command("files-init")
+    def files_init_command() -> None:
+        provider = get_file_provider()
+        provider.initialise_bucket()
 
         click.echo(
-            f"Object storage is ready. Bucket: {storage.bucket}"
+            f"File storage is ready. Bucket: {provider.bucket}"
         )
 
     app.register_blueprint(main_bp)

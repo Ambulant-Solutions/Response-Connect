@@ -13,7 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.datastructures import FileStorage
 
 from app.extensions import db
-from app.storage.exceptions import (
+from app.files.exceptions import (
     DeletedFileError,
     FilePersistenceError,
     FileTooLargeError,
@@ -21,9 +21,9 @@ from app.storage.exceptions import (
     ManagedFileNotFoundError,
     StorageError,
 )
-from app.storage.keys import ObjectKeyGenerator
-from app.storage.models import FileObject
-from app.storage.service import S3StorageService
+from app.files.keys import ObjectKeyGenerator
+from app.files.models import FileObject
+from app.files.providers import S3FileProvider
 
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class FileManager:
 
     def __init__(
         self,
-        storage: S3StorageService,
+        provider: S3FileProvider,
         *,
         max_upload_bytes: int,
         spool_max_bytes: int,
@@ -57,14 +57,14 @@ class FileManager:
                 "spool_max_bytes must be greater than zero."
             )
 
-        self.storage = storage
+        self.provider = provider
         self.max_upload_bytes = max_upload_bytes
         self.spool_max_bytes = spool_max_bytes
 
     @classmethod
     def from_app_config(
         cls,
-        storage: S3StorageService,
+        provider: S3FileProvider,
     ) -> "FileManager":
         return cls(
             storage,
@@ -115,7 +115,7 @@ class FileManager:
         try:
             temporary_file.seek(0)
 
-            self.storage.upload_fileobj(
+            self.provider.upload_fileobj(
                 temporary_file,
                 object_key,
                 content_type=normalised_content_type,
@@ -131,7 +131,7 @@ class FileManager:
                 id=file_id,
                 uploaded_by_id=uploaded_by_id,
                 storage_backend="s3",
-                bucket=self.storage.bucket,
+                bucket=self.provider.bucket,
                 object_key=object_key,
                 original_filename=cleaned_filename,
                 mime_type=normalised_content_type,
@@ -235,7 +235,7 @@ class FileManager:
                 "Deleted files cannot be downloaded."
             )
 
-        response = self.storage.get_object(
+        response = self.provider.get_object(
             file_object.object_key
         )
 
@@ -267,7 +267,7 @@ class FileManager:
                 "Deleted files cannot be downloaded."
             )
 
-        self.storage.download_fileobj(
+        self.provider.download_fileobj(
             file_object.object_key,
             destination,
         )
@@ -306,7 +306,7 @@ class FileManager:
         if not file_object.is_deleted:
             return file_object
 
-        if not self.storage.object_exists(
+        if not self.provider.object_exists(
             file_object.object_key
         ):
             raise FilePersistenceError(
@@ -344,7 +344,7 @@ class FileManager:
             )
 
         try:
-            self.storage.delete_object(
+            self.provider.delete_object(
                 file_object.object_key
             )
         except StorageError:
@@ -503,7 +503,7 @@ class FileManager:
         object_key: str,
     ) -> Exception | None:
         try:
-            self.storage.delete_object(object_key)
+            self.provider.delete_object(object_key)
             return None
 
         except Exception as exc:

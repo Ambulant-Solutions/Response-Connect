@@ -12,7 +12,7 @@ from botocore.exceptions import (
 )
 from flask import current_app
 
-from app.storage.exceptions import (
+from app.files.exceptions import (
     StorageConfigurationError,
     StorageConnectionError,
     StorageError,
@@ -20,7 +20,7 @@ from app.storage.exceptions import (
 )
 
 
-class S3StorageService:
+class S3FileProvider:
     """
     Provider-neutral storage service for S3-compatible object storage.
 
