@@ -1,0 +1,174 @@
+{% extends "org/org_base.html" %}
+
+
+{% macro render_field(field, help_text=None) %}
+    <div class="settings-field">
+        {{ field.label }}
+
+        {{ field(
+            class_=(
+                "settings-control settings-control--invalid"
+                if field.errors
+                else "settings-control"
+            )
+        ) }}
+
+        {% if help_text %}
+            <p class="settings-field__help">
+                {{ help_text }}
+            </p>
+        {% endif %}
+
+        {% if field.errors %}
+            <ul class="settings-field__errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% block title %}
+    {% if course %}
+        Edit {{ course.name }}
+    {% else %}
+        Add mandatory training course
+    {% endif %}
+    · Response Connect
+{% endblock %}
+
+
+{% block main_class %}
+    main-content main-content--org-settings
+{% endblock %}
+
+
+{% block content %}
+<section class="settings-page">
+    <header class="settings-page__header">
+        <div>
+            <a
+                class="settings-back-link"
+                href="{{ url_for(
+                    'org.settings.mandatory_training_course_index'
+                ) }}"
+            >
+                <iconify-icon
+                    icon="tabler:arrow-left"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Back to mandatory training courses
+            </a>
+
+            <br>
+
+            <span class="eyebrow">
+                Training and compliance
+            </span>
+
+            <h1>
+                {% if course %}
+                    Edit mandatory training course
+                {% else %}
+                    Add mandatory training course
+                {% endif %}
+            </h1>
+
+            <p>
+                Define the course and its organisation-wide
+                requalification period.
+            </p>
+        </div>
+    </header>
+
+    <form method="post" class="settings-form">
+        {{ form.hidden_tag() }}
+
+        <div class="settings-grid">
+            <section class="settings-card settings-card--wide">
+                <header class="settings-card__header">
+                    <span class="settings-card__icon">
+                        <iconify-icon
+                            icon="tabler:certificate"
+                            aria-hidden="true"
+                        ></iconify-icon>
+                    </span>
+
+                    <div>
+                        <h2>Course details</h2>
+
+                        <p>
+                            Enter the organisation-wide definition
+                            of this mandatory course.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-card__body">
+                    <div class="settings-row">
+                        {{ render_field(
+                            form.name,
+                            "Use the course title shown on staff "
+                            "training and compliance records."
+                        ) }}
+
+                        {{ render_field(
+                            form.requalification_period_years,
+                            "The number of years a completed course "
+                            "remains valid before renewal is required."
+                        ) }}
+                    </div>
+
+                    <div class="settings-field">
+                        {{ form.description.label }}
+
+                        {{ form.description(
+                            class_=(
+                                "settings-control settings-control--invalid"
+                                if form.description.errors
+                                else "settings-control"
+                            ),
+                            rows=8
+                        ) }}
+
+                        <p class="settings-field__help">
+                            Describe the course content or the
+                            compliance requirement it satisfies.
+                        </p>
+
+                        {% if form.description.errors %}
+                            <ul class="settings-field__errors">
+                                {% for error in form.description.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {{ render_field(
+                        form.sort_order,
+                        "Lower numbers appear first in course lists."
+                    ) }}
+                </div>
+            </section>
+        </div>
+
+        <footer class="settings-form__actions">
+            <a
+                class="button button--secondary"
+                href="{{ url_for(
+                    'org.settings.mandatory_training_course_index'
+                ) }}"
+            >
+                Cancel
+            </a>
+
+            {{ form.submit(
+                class_="button button--primary"
+            ) }}
+        </footer>
+    </form>
+</section>
+{% endblock %}
