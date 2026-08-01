@@ -115,6 +115,22 @@ def index():
                     "permission": "hr:configure",
                 },
                 {
+                    "title": "Mandatory training courses",
+                    "description": (
+                        "Configure mandatory training courses and "
+                        "their requalification periods."
+                    ),
+                    "icon": "tabler:school",
+                    "url": url_for(
+                        "org.settings."
+                        "mandatory_training_course_index"
+                    ),
+                    "status": "Available",
+                    "status_style": "available",
+                    "meta": "Training compliance",
+                    "permission": "hr:manage_training",
+                },
+                {
                     "title": "Employment statuses",
                     "description": (
                         "Configure the employment states available "
