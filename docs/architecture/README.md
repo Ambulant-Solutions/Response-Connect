@@ -40,9 +40,9 @@ Ambulance and healthcare functionality is an important initial use case, but the
 ## Architecture guide contents
 
 1. [Platform principles](01-platform-principles.md)
-2. Project structure
-3. Module conventions
-4. Service-layer conventions
+2. [Project structure](02-project-structure.md)
+3. [Module conventions](03-module-conventions.md)
+4. [Service-layer conventions](04-service-layer-conventions.md)
 5. Catalogue framework
 6. File platform
 7. Audit framework
