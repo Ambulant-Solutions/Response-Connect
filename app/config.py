@@ -130,3 +130,18 @@ class Config:
             "300",
         )
     )
+
+        # Managed file uploads
+    FILE_UPLOAD_MAX_BYTES = int(
+        os.getenv(
+            "FILE_UPLOAD_MAX_BYTES",
+            str(25 * 1024 * 1024),
+        )
+    )
+
+    FILE_UPLOAD_SPOOL_MAX_BYTES = int(
+        os.getenv(
+            "FILE_UPLOAD_SPOOL_MAX_BYTES",
+            str(5 * 1024 * 1024),
+        )
+    )

@@ -12,3 +12,27 @@ class StorageConnectionError(StorageError):
 
 class StorageObjectNotFoundError(StorageError):
     """Raised when a requested object does not exist."""
+
+
+class FileManagementError(Exception):
+    """Base exception for managed-file operations."""
+
+
+class InvalidFileError(FileManagementError):
+    """Raised when an uploaded file is invalid."""
+
+
+class FileTooLargeError(InvalidFileError):
+    """Raised when a file exceeds the configured limit."""
+
+
+class FilePersistenceError(FileManagementError):
+    """Raised when file metadata cannot be persisted safely."""
+
+
+class ManagedFileNotFoundError(FileManagementError):
+    """Raised when a managed file record cannot be found."""
+
+
+class DeletedFileError(FileManagementError):
+    """Raised when an operation is attempted on a deleted file."""

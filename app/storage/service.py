@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import BinaryIO
+from typing import BinaryIO, Any
 
 import boto3
 from botocore.client import BaseClient
@@ -199,6 +199,45 @@ class S3StorageService:
         except BotoCoreError as exc:
             raise StorageError(
                 f"Unable to check object {object_key!r}."
+            ) from exc
+
+    def get_object(
+        self,
+        object_key: str,
+    ) -> dict[str, Any]:
+        """
+        Return an S3 object response containing a streaming body.
+
+        The caller is responsible for closing the returned Body.
+        """
+
+        try:
+            return self.client.get_object(
+                Bucket=self.bucket,
+                Key=object_key,
+            )
+
+        except ClientError as exc:
+            error_code = str(
+                exc.response.get("Error", {}).get("Code", "")
+            )
+
+            if error_code in {
+                "404",
+                "NoSuchKey",
+                "NotFound",
+            }:
+                raise StorageObjectNotFoundError(
+                    f"Object {object_key!r} does not exist."
+                ) from exc
+
+            raise StorageError(
+                f"Unable to open object {object_key!r}."
+            ) from exc
+
+        except BotoCoreError as exc:
+            raise StorageError(
+                f"Unable to open object {object_key!r}."
             ) from exc
 
     def upload_fileobj(
