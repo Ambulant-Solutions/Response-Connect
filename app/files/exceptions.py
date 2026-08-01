@@ -36,3 +36,48 @@ class ManagedFileNotFoundError(FileManagementError):
 
 class DeletedFileError(FileManagementError):
     """Raised when an operation is attempted on a deleted file."""
+
+class FileProcessingPolicyError(Exception):
+    """Base exception for file-processing policy operations."""
+
+
+class FileProcessingPolicyNotFoundError(
+    FileProcessingPolicyError
+):
+    """Raised when a processing policy cannot be found."""
+
+
+class FileProcessingPolicyCodeConflictError(
+    FileProcessingPolicyError
+):
+    """Raised when a processing-policy code is already used."""
+
+
+class FileProcessingPolicyNameConflictError(
+    FileProcessingPolicyError
+):
+    """Raised when a processing-policy name is already used."""
+
+
+class InvalidFileProcessingPolicyError(
+    FileProcessingPolicyError
+):
+    """Raised when processing-policy settings are invalid."""
+
+
+class ProtectedFileProcessingPolicyError(
+    FileProcessingPolicyError
+):
+    """Raised when a protected system policy is modified illegally."""
+
+
+class FileProcessingPolicyInUseError(
+    FileProcessingPolicyError
+):
+    """Raised when a processing policy is still referenced."""
+
+
+class FileProcessingPolicyPersistenceError(
+    FileProcessingPolicyError
+):
+    """Raised when processing-policy state cannot be persisted."""

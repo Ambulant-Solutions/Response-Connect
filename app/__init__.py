@@ -23,6 +23,15 @@ from app.blueprints.people.models import Person
 
 from app.files.models import FileObject  # noqa: F401
 from app.files import get_file_provider
+from app.files import (
+    get_file_processing_policy_synchroniser,
+)
+from app.reference_data import (
+    init_reference_data,
+)
+from app.reference_data.cli import (
+    register_reference_data_cli,
+)
 
 
 
@@ -104,6 +113,18 @@ def create_app(
         click.echo(
             f"File storage is ready. Bucket: {provider.bucket}"
         )
+
+    reference_data_registry = (
+        init_reference_data(app)
+    )
+
+    register_reference_data_cli(app)
+
+    with app.app_context():
+        reference_data_registry.register(
+            get_file_processing_policy_synchroniser()
+        )
+
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
