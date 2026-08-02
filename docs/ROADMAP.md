@@ -365,9 +365,9 @@ Required tests:
 * [x] ✅ Reference-data codes are unique within each dataset.
 * [ ] 🚧 Public package exports resolve successfully.
 * [x] ✅ Public `__all__` exports resolve successfully.
-* [ ] ⬜ Stable permission-code format is valid.
+* [x] ✅ Stable permission-code format is valid.
 * [ ] ⬜ Stable catalogue-code format is valid.
-* [ ] ⬜ No obsolete job-position route module remains imported.
+* [x] ✅ No obsolete job-position route module remains imported.
 * [ ] ⬜ Platform modules do not depend on templates.
 * [ ] ⬜ Business modules use public Files APIs.
 * [ ] ⬜ No duplicate storage-provider implementation exists.
