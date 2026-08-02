@@ -361,8 +361,9 @@ Required tests:
 * [x] ✅ Platform modules do not import business blueprints.
 * [x] ✅ Service modules do not import route modules.
 * [ ] ⬜ Route modules do not contain direct cross-module persistence.
-* [ ] ⬜ Reference-data dataset names are unique.
-* [ ] ⬜ Reference-data codes are unique within each dataset.
+* [x] ✅ Reference-data dataset names are unique.
+* [x] ✅ Reference-data codes are unique within each dataset.
+* [ ] 🚧 Public package exports resolve successfully.
 * [ ] ⬜ Public `__all__` exports resolve successfully.
 * [ ] ⬜ Stable permission-code format is valid.
 * [ ] ⬜ Stable catalogue-code format is valid.
