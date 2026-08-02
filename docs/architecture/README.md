@@ -64,6 +64,10 @@ The following chapters have been created and form the current architecture basel
 5. [Core Concepts and Shared Vocabulary](05-core-concepts.md)
    Defines the shared terminology used throughout the project, including files, documents, versions, evidence, catalogues, reference data, people, user accounts, competencies, workflows, audit events and notifications.
 
+6. [Catalogue Framework](06-catalogue-framework.md)
+
+7. [Platform Overview and Operational Architecture](07-platform-overview.md)
+
 ## Planned architecture chapters
 
 The following chapters remain planned and will be written as the corresponding platform capabilities are designed and implemented.
