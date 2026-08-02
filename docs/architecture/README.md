@@ -86,6 +86,17 @@ The following chapters remain planned and will be written as the corresponding p
 
 The numbering may be extended as new platform capabilities require dedicated guidance.
 
+## Architecture decisions
+
+Major architectural decisions are currently documented in two places:
+
+- Within the relevant architecture chapters where the decision forms part of the design.
+- Within `docs/decisions/` for standalone decision records.
+
+The long-term intention is for significant architectural decisions to be maintained as individual decision records in `docs/decisions/`, with the architecture chapters providing the wider context and rationale.
+
+During the current platform consolidation phase, some decisions remain embedded within the architecture chapters and will be extracted as the decision-record convention is finalised.
+
 ## Recommended reading order
 
 New contributors should read the current chapters in order:

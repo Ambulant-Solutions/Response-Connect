@@ -1139,6 +1139,14 @@ Create canonical examples for:
 * [ ] ⬜ Documentation versioning.
 * [ ] ⬜ Release-specific documentation.
 
+## Decision-record conventions
+
+* [ ] ⬜ Define the permanent decision-record template.
+* [ ] ⬜ Decide whether decision records use dates, sequence numbers, or both.
+* [ ] ⬜ Create a decision-record index.
+* [ ] ⬜ Review existing decision documents for consistency.
+* [ ] ⬜ Extract embedded architectural decisions from Chapter 9 into standalone decision records.
+
 ---
 
 # Phase 20 — Deployment and operations
@@ -1180,14 +1188,16 @@ The following order should be followed unless a documented decision changes it.
    * [ ] ⬜ Review Jobs module exceptions.
    * [ ] ⬜ Review Location service exceptions.
    * [ ] ⬜ Verify public services do not leak raw built-in, provider or persistence exceptions.
-2. [ ] ⬜ Complete the platform logging conventions review.
-3. [ ] ⬜ Review all remaining public package APIs.
-4. [ ] ⬜ Review platform exception and transaction consistency.
-5. [ ] ⬜ Create the initial developer guides.
-6. [ ] ⬜ Complete the remaining architecture fitness tests.
-7. [ ] ⬜ Remove obsolete or duplicate implementation files.
-8. [ ] ⬜ Run and stabilise the complete test suite.
-9. [ ] ⬜ Update this roadmap and close the Platform Foundation and Consolidation phase.
+2. [x] ✅ Document initial Event Journal design decisions in Chapter 9.
+3. [ ] ⬜ Extract significant decisions into formal decision records once the project-wide decision-record convention is agreed.
+4. [ ] ⬜ Complete the platform logging conventions review.
+5. [ ] ⬜ Review all remaining public package APIs.
+6. [ ] ⬜ Review platform exception and transaction consistency.
+7. [ ] ⬜ Create the initial developer guides.
+8. [ ] ⬜ Complete the remaining architecture fitness tests.
+9. [ ] ⬜ Remove obsolete or duplicate implementation files.
+10. [ ] ⬜ Run and stabilise the complete test suite.
+11. [ ] ⬜ Update this roadmap and close the Platform Foundation and Consolidation phase.
 
 ## Event Journal
 
