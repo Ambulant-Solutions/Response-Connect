@@ -378,8 +378,9 @@ Required tests:
 * [x] ✅ Refactor Catalogue exceptions onto the shared hierarchy.
 * [x] ✅ Refactor Files exceptions onto the shared hierarchy.
   * [x] ✅ Refactor storage exceptions.
-  * [ ] 🚧 Refactor managed-file exceptions.
-  * [ ] ⬜ Refactor processing-policy exceptions.
+  * [x] ✅ Refactor managed-file exceptions.
+  * [x] ✅ Refactor processing-policy exceptions.
+* [ ] 🚧 Refactor Reference Data exceptions onto the shared hierarchy.
 
 ## Developer guides
 

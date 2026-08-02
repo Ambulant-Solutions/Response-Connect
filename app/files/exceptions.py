@@ -6,6 +6,7 @@ from app.exceptions import (
     PersistenceError,
     ResponseConnectError,
     ValidationError,
+    ConflictError,
 )
 
 class StorageError(ResponseConnectError):
@@ -67,47 +68,54 @@ class DeletedFileError(
 ):
     """Raised when an operation is attempted on a deleted file."""
 
-class FileProcessingPolicyError(Exception):
+class FileProcessingPolicyError(ResponseConnectError):
     """Base exception for file-processing policy operations."""
 
 
 class FileProcessingPolicyNotFoundError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    NotFoundError,
 ):
     """Raised when a processing policy cannot be found."""
 
 
 class FileProcessingPolicyCodeConflictError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    ConflictError,
 ):
     """Raised when a processing-policy code is already used."""
 
 
 class FileProcessingPolicyNameConflictError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    ConflictError,
 ):
     """Raised when a processing-policy name is already used."""
 
 
 class InvalidFileProcessingPolicyError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    ValidationError,
 ):
     """Raised when processing-policy settings are invalid."""
 
 
 class ProtectedFileProcessingPolicyError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    LifecycleError,
 ):
     """Raised when a protected system policy is modified illegally."""
 
 
 class FileProcessingPolicyInUseError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    ConflictError,
 ):
     """Raised when a processing policy is still referenced."""
 
 
 class FileProcessingPolicyPersistenceError(
-    FileProcessingPolicyError
+    FileProcessingPolicyError,
+    PersistenceError,
 ):
     """Raised when processing-policy state cannot be persisted."""

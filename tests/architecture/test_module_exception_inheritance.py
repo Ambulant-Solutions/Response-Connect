@@ -6,10 +6,12 @@ from types import ModuleType
 from app import exceptions as platform_exceptions
 from app.catalogues import exceptions as catalogue_exceptions
 from app.exceptions import ResponseConnectError
+from app.files import exceptions as file_exceptions
 
 
 EXCEPTION_MODULES: tuple[ModuleType, ...] = (
     catalogue_exceptions,
+    file_exceptions,
 )
 
 PLATFORM_EXCEPTION_CLASSES = frozenset(
