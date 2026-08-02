@@ -70,11 +70,12 @@ The following chapters have been created and form the current architecture basel
 
 8. [Error Handling Architecture](08-exception-hierarchy.md)
 
+9. [Event Journal and Operational Model](09-event-journal-and-operational-model.md)
+
 ## Planned architecture chapters
 
 The following chapters remain planned and will be written as the corresponding platform capabilities are designed and implemented.
 
-9. Reference Data
 10. Competency Framework
 11. Workflow and Notifications
 12. UI and HTMX Patterns
