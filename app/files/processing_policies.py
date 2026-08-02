@@ -50,6 +50,10 @@ from app.files.commands import (
     UpdateFileProcessingPolicyCommand,
 )
 
+import logging
+
+from app.platform_logging import log_platform_event
+
 
 _EXTENSION_PATTERN = re.compile(
     r"^[a-z0-9][a-z0-9_-]*$"
@@ -59,6 +63,8 @@ _MIME_TYPE_PATTERN = re.compile(
     r"^[a-z0-9][a-z0-9!#$&^_.+-]*/"
     r"[a-z0-9][a-z0-9!#$&^_.+-]*$"
 )
+
+logger = logging.getLogger(__name__)
 
 
 class FileProcessingPolicyService(
@@ -245,6 +251,16 @@ class FileProcessingPolicyService(
             "be created."
         )
 
+        log_platform_event(
+            logger,
+            "file_processing_policy.created",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+                "is_system": policy.is_system,
+            },
+        )
+
         return policy
 
 
@@ -318,6 +334,15 @@ class FileProcessingPolicyService(
             "be updated."
         )
 
+        log_platform_event(
+            logger,
+            "file_processing_policy.updated",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+            },
+        )
+
         return policy
 
     def activate(
@@ -336,6 +361,15 @@ class FileProcessingPolicyService(
             "be activated."
         )
 
+        log_platform_event(
+            logger,
+            "file_processing_policy.activated",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+            },
+        )
+
         return policy
 
     def deactivate(
@@ -352,6 +386,15 @@ class FileProcessingPolicyService(
         self._commit_policy_change(
             "The file processing policy could not "
             "be deactivated."
+        )
+
+        log_platform_event(
+            logger,
+            "file_processing_policy.deactivated",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+            },
         )
 
         return policy
@@ -373,6 +416,15 @@ class FileProcessingPolicyService(
         self._commit_policy_change(
             "The file processing policy could not "
             "be deleted."
+        )
+
+        log_platform_event(
+            logger,
+            "file_processing_policy.deleted",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+            },
         )
 
     def replace_rules(
@@ -412,6 +464,21 @@ class FileProcessingPolicyService(
         self._commit_policy_change(
             "The processing-policy validation "
             "rules could not be updated."
+        )
+
+        log_platform_event(
+            logger,
+            "file_processing_policy.rules_replaced",
+            fields={
+                "policy_id": str(policy.id),
+                "policy_code": policy.code,
+                "extension_count": len(
+                    normalised_extensions
+                ),
+                "mime_type_count": len(
+                    normalised_mime_types
+                ),
+            },
         )
 
         return policy
@@ -815,6 +882,19 @@ class FileProcessingPolicySynchroniser(
             else:
                 self.session.commit()
 
+            log_platform_event(
+                logger,
+                "reference_data.synchronised",
+                fields={
+                    "dataset": result.dataset,
+                    "dry_run": dry_run,
+                    "created_count": result.created_count,
+                    "updated_count": result.updated_count,
+                    "unchanged_count": result.unchanged_count,
+                    "conflict_count": result.conflict_count,
+                },
+            )
+
             return result
 
         except ReferenceDataConflictError:
@@ -879,6 +959,19 @@ class FileProcessingPolicySynchroniser(
                         "uses this reserved system code."
                     ),
                 )
+            )
+
+            log_platform_event(
+                logger,
+                "reference_data.conflict",
+                level=logging.WARNING,
+                fields={
+                    "dataset": self.dataset.name,
+                    "record_code": definition.code,
+                    "reason": (
+                        "custom_record_uses_reserved_code"
+                    ),
+                },
             )
 
             raise ReferenceDataConflictError(

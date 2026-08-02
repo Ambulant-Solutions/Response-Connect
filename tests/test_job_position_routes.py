@@ -36,6 +36,9 @@ TEST_TABLES = (
     user_roles,
 )
 
+JOB_POSITION_BASE_URL = (
+    "/org/settings/workforce/job-positions"
+)
 
 class JobPositionRouteTestCase(unittest.TestCase):
     def setUp(self):
@@ -71,6 +74,12 @@ class JobPositionRouteTestCase(unittest.TestCase):
             description="Manage HR records",
             category="hr",
         )
+        
+        configure_permission = Permission(
+            name="hr:configure",
+            description="Configure workforce settings",
+            category="hr",
+        )
 
         reader_role = Role(
             name="hr_reader",
@@ -86,8 +95,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
         )
         manager_role.permissions.extend(
             [
-                read_permission,
-                manage_permission,
+                configure_permission,
             ]
         )
 
@@ -159,7 +167,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
     def test_position_list_requires_hr_read(self):
         response = self.client.get(
-            "/org/hr/positions"
+            "/org/settings/workforce/job-positions"
         )
 
         self.assertEqual(response.status_code, 302)
@@ -171,7 +179,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
         self.login_as(self.no_access_user)
 
         response = self.client.get(
-            "/org/hr/positions"
+            "/org/settings/workforce/job-positions"
         )
 
         self.assertEqual(response.status_code, 302)
@@ -180,7 +188,34 @@ class JobPositionRouteTestCase(unittest.TestCase):
             "/",
         )
 
-    def test_reader_can_list_but_cannot_manage_positions(self):
+    def test_hr_reader_cannot_access_job_position_settings(
+        self,
+    ) -> None:
+        self.login_as(self.reader)
+
+        response = self.client.get(
+            JOB_POSITION_BASE_URL
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            "/",
+        )
+
+        response = self.client.get(
+            f"{JOB_POSITION_BASE_URL}/new"
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            "/",
+        )
+
+    def test_configurator_can_list_positions(
+        self,
+    ) -> None:
         db.session.add_all(
             [
                 JobPosition(
@@ -199,14 +234,14 @@ class JobPositionRouteTestCase(unittest.TestCase):
         )
         db.session.commit()
 
-        self.login_as(self.reader)
+        self.login_as(self.manager)
 
         with patch(
-            "app.blueprints.org.hr.routes.render_template",
+            "app.blueprints.org.settings.workforce.render_template",
             return_value="position-list",
         ) as render_template:
             response = self.client.get(
-                "/org/hr/positions"
+                JOB_POSITION_BASE_URL
             )
 
         self.assertEqual(response.status_code, 200)
@@ -226,21 +261,11 @@ class JobPositionRouteTestCase(unittest.TestCase):
             ],
         )
 
-        response = self.client.get(
-            "/org/hr/positions/new"
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.headers["Location"],
-            "/",
-        )
-
     def test_manager_can_create_and_edit_position(self):
         self.login_as(self.manager)
 
         response = self.client.post(
-            "/org/hr/positions/new",
+            "/org/settings/workforce/job-positions/new",
             data={
                 "name": "  Training Manager  ",
                 "description": (
@@ -253,7 +278,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             response.headers["Location"].endswith(
-                "/org/hr/positions"
+                "/org/settings/workforce/job-positions"
             )
         )
 
@@ -273,7 +298,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
         response = self.client.post(
             (
-                f"/org/hr/positions/"
+                f"/org/settings/workforce/job-positions/"
                 f"{position.id}/edit"
             ),
             data={
@@ -310,11 +335,11 @@ class JobPositionRouteTestCase(unittest.TestCase):
         self.login_as(self.manager)
 
         with patch(
-            "app.blueprints.org.hr.routes.render_template",
+            "app.blueprints.org.settings.workforce.render_template",
             return_value="position-form",
         ) as render_template:
             response = self.client.post(
-                "/org/hr/positions/new",
+                "/org/settings/workforce/job-positions/new",
                 data={
                     "name": "operations manager",
                     "description": "",
@@ -375,7 +400,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
         response = self.client.post(
             (
-                f"/org/hr/positions/"
+                f"/org/settings/workforce/job-positions/"
                 f"{position.id}/deactivate"
             )
         )
@@ -394,7 +419,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
         response = self.client.post(
             (
-                f"/org/hr/positions/"
+                f"/org/settings/workforce/job-positions/"
                 f"{position.id}/deactivate"
             )
         )
@@ -406,7 +431,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
         response = self.client.post(
             (
-                f"/org/hr/positions/"
+                f"/org/settings/workforce/job-positions/"
                 f"{position.id}/activate"
             )
         )
@@ -421,7 +446,7 @@ class JobPositionRouteTestCase(unittest.TestCase):
 
         response = self.client.get(
             (
-                "/org/hr/positions/"
+                "/org/settings/workforce/job-positions/"
                 f"{uuid.uuid4()}/edit"
             )
         )

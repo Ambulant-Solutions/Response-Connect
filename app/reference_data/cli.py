@@ -8,6 +8,13 @@ from app.reference_data import (
     get_reference_data_registry,
 )
 
+import logging
+
+from app.platform_logging import log_platform_event
+
+
+logger = logging.getLogger(__name__)
+
 
 def register_reference_data_cli(
     app: Flask,
@@ -60,6 +67,27 @@ def register_reference_data_cli(
                 f"{result.updated_count} updated, "
                 f"{result.unchanged_count} unchanged, "
                 f"{result.conflict_count} conflicts"
+            )
+
+            log_platform_event(
+                logger,
+                "reference_data.cli_sync_completed",
+                fields={
+                    "dataset": result.dataset,
+                    "dry_run": dry_run,
+                    "created_count": (
+                        result.created_count
+                    ),
+                    "updated_count": (
+                        result.updated_count
+                    ),
+                    "unchanged_count": (
+                        result.unchanged_count
+                    ),
+                    "conflict_count": (
+                        result.conflict_count
+                    ),
+                },
             )
 
             for change in result.changes:

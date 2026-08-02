@@ -18,7 +18,7 @@ from app.files.models import (
 from app.files.processing_policies import (
     FileProcessingPolicyService,
 )
-
+import logging
 
 @pytest.fixture
 def policy_service(app):
@@ -772,3 +772,95 @@ def test_custom_policy_can_be_deleted(
             )
             is None
         )
+
+def test_create_emits_platform_log(
+    app,
+    policy_service,
+    caplog,
+) -> None:
+    with app.app_context():
+        with caplog.at_level(
+            logging.INFO,
+            logger=(
+                "app.files.processing_policies"
+            ),
+        ):
+            policy = policy_service.create(
+                CreateFileProcessingPolicyCommand(
+                    code="test_logged_create",
+                    name="Logged Create Test",
+                    category=FileCategory.GENERIC,
+                    max_size_bytes=1024,
+                    extensions=["bin"],
+                    mime_types=[
+                        "application/octet-stream"
+                    ],
+                )
+            )
+
+        matching_records = [
+            record
+            for record in caplog.records
+            if getattr(
+                record,
+                "platform_event",
+                None,
+            )
+            == "file_processing_policy.created"
+        ]
+
+        assert len(matching_records) == 1
+
+        record = matching_records[0]
+
+        assert record.policy_id == str(policy.id)
+        assert record.policy_code == (
+            "test_logged_create"
+        )
+        assert record.is_system is False
+
+def test_deactivate_emits_log_only_on_change(
+    app,
+    policy_service,
+    caplog,
+) -> None:
+    with app.app_context():
+        policy = policy_service.create(
+            CreateFileProcessingPolicyCommand(
+                code="test_logged_deactivate",
+                name="Logged Deactivate Test",
+                category=FileCategory.GENERIC,
+                max_size_bytes=1024,
+                extensions=["bin"],
+                mime_types=[
+                    "application/octet-stream"
+                ],
+            )
+        )
+
+        caplog.clear()
+
+        with caplog.at_level(
+            logging.INFO,
+            logger=(
+                "app.files.processing_policies"
+            ),
+        ):
+            policy_service.deactivate(policy.id)
+            policy_service.deactivate(policy.id)
+
+        matching_records = [
+            record
+            for record in caplog.records
+            if getattr(
+                record,
+                "platform_event",
+                None,
+            )
+            == (
+                "file_processing_policy."
+                "deactivated"
+            )
+        ]
+
+        assert len(matching_records) == 1
