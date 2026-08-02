@@ -37,7 +37,7 @@ PERMISSION_DEFINITIONS = (
         "category": "org",
     },
     {
-        "name": "org:audit-manage",
+        "name": "org:audit_manage",
         "description": "Manage Audit workspace",
         "category": "org",
     },
