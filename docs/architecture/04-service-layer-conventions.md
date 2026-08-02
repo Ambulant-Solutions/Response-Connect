@@ -99,6 +99,85 @@ A public method should make clear:
 
 Private implementation helpers should use a leading underscore.
 
+# Service contract principle
+
+Public domain services must expose predictable contracts.
+
+Every public service method must either:
+
+* return the requested domain object, collection or structured result; or
+* raise a domain-specific exception describing why the operation could not be completed.
+
+Public mutation methods must not:
+
+* return `None` to indicate failure;
+* return boolean success or failure flags;
+* return undocumented sentinel values;
+* expose raw persistence exceptions;
+* expose provider-specific exceptions.
+
+Preferred:
+
+```python
+desk = desk_service.create(command)
+```
+
+The method returns the created `Desk` or raises a Desk-specific exception.
+
+Preferred:
+
+```python
+desk = desk_query.get(desk_id)
+```
+
+The method returns the requested `Desk` or raises `DeskNotFoundError`.
+
+Avoid:
+
+```python
+desk = desk_service.create(command)
+
+if desk is None:
+    ...
+```
+
+Avoid:
+
+```python
+success = desk_service.update(command)
+
+if not success:
+    ...
+```
+
+Predicate query methods may return booleans where the boolean itself is the requested value.
+
+For example:
+
+```python
+exists = desk_query.exists(desk_id)
+```
+
+This is not a success flag. It is an explicit existence query whose domain result is either `True` or `False`.
+
+Optional lookup methods may return `None` only where absence is an expected, documented result and the method name makes that contract explicit.
+
+For example:
+
+```python
+desk = desk_query.find_by_code(code)
+```
+
+By convention:
+
+* `get_*` methods return a value or raise a not-found exception;
+* `find_*` methods may return `None`;
+* `exists` methods return `bool`;
+* mutation methods return the affected domain object or structured result.
+
+Callers must not inspect exception message text to determine behaviour. They should catch the documented domain-specific exception class.
+
+
 # Dependency injection
 
 Services should receive their dependencies explicitly where practical.
@@ -344,29 +423,16 @@ A useful exception changes how the caller responds.
 
 # Query methods
 
-Read methods should express business intent.
+Where absence represents failure of the requested operation, the query must raise a domain-specific not-found exception.
 
-Preferred:
+Methods prefixed with `get_` must return the requested value or raise a not-found exception.
 
-```python
-get_active_type_by_code("mandatory_training")
-list_assignable_competencies(person_id)
-get_current_policy_version(document_id)
-```
+Methods prefixed with `find_` may return `None` where absence is an expected and documented result.
 
-Less useful:
+Predicate methods such as `exists` may return `bool` because the boolean is the requested domain value.
 
-```python
-get_record(...)
-query_records(...)
-find_items(...)
-```
+The contract must be clear from the method name, type annotation and documentation.
 
-Where absence is normal, a method may return `None`.
-
-Where absence represents failure of the requested operation, raise a not-found exception.
-
-The convention should be clear from the method name and documentation.
 
 # Stable identifiers
 

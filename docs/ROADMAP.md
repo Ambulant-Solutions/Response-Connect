@@ -85,12 +85,12 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 * [X] Create Desk package.
 * [X] Implement Desk model.
-* [ ] Implement Desk service.
+* [X] Implement Desk service.
 * [ ] Implement Desk query service.
 * [X] Implement Desk validators.
 * [X] Implement Desk commands.
 * [X] Implement Desk exceptions.
-* [ ] Create Desk migration.
+* [X] Create Desk migration.
 
 #### Hierarchy
 
@@ -105,7 +105,7 @@ The Desk platform defines operational ownership and scope throughout Response Co
 #### Testing
 
 * [X] Model tests.
-* [ ] Service tests.
+* [X] Service tests.
 * [ ] Query tests.
 * [ ] Architecture tests.
 
