@@ -77,7 +77,19 @@ Platform Foundation and Consolidation
 
 ## Current objective
 
-Complete and stabilise the reusable platform capabilities required before building major workforce and operational modules.
+Complete the remaining platform hardening, logging conventions, developer guidance and public-interface reviews before beginning the Event Journal.
+
+## Current test status
+
+```text
+138 tests passing
+```
+
+## Current workstream
+
+```text
+Exception and error-handling consolidation
+```
 
 ## Next implementation milestone
 
@@ -85,7 +97,8 @@ Complete and stabilise the reusable platform capabilities required before buildi
 Event Journal Foundation
 ```
 
-This must not begin until the remaining consolidation tasks listed below are complete.
+The Event Journal must not begin until the remaining consolidation tasks in Phase 6 are completed or explicitly deferred.
+
 
 ---
 
@@ -323,15 +336,31 @@ Initial ADR backlog:
 * [x] ✅ File Processing Policy service updated.
 * [x] ✅ Child collection reconciliation implemented.
 * [x] ✅ Public service factories.
-* [x] ✅ Public package exports reviewed for current Files and Catalogues work.
-* [ ] ⬜ Review all existing platform package exports.
-* [ ] ⬜ Standardise exception hierarchies.
+* [x] ✅ Initial public package export review for Catalogues, Files and Reference Data.
+* [x] ✅ Shared platform exception hierarchy.
+* [x] ✅ Catalogue exceptions migrated to the shared hierarchy.
+* [x] ✅ Files exceptions migrated to the shared hierarchy.
+* [x] ✅ Reference Data exceptions migrated to the shared hierarchy.
+* [x] ✅ Module exception inheritance protected by architecture tests.
+* [x] ✅ Existing custom exceptions inventoried and reviewed.
+* [x] ✅ Built-in exception usage reviewed.
+* [x] ✅ Reference Data registry configuration failure migrated from `RuntimeError`.
+* [x] ✅ Password-reset token error migrated to `ValidationError`.
+* [x] ✅ Password-reset configuration failures migrated to `ConfigurationError`.
+* [x] ✅ Password-reset maximum-age configuration validation added.
+* [x] ✅ Duplicate `FileProcessingPolicyService` import removed.
+* [ ] 🚧 Review Email module exceptions.
+* [ ] ⬜ Review Jobs module exceptions.
+* [ ] ⬜ Review Location service exceptions.
+* [ ] ⬜ Verify public services do not leak raw `ValueError`.
+* [ ] ⬜ Review all remaining platform package exports.
 * [ ] ⬜ Standardise service method names.
 * [ ] ⬜ Review transaction boundaries.
 * [ ] ⬜ Review complete typing coverage.
 * [ ] ⬜ Review docstrings.
-* [ ] ⬜ Remove obsolete modules and route files.
+* [ ] ⬜ Remove any remaining obsolete modules and route files.
 * [ ] ⬜ Review test database isolation.
+
 
 ## Platform logging
 
@@ -351,36 +380,71 @@ Initial ADR backlog:
 
 ## Architecture fitness tests
 
-Create:
+Architecture tests are maintained under:
 
 ```text
 tests/architecture/
 ```
 
-Required tests:
+Completed safeguards:
 
 * [x] ✅ Platform modules do not import business blueprints.
 * [x] ✅ Service modules do not import route modules.
-* [ ] ⬜ Route modules do not contain direct cross-module persistence.
-* [x] ✅ Reference-data dataset names are unique.
-* [x] ✅ Reference-data codes are unique within each dataset.
-* [ ] 🚧 Public package exports resolve successfully.
+* [x] ✅ Reference Data dataset names are unique.
+* [x] ✅ Reference Data stable codes are unique within each dataset.
+* [x] ✅ Reference Data dataset names use the required format.
+* [x] ✅ Reference Data record codes use the required format.
+* [x] ✅ Public packages import successfully.
+* [x] ✅ Public packages define `__all__`.
 * [x] ✅ Public `__all__` exports resolve successfully.
+* [x] ✅ Public exports contain no duplicates.
+* [x] ✅ Public exports use valid Python identifiers.
+* [x] ✅ Public exports do not expose private names.
 * [x] ✅ Stable permission-code format is valid.
-* [ ] ⬜ Stable catalogue-code format is valid.
-* [x] ✅ No obsolete job-position route module remains imported.
+* [x] ✅ Stable catalogue and Reference Data code formats are valid.
+* [x] ✅ Obsolete Job Position route modules are not imported.
+* [x] ✅ Platform exception names follow conventions.
+* [x] ✅ Platform exception categories inherit from `ResponseConnectError`.
+* [x] ✅ Catalogue, Files and Reference Data exceptions inherit from the shared hierarchy.
+
+Remaining safeguards:
+
+* [ ] 🚧 Route modules do not contain direct cross-module persistence.
 * [ ] ⬜ Platform modules do not depend on templates.
 * [ ] ⬜ Business modules use public Files APIs.
 * [ ] ⬜ No duplicate storage-provider implementation exists.
-* [x] ✅ Inventory and review existing custom exceptions.
-* [x] ✅ Add shared platform exception hierarchy.
-* [x] ✅ Add tests for shared platform exceptions.
-* [x] ✅ Refactor Catalogue exceptions onto the shared hierarchy.
-* [x] ✅ Refactor Files exceptions onto the shared hierarchy.
-  * [x] ✅ Refactor storage exceptions.
-  * [x] ✅ Refactor managed-file exceptions.
-  * [x] ✅ Refactor processing-policy exceptions.
-* [ ] 🚧 Refactor Reference Data exceptions onto the shared hierarchy.
+* [ ] ⬜ Public services do not leak provider-specific exceptions.
+* [ ] ⬜ Public services do not leak raw persistence exceptions.
+
+## Error-handling consolidation
+
+### Completed
+
+* [x] ✅ Write `08-exception-hierarchy.md`.
+* [x] ✅ Inventory existing custom exceptions.
+* [x] ✅ Add `app/exceptions.py`.
+* [x] ✅ Add shared exception-category tests.
+* [x] ✅ Add exception architecture tests.
+* [x] ✅ Migrate Catalogue exceptions.
+* [x] ✅ Migrate Files storage exceptions.
+* [x] ✅ Migrate managed-file exceptions.
+* [x] ✅ Migrate File Processing Policy exceptions.
+* [x] ✅ Migrate Reference Data exceptions.
+* [x] ✅ Review direct uses of built-in exceptions.
+* [x] ✅ Replace the Reference Data registry `RuntimeError`.
+* [x] ✅ Refactor password-reset token and configuration errors.
+* [x] ✅ Add focused password-reset exception tests.
+
+### Remaining
+
+* [ ] 🚧 Review and define Email module exceptions.
+* [ ] ⬜ Review and define Jobs module exceptions.
+* [ ] ⬜ Review and define Location module exceptions.
+* [ ] ⬜ Confirm public service boundaries translate raw `ValueError`.
+* [ ] ⬜ Confirm provider and SQLAlchemy exceptions do not escape services.
+* [ ] ⬜ Decide whether authentication and permission services require dedicated module exception bases.
+* [ ] ⬜ Remove the temporary exception inventory documents once their conclusions are fully represented by permanent documentation and tests.
+
 
 ## Developer guides
 
@@ -1110,25 +1174,32 @@ The following order should be followed unless a documented decision changes it.
 
 ## Current consolidation
 
-1. [ ] ⬜ Add architecture fitness tests.
-2. [ ] ⬜ Complete public API review.
-3. [ ] ⬜ Review platform exception consistency.
-4. [ ] ⬜ Complete platform logging conventions.
-5. [ ] ⬜ Create initial developer guides.
-6. [ ] ⬜ Remove obsolete files and route implementations.
-7. [ ] ⬜ Run and stabilise the full test suite.
-8. [ ] ⬜ Update this roadmap.
+1. [ ] 🚧 Complete the remaining error-handling review.
+
+   * [ ] 🚧 Review Email module exceptions.
+   * [ ] ⬜ Review Jobs module exceptions.
+   * [ ] ⬜ Review Location service exceptions.
+   * [ ] ⬜ Verify public services do not leak raw built-in, provider or persistence exceptions.
+2. [ ] ⬜ Complete the platform logging conventions review.
+3. [ ] ⬜ Review all remaining public package APIs.
+4. [ ] ⬜ Review platform exception and transaction consistency.
+5. [ ] ⬜ Create the initial developer guides.
+6. [ ] ⬜ Complete the remaining architecture fitness tests.
+7. [ ] ⬜ Remove obsolete or duplicate implementation files.
+8. [ ] ⬜ Run and stabilise the complete test suite.
+9. [ ] ⬜ Update this roadmap and close the Platform Foundation and Consolidation phase.
 
 ## Event Journal
 
-9. [ ] ⬜ Write Event Journal architecture chapter.
-10. [ ] ⬜ Create Event Journal ADR.
-11. [ ] ⬜ Define event model and migration.
-12. [ ] ⬜ Implement event commands and service.
-13. [ ] ⬜ Add transactional event recording.
-14. [ ] ⬜ Add event queries.
-15. [ ] ⬜ Add Event Journal tests.
-16. [ ] ⬜ Update this roadmap.
+10. [ ] ⬜ Write the Event Journal architecture chapter.
+11. [ ] ⬜ Create the Event Journal ADR.
+12. [ ] ⬜ Define the event model and migration.
+13. [ ] ⬜ Implement event commands and recording services.
+14. [ ] ⬜ Add transactional event recording.
+15. [ ] ⬜ Add event query services.
+16. [ ] ⬜ Add Event Journal tests.
+17. [ ] ⬜ Update this roadmap.
+
 
 ## Lifecycle
 
