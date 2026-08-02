@@ -1,3 +1,16 @@
+# Historical Roadmap (Archived)
+
+> **Status:** Archived
+
+This document records the original development roadmap used during the
+Platform Foundation and Consolidation phase of Response Connect.
+
+It has been superseded by `ROADMAP.md`, which is now the authoritative
+development roadmap.
+
+This file is retained as part of the project's architectural history and
+should not be updated.
+
 # Response Connect Delivery Roadmap
 
 ## Purpose

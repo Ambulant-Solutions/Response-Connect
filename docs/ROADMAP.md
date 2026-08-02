@@ -1,3 +1,10 @@
+> **Status:** Active
+
+This is the authoritative development roadmap for Response Connect.
+
+The historical roadmap used during the initial platform development has
+been archived as `ROADMAP_OLD.md`.
+
 # Response Connect Roadmap
 
 **Last Updated:** August 2026
