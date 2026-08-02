@@ -372,6 +372,10 @@ Required tests:
 * [ ] ⬜ Platform modules do not depend on templates.
 * [ ] ⬜ Business modules use public Files APIs.
 * [ ] ⬜ No duplicate storage-provider implementation exists.
+* [x] ✅ Inventory and review existing custom exceptions.
+* [x] ✅ Add shared platform exception hierarchy.
+* [x] ✅ Add tests for shared platform exceptions.
+* [ ] 🚧 Refactor Catalogue exceptions onto the shared hierarchy.
 
 ## Developer guides
 
