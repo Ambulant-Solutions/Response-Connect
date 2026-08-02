@@ -7,12 +7,17 @@ from app import exceptions as platform_exceptions
 from app.catalogues import exceptions as catalogue_exceptions
 from app.exceptions import ResponseConnectError
 from app.files import exceptions as file_exceptions
+from app.reference_data import (
+    exceptions as reference_data_exceptions,
+)
 
 
 EXCEPTION_MODULES: tuple[ModuleType, ...] = (
     catalogue_exceptions,
     file_exceptions,
+    reference_data_exceptions,
 )
+
 
 PLATFORM_EXCEPTION_CLASSES = frozenset(
     exception_class
