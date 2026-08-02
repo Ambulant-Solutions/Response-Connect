@@ -8,9 +8,7 @@ from app.files.http import (
     iter_s3_body,
 )
 from app.extensions import db
-from app.files.processing_policies import (
-    FileProcessingPolicyService,
-)
+
 from app.files.processing_policies import (
     FileProcessingPolicyService,
     FileProcessingPolicySynchroniser,

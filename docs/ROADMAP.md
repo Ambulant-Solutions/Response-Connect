@@ -375,7 +375,11 @@ Required tests:
 * [x] ✅ Inventory and review existing custom exceptions.
 * [x] ✅ Add shared platform exception hierarchy.
 * [x] ✅ Add tests for shared platform exceptions.
-* [ ] 🚧 Refactor Catalogue exceptions onto the shared hierarchy.
+* [x] ✅ Refactor Catalogue exceptions onto the shared hierarchy.
+* [x] ✅ Refactor Files exceptions onto the shared hierarchy.
+  * [x] ✅ Refactor storage exceptions.
+  * [ ] 🚧 Refactor managed-file exceptions.
+  * [ ] ⬜ Refactor processing-policy exceptions.
 
 ## Developer guides
 

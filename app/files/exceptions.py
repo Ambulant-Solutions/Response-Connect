@@ -1,24 +1,45 @@
-class StorageError(Exception):
+from app.exceptions import (
+    ConfigurationError,
+    InfrastructureError,
+    LifecycleError,
+    NotFoundError,
+    PersistenceError,
+    ResponseConnectError,
+    ValidationError,
+)
+
+class StorageError(ResponseConnectError):
     """Base exception for object-storage failures."""
 
 
-class StorageConfigurationError(StorageError):
+class StorageConfigurationError(
+    StorageError,
+    ConfigurationError,
+):
     """Raised when required storage configuration is missing."""
 
 
-class StorageConnectionError(StorageError):
+class StorageConnectionError(
+    StorageError,
+    InfrastructureError,
+):
     """Raised when the object-storage service cannot be reached."""
 
 
-class StorageObjectNotFoundError(StorageError):
+class StorageObjectNotFoundError(
+    StorageError,
+    NotFoundError,
+):
     """Raised when a requested object does not exist."""
 
-
-class FileManagementError(Exception):
+class FileManagementError(ResponseConnectError):
     """Base exception for managed-file operations."""
 
 
-class InvalidFileError(FileManagementError):
+class InvalidFileError(
+    FileManagementError,
+    ValidationError,
+):
     """Raised when an uploaded file is invalid."""
 
 
@@ -26,15 +47,24 @@ class FileTooLargeError(InvalidFileError):
     """Raised when a file exceeds the configured limit."""
 
 
-class FilePersistenceError(FileManagementError):
+class FilePersistenceError(
+    FileManagementError,
+    PersistenceError,
+):
     """Raised when file metadata cannot be persisted safely."""
 
 
-class ManagedFileNotFoundError(FileManagementError):
+class ManagedFileNotFoundError(
+    FileManagementError,
+    NotFoundError,
+):
     """Raised when a managed file record cannot be found."""
 
 
-class DeletedFileError(FileManagementError):
+class DeletedFileError(
+    FileManagementError,
+    LifecycleError,
+):
     """Raised when an operation is attempted on a deleted file."""
 
 class FileProcessingPolicyError(Exception):
