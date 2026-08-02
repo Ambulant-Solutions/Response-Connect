@@ -358,8 +358,8 @@ tests/architecture/
 
 Required tests:
 
-* [ ] ⬜ Platform modules do not import business blueprints.
-* [ ] ⬜ Service modules do not import route modules.
+* [x] ✅ Platform modules do not import business blueprints.
+* [x] ✅ Service modules do not import route modules.
 * [ ] ⬜ Route modules do not contain direct cross-module persistence.
 * [ ] ⬜ Reference-data dataset names are unique.
 * [ ] ⬜ Reference-data codes are unique within each dataset.
