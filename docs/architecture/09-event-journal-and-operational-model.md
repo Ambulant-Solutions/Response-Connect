@@ -23,6 +23,18 @@ Future modules must use these shared capabilities rather than introduce independ
 
 ---
 
+## Terminology and naming
+
+Response Connect uses **Event Journal** as the name of the shared history platform.
+
+An individual persistent record within the Event Journal is called a **Journal Entry**.
+
+The term **Event Medical** refers to medical provision at organised public or private events. The shorter term **Event** may be used for a specific organised event where the Event Medical context is clear.
+
+The implementation uses the `app/journal/` package and `JournalEntry` model names to avoid ambiguity between Event Journal records and Event Medical operations.
+
+Stable event codes such as `vehicle.arrived_on_scene` describe the occurrence being recorded. They do not imply that the persistent model itself is named `Event`.
+
 # Guiding principle
 
 > Record each significant occurrence once, then present it through the views that need it.
