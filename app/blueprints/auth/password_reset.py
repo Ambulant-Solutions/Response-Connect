@@ -13,9 +13,13 @@ from itsdangerous import (
 
 from app.blueprints.auth.models import UserAccount
 from app.extensions import db
+from app.exceptions import (
+    ConfigurationError,
+    ValidationError,
+)
 
 
-class PasswordResetTokenError(ValueError):
+class PasswordResetTokenError(ValidationError):
     """Raised when a password-reset token is invalid or expired."""
 
 
@@ -111,15 +115,19 @@ def validate_password_reset_token(
 
 
 def _get_serializer() -> URLSafeTimedSerializer:
-    secret_key = current_app.config.get("SECRET_KEY")
+    secret_key = current_app.config.get(
+        "SECRET_KEY"
+    )
 
     if not secret_key:
-        raise RuntimeError(
-            "SECRET_KEY must be configured before password-reset "
-            "tokens can be generated."
+        raise ConfigurationError(
+            "SECRET_KEY must be configured before "
+            "password-reset tokens can be generated."
         )
 
-    return URLSafeTimedSerializer(secret_key)
+    return URLSafeTimedSerializer(
+        secret_key
+    )
 
 
 def _get_salt() -> str:
@@ -130,12 +138,26 @@ def _get_salt() -> str:
 
 
 def _get_max_age() -> int:
-    return int(
-        current_app.config.get(
-            "PASSWORD_RESET_TOKEN_MAX_AGE",
-            3600,
-        )
+    configured_value = current_app.config.get(
+        "PASSWORD_RESET_TOKEN_MAX_AGE",
+        3600,
     )
+
+    try:
+        max_age = int(configured_value)
+    except (TypeError, ValueError) as exc:
+        raise ConfigurationError(
+            "PASSWORD_RESET_TOKEN_MAX_AGE must "
+            "be a valid integer."
+        ) from exc
+
+    if max_age <= 0:
+        raise ConfigurationError(
+            "PASSWORD_RESET_TOKEN_MAX_AGE must "
+            "be greater than zero."
+        )
+
+    return max_age
 
 
 def _password_fingerprint(password_hash: str) -> str:

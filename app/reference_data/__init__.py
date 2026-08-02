@@ -13,6 +13,7 @@ from app.reference_data.synchroniser import (
     ReferenceDataSynchronisationResult,
     ReferenceDatasetSynchroniser,
 )
+from app.exceptions import ConfigurationError
 
 
 _REGISTRY_EXTENSION_KEY = "response_connect_reference_data"
@@ -45,7 +46,7 @@ def get_reference_data_registry(
             _REGISTRY_EXTENSION_KEY
         ]
     except KeyError as exc:
-        raise RuntimeError(
+        raise ConfigurationError(
             "The reference-data registry has not been "
             "initialised for this application."
         ) from exc
