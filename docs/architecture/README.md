@@ -68,13 +68,12 @@ The following chapters have been created and form the current architecture basel
 
 7. [Platform Overview and Operational Architecture](07-platform-overview.md)
 
+8. [Error Handling Architecture](08-exception-hierarchy.md)
+
 ## Planned architecture chapters
 
 The following chapters remain planned and will be written as the corresponding platform capabilities are designed and implemented.
 
-6. Catalogue Framework
-7. File Platform
-8. Audit Framework
 9. Reference Data
 10. Competency Framework
 11. Workflow and Notifications

@@ -132,6 +132,7 @@ This must not begin until the remaining consolidation tasks listed below are com
 * [x] ✅ `05-core-concepts.md`
 * [x] ✅ `06-catalogue-framework.md`
 * [x] ✅ `07-platform-overview.md`
+* [x] ✅ Error Handling Architecture chapter.
 * [x] ✅ Architecture README updated.
 
 ## Planned architecture chapters
