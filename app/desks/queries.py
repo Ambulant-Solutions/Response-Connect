@@ -1,1 +1,1 @@
-"""Desk domain models."""
+"""Desk hierarchy and lookup queries."""

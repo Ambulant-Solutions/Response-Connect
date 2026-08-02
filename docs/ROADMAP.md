@@ -83,13 +83,13 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 #### Core Platform
 
-* [ ] Create Desk package.
+* [X] Create Desk package.
 * [ ] Implement Desk model.
 * [ ] Implement Desk service.
 * [ ] Implement Desk query service.
-* [ ] Implement Desk validators.
-* [ ] Implement Desk commands.
-* [ ] Implement Desk exceptions.
+* [X] Implement Desk validators.
+* [X] Implement Desk commands.
+* [X] Implement Desk exceptions.
 * [ ] Create Desk migration.
 
 #### Hierarchy
@@ -117,10 +117,11 @@ The Event Journal records immutable Journal Entries describing operational occur
 
 #### Architecture
 
-* [ ] Write Event Journal data model chapter.
-* [ ] Finalise Journal schema.
-* [ ] Finalise classification model.
-* [ ] Finalise metadata structure.
+* [x] Write Event Journal and Operational Model chapter.
+* [x] Write Event Journal data model chapter.
+* [x] Finalise Journal terminology and package naming.
+* [x] Define initial Journal schema.
+* [x] Define classification and metadata models
 
 #### Core Platform
 

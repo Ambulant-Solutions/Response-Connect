@@ -1,7 +1,20 @@
-"""Desk hierarchy and operational-scope platform.
+"""Desk hierarchy and operational-scope platform."""
 
-Desks represent hierarchical operational workspaces used to scope work,
-resources, permissions, dashboards, notifications, and Journal queries.
-"""
+from app.desks.exceptions import (
+    DeskConflictError,
+    DeskError,
+    DeskHierarchyError,
+    DeskNotFoundError,
+    DeskPersistenceError,
+    InvalidDeskError,
+)
 
-__all__: list[str] = []
+
+__all__ = [
+    "DeskConflictError",
+    "DeskError",
+    "DeskHierarchyError",
+    "DeskNotFoundError",
+    "DeskPersistenceError",
+    "InvalidDeskError",
+]

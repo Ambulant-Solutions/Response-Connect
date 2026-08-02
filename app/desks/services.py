@@ -1,1 +1,1 @@
-"""Desk domain models."""
+"""Desk lifecycle and hierarchy services."""
