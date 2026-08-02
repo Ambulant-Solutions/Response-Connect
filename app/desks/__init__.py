@@ -8,9 +8,11 @@ from app.desks.exceptions import (
     DeskPersistenceError,
     InvalidDeskError,
 )
+from app.desks.models import Desk
 
 
 __all__ = [
+    "Desk",
     "DeskConflictError",
     "DeskError",
     "DeskHierarchyError",

@@ -32,6 +32,7 @@ from app.reference_data import (
 from app.reference_data.cli import (
     register_reference_data_cli,
 )
+from app.desks.models import Desk  # noqa: F401
 
 
 

@@ -76,15 +76,15 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 #### Architecture
 
-* [ ] Write detailed Desk architecture chapter.
-* [ ] Finalise Desk data model.
+* [X] Write detailed Desk architecture chapter.
+* [X] Finalise Desk data model.
 * [ ] Define Desk lifecycle.
 * [ ] Define Desk permission model.
 
 #### Core Platform
 
 * [X] Create Desk package.
-* [ ] Implement Desk model.
+* [X] Implement Desk model.
 * [ ] Implement Desk service.
 * [ ] Implement Desk query service.
 * [X] Implement Desk validators.
@@ -104,7 +104,7 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 #### Testing
 
-* [ ] Model tests.
+* [X] Model tests.
 * [ ] Service tests.
 * [ ] Query tests.
 * [ ] Architecture tests.
