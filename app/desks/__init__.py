@@ -15,6 +15,7 @@ from app.desks.exceptions import (
 )
 from app.desks.models import Desk
 from app.desks.services import DeskService
+from app.desks.queries import DeskQueryService
 
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     "InvalidDeskError",
     "MoveDeskCommand",
     "UpdateDeskCommand",
+    "DeskQueryService",
 ]
