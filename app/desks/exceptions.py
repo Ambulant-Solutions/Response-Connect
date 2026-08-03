@@ -48,11 +48,18 @@ class DeskPersistenceError(
 ):
     """Raised when Desk state cannot be persisted."""
 
+class DeskLifecycleError(
+    DeskError,
+    LifecycleError,
+):
+    """Raised when a Desk lifecycle transition is invalid."""
+
 
 __all__ = [
     "DeskConflictError",
     "DeskError",
     "DeskHierarchyError",
+    "DeskLifecycleError",
     "DeskNotFoundError",
     "DeskPersistenceError",
     "InvalidDeskError",

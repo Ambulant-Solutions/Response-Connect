@@ -77,11 +77,13 @@ class Desk(db.Model):
         Index(
             "ix_desks_parent_active_name",
             "parent_id",
+            "archived_at",
             "is_active",
             "name",
         ),
         Index(
             "ix_desks_active_name",
+            "archived_at",
             "is_active",
             "name",
         ),
@@ -148,6 +150,12 @@ class Desk(db.Model):
         onupdate=func.now(),
     )
 
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+        index=True,
+    )
+
     parent: Mapped["Desk | None"] = relationship(
         "Desk",
         remote_side="Desk.id",
@@ -169,9 +177,26 @@ class Desk(db.Model):
 
         return not self.children
 
+    @property
+    def is_archived(self) -> bool:
+        """Return whether this Desk has been archived."""
+
+        return self.archived_at is not None
+
+
+    @property
+    def is_available(self) -> bool:
+        """Return whether the Desk is active and not archived."""
+
+        return (
+            self.is_active
+            and not self.is_archived
+        )
+
     def __repr__(self) -> str:
         return (
             f"<Desk "
             f"code={self.code!r} "
             f"name={self.name!r}>"
         )
+

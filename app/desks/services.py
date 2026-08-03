@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import uuid
 from typing import Any
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.exc import (
@@ -20,6 +21,7 @@ from app.desks.commands import (
 from app.desks.exceptions import (
     DeskConflictError,
     DeskHierarchyError,
+    DeskLifecycleError,
     DeskNotFoundError,
     DeskPersistenceError,
     InvalidDeskError,
@@ -233,6 +235,23 @@ class DeskService:
                 "A Desk cannot be moved beneath itself."
             )
 
+        if desk.archived_at is not None:
+            raise DeskLifecycleError(
+                "An archived Desk cannot be moved."
+            )
+
+        if new_parent.archived_at is not None:
+            raise DeskLifecycleError(
+                "A Desk cannot be moved beneath an "
+                "archived parent Desk."
+            )
+
+        if desk.is_active and not new_parent.is_active:
+            raise DeskLifecycleError(
+                "An active Desk cannot be moved beneath "
+                "an inactive parent Desk."
+            )
+
         if desk.parent_id == new_parent.id:
             return desk
 
@@ -253,6 +272,143 @@ class DeskService:
             self.session.rollback()
             raise DeskPersistenceError(
                 "The Desk could not be moved."
+            ) from exc
+
+        return desk
+
+    def activate(
+        self,
+        desk_id: uuid.UUID,
+    ) -> Desk:
+        """Activate and return a Desk."""
+
+        desk = self._get_desk(desk_id)
+
+        if desk.archived_at is not None:
+            raise DeskLifecycleError(
+                "An archived Desk cannot be activated."
+            )
+
+        if desk.is_active:
+            return desk
+
+        if desk.parent is not None:
+            if desk.parent.archived_at is not None:
+                raise DeskLifecycleError(
+                    "A Desk cannot be activated beneath "
+                    "an archived parent Desk."
+                )
+
+            if not desk.parent.is_active:
+                raise DeskLifecycleError(
+                    "A Desk cannot be activated beneath "
+                    "an inactive parent Desk."
+                )
+
+        desk.is_active = True
+
+        try:
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            self.session.rollback()
+            raise DeskPersistenceError(
+                "The Desk could not be activated."
+            ) from exc
+
+        return desk
+
+    def deactivate(
+        self,
+        desk_id: uuid.UUID,
+    ) -> Desk:
+        """Deactivate and return a Desk."""
+
+        desk = self._get_desk(desk_id)
+
+        if desk.is_root:
+            raise DeskLifecycleError(
+                "The root Desk cannot be deactivated."
+            )
+
+        if desk.archived_at is not None:
+            raise DeskLifecycleError(
+                "An archived Desk cannot be deactivated."
+            )
+
+        if not desk.is_active:
+            return desk
+
+        active_child_id = self.session.scalar(
+            select(Desk.id).where(
+                Desk.parent_id == desk.id,
+                Desk.is_active.is_(True),
+                Desk.archived_at.is_(None),
+            )
+        )
+
+        if active_child_id is not None:
+            raise DeskLifecycleError(
+                "A Desk with active child Desks "
+                "cannot be deactivated."
+            )
+
+        desk.is_active = False
+
+        try:
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            self.session.rollback()
+            raise DeskPersistenceError(
+                "The Desk could not be deactivated."
+            ) from exc
+
+        return desk
+
+    def archive(
+        self,
+        desk_id: uuid.UUID,
+    ) -> Desk:
+        """Archive and return a Desk."""
+
+        desk = self._get_desk(desk_id)
+
+        if desk.is_root:
+            raise DeskLifecycleError(
+                "The root Desk cannot be archived."
+            )
+
+        if desk.archived_at is not None:
+            return desk
+
+        if desk.is_active:
+            raise DeskLifecycleError(
+                "An active Desk must be deactivated "
+                "before it can be archived."
+            )
+
+        unarchived_child_id = self.session.scalar(
+            select(Desk.id).where(
+                Desk.parent_id == desk.id,
+                Desk.archived_at.is_(None),
+            )
+        )
+
+        if unarchived_child_id is not None:
+            raise DeskLifecycleError(
+                "A Desk with unarchived child Desks "
+                "cannot be archived."
+            )
+
+        desk.archived_at = datetime.now(
+            timezone.utc
+        )
+
+        try:
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            self.session.rollback()
+            raise DeskPersistenceError(
+                "The Desk could not be archived."
             ) from exc
 
         return desk

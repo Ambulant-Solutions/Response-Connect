@@ -97,10 +97,16 @@ class DeskQueryService:
         self,
         *,
         active_only: bool = False,
+        include_archived: bool = False,
     ) -> list[Desk]:
         """Return Desks ordered consistently for administration."""
 
         statement = self._base_list_query()
+
+        if not include_archived:
+            statement = statement.where(
+                Desk.archived_at.is_(None)
+            )
 
         if active_only:
             statement = statement.where(
@@ -118,6 +124,7 @@ class DeskQueryService:
         parent_id: uuid.UUID,
         *,
         active_only: bool = False,
+        include_archived: bool = False,
     ) -> list[Desk]:
         """Return the immediate child Desks of a parent."""
 
@@ -133,6 +140,11 @@ class DeskQueryService:
                 Desk.code,
             )
         )
+
+        if not include_archived:
+            statement = statement.where(
+                Desk.archived_at.is_(None)
+            )
 
         if active_only:
             statement = statement.where(
@@ -176,6 +188,7 @@ class DeskQueryService:
         desk_id: uuid.UUID,
         *,
         active_only: bool = False,
+        include_archived: bool = False,
     ) -> list[Desk]:
         """Return every descendant beneath a Desk."""
 
@@ -217,11 +230,20 @@ class DeskQueryService:
 
                 visited_ids.add(child.id)
 
-                if (
-                    not active_only
-                    or child.is_active
-                ):
+                should_include = (
+                    (
+                        include_archived
+                        or child.archived_at is None
+                    )
+                    and (
+                        not active_only
+                        or child.is_active
+                    )
+                )
+
+                if should_include:
                     descendants.append(child)
+
 
                 pending_parent_ids.append(
                     child.id

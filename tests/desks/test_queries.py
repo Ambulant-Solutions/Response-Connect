@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 
 import pytest
-
+from datetime import datetime, timezone
 from app.desks.exceptions import (
     DeskNotFoundError,
     InvalidDeskError,
@@ -466,3 +466,73 @@ def test_descendants_unknown_desk_raises_not_found(
         desk_queries.descendants(
             uuid.uuid4()
         )
+
+def test_list_excludes_archived_desks_by_default(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    archived = create_child(
+        parent=root,
+        code="archived",
+        name="Archived Desk",
+        is_active=False,
+    )
+    archived.archived_at = datetime.now(
+        timezone.utc
+    )
+
+    db.session.flush()
+
+    results = desk_queries.list()
+
+    assert archived not in results
+
+
+def test_list_can_include_archived_desks(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    archived = create_child(
+        parent=root,
+        code="archived",
+        name="Archived Desk",
+        is_active=False,
+    )
+    archived.archived_at = datetime.now(
+        timezone.utc
+    )
+
+    db.session.flush()
+
+    results = desk_queries.list(
+        include_archived=True
+    )
+
+    assert archived in results
+
+
+def test_get_still_returns_archived_desk(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    archived = create_child(
+        parent=root,
+        code="archived",
+        name="Archived Desk",
+        is_active=False,
+    )
+    archived.archived_at = datetime.now(
+        timezone.utc
+    )
+
+    db.session.flush()
+
+    assert desk_queries.get(
+        archived.id
+    ) is archived

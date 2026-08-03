@@ -43,6 +43,7 @@ def _remove_test_desks() -> None:
                         "active",
                         "inactive",
                         "orphan",
+                        "archived",
                     ]
                 )
             )

@@ -11,6 +11,7 @@ EXPECTED_PUBLIC_EXPORTS = {
     "DeskConflictError",
     "DeskError",
     "DeskHierarchyError",
+    "DeskLifecycleError",
     "DeskNotFoundError",
     "DeskPersistenceError",
     "DeskQueryService",

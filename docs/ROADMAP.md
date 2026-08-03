@@ -19,7 +19,7 @@ been archived as `ROADMAP_OLD.md`.
 
 ## Current Milestone
 
-**Desk Hierarchy Platform**
+**Event Journal Core Platform**
 
 ## Current Status
 
@@ -78,8 +78,10 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 * [X] Write detailed Desk architecture chapter.
 * [X] Finalise Desk data model.
-* [ ] Define Desk lifecycle.
-* [ ] Define Desk permission model.
+* [x] Define Desk lifecycle.
+* [x] Define Desk permission model.
+* [x] Add Desk architecture fitness tests.
+* [x] Confirm public package import boundaries.
 
 #### Core Platform
 
@@ -100,8 +102,18 @@ The Desk platform defines operational ownership and scope throughout Response Co
 * [x] Desk movement.
 * [x] Descendant queries.
 * [x] Breadcrumb/path generation.
-* [ ] 🚧 Desk activation/deactivation.
-* [ ] Desk archival.
+* [x] Desk activation/deactivation.
+* [x] Desk archival.
+
+#### Lifecycle
+
+* [x] Add explicit Desk archival state.
+* [x] Implement Desk activation.
+* [x] Implement Desk deactivation.
+* [x] Implement Desk archival.
+* [x] Protect the root Desk.
+* [x] Prevent invalid lifecycle transitions.
+* [x] Add Desk lifecycle tests.
 
 #### Testing
 
@@ -109,8 +121,8 @@ The Desk platform defines operational ownership and scope throughout Response Co
 * [x] Service tests.
 * [x] Query tests.
 * [x] Public API architecture tests.
-* [ ] 🚧 Hierarchy service tests.
-* [ ] Lifecycle tests.
+* [x] Hierarchy service tests.
+* [x] Lifecycle tests.
 
 ---
 
