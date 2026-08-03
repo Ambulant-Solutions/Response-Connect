@@ -1,1 +1,18 @@
-"""Event Journal recording commands."""
+"""Technical constants for the Event Journal."""
+
+EVENT_CODE_MAX_LENGTH = 120
+JOURNAL_SUMMARY_MAX_LENGTH = 500
+JOURNAL_DETAILS_MAX_LENGTH = 10_000
+
+JOURNAL_EVENT_CODE_PATTERN = (
+    r"^[a-z][a-z0-9_]*\."
+    r"[a-z][a-z0-9_]*$"
+)
+
+
+__all__ = [
+    "EVENT_CODE_MAX_LENGTH",
+    "JOURNAL_DETAILS_MAX_LENGTH",
+    "JOURNAL_EVENT_CODE_PATTERN",
+    "JOURNAL_SUMMARY_MAX_LENGTH",
+]

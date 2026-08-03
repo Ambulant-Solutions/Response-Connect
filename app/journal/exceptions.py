@@ -32,14 +32,14 @@ class JournalEntryVisibilityError(
     JournalError,
     PermissionDeniedError,
 ):
-    """Raised when an actor cannot access a Journal Entry."""
+    """Raised when access to a Journal Entry is denied."""
 
 
 class JournalEntryConflictError(
     JournalError,
     ConflictError,
 ):
-    """Raised when a Journal operation conflicts with existing history."""
+    """Raised when a Journal operation conflicts with history."""
 
 
 class JournalPersistenceError(

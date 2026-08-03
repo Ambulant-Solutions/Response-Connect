@@ -1,7 +1,26 @@
-"""Event Journal platform.
+"""System-wide Event Journal platform."""
 
-The Event Journal stores immutable Journal Entries representing significant
-operational, audit, security, and system occurrences.
-"""
+from app.journal.commands import (
+    RecordJournalEntryCommand,
+)
+from app.journal.exceptions import (
+    InvalidJournalEntryError,
+    JournalEntryConflictError,
+    JournalEntryNotFoundError,
+    JournalEntryVisibilityError,
+    JournalError,
+    JournalPersistenceError,
+)
+from app.journal.models import JournalEntry
 
-__all__: list[str] = []
+
+__all__ = [
+    "InvalidJournalEntryError",
+    "JournalEntry",
+    "JournalEntryConflictError",
+    "JournalEntryNotFoundError",
+    "JournalEntryVisibilityError",
+    "JournalError",
+    "JournalPersistenceError",
+    "RecordJournalEntryCommand",
+]

@@ -6,6 +6,7 @@ from app import create_app
 from app.extensions import db
 from app.desks.models import Desk
 from app.files.models import FileProcessingPolicy
+from app.journal.models import JournalEntry
 
 
 def _remove_test_processing_policies() -> None:
@@ -84,6 +85,23 @@ def _remove_test_desks() -> None:
 
     db.session.commit()
 
+def _remove_test_journal_entries() -> None:
+    db.session.rollback()
+
+    db.session.execute(
+        delete(JournalEntry).where(
+            JournalEntry.event_code.like(
+                "system.test_%"
+            )
+            | (
+                JournalEntry.event_code
+                == "desk.created"
+            )
+        )
+    )
+
+    db.session.commit()
+
 
 @pytest.fixture
 def app():
@@ -96,11 +114,13 @@ def app():
 
     with app.app_context():
         # Remove leftovers from interrupted or failed earlier runs.
+        _remove_test_journal_entries()
         _remove_test_desks()
         _remove_test_processing_policies()
 
         yield app
 
+        _remove_test_journal_entries()
         _remove_test_desks()
         _remove_test_processing_policies()
         db.session.remove()

@@ -33,6 +33,7 @@ from app.reference_data.cli import (
     register_reference_data_cli,
 )
 from app.desks.models import Desk  # noqa: F401
+from app.journal.models import JournalEntry  # noqa: F401
 
 
 

@@ -152,22 +152,33 @@ The Event Journal records immutable Journal Entries describing operational occur
 
 #### Architecture
 
-* [x] Write Event Journal and Operational Model chapter.
-* [x] Write Event Journal data model chapter.
-* [x] Finalise Journal terminology and package naming.
-* [x] Define initial Journal schema.
-* [x] Define classification and metadata models
+- [x] Write Event Journal and Operational Model chapter.
+- [x] Write Event Journal data model chapter.
+- [x] Finalise Journal terminology and package naming.
+- [x] Define initial Journal schema.
+- [x] Define classification and metadata models.
 
 #### Core Platform
 
-* [ ] Create Journal package.
-* [ ] Implement Journal Entry model.
-* [ ] Implement recording commands.
-* [ ] Implement recording service.
-* [ ] Implement query service.
-* [ ] Implement validators.
-* [ ] Implement exceptions.
-* [ ] Create migration.
+- [x] Create Journal package.
+- [x] Define Journal Reference Data vocabulary.
+- [x] Implement initial Journal Entry model.
+- [x] Implement Journal constants.
+- [x] Implement Journal exceptions.
+- [x] Implement initial recording command.
+- [x] Implement initial validators.
+- [x] Create initial Journal migration.
+- [ ] 🚧 Implement Journal recording service.
+- [ ] Implement Journal query service.
+
+#### Testing
+
+- [x] Reference Data definition tests.
+- [x] Validator tests.
+- [x] Initial model tests.
+- [ ] 🚧 Recording service tests.
+- [ ] Query tests.
+- [ ] Architecture tests.
 
 #### Journal Features
 
@@ -179,13 +190,6 @@ The Event Journal records immutable Journal Entries describing operational occur
 * [ ] Source model.
 * [ ] Structured metadata.
 * [ ] Historical display snapshots.
-
-#### Testing
-
-* [ ] Model tests.
-* [ ] Service tests.
-* [ ] Query tests.
-* [ ] Architecture tests.
 
 ---
 
