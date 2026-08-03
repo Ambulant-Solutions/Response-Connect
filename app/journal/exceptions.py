@@ -48,6 +48,33 @@ class JournalPersistenceError(
 ):
     """Raised when a Journal Entry cannot be persisted."""
 
+class InvalidJournalReferenceError(
+    JournalError,
+    ValidationError,
+):
+    """Raised when a Journal Reference is invalid."""
+
+
+class JournalReferenceNotFoundError(
+    JournalError,
+    NotFoundError,
+):
+    """Raised when a Journal Reference cannot be found."""
+
+
+class JournalReferenceConflictError(
+    JournalError,
+    ConflictError,
+):
+    """Raised when a Journal Reference conflicts with existing identity."""
+
+
+class JournalReferencePersistenceError(
+    JournalError,
+    PersistenceError,
+):
+    """Raised when a Journal Reference cannot be persisted."""
+
 
 __all__ = [
     "InvalidJournalEntryError",
@@ -56,4 +83,8 @@ __all__ = [
     "JournalEntryVisibilityError",
     "JournalError",
     "JournalPersistenceError",
+    "InvalidJournalReferenceError",
+    "JournalReferenceNotFoundError",
+    "JournalReferenceConflictError",
+    "JournalReferencePersistenceError",
 ]

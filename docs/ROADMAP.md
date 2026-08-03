@@ -192,6 +192,20 @@ The Event Journal records immutable Journal Entries describing operational occur
 * [ ] Structured metadata.
 * [ ] Historical display snapshots.
 
+#### Stable Journal References
+
+- [x] Define the Journal Reference architecture.
+- [x] Replace raw polymorphic references in the data-model design.
+- [x] Defer the universal Resource abstraction.
+- [x] Implement the Journal Reference model.
+- [x] Implement Journal Reference commands and validators.
+- [x] Implement the idempotent Journal Reference service.
+- [x] Add Journal Reference model tests.
+- [x] Add Journal Reference validator tests.
+- [x] Add Journal Reference service tests.
+- [x] Create the Journal Reference migration.
+- [ ] 🚧 Add actor, subject, and context references to Journal Entries.
+
 ---
 
 ### 7.3 Lifecycle Framework

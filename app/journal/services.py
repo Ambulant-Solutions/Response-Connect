@@ -2,20 +2,36 @@
 
 from __future__ import annotations
 
-from sqlalchemy.exc import SQLAlchemyError
+import uuid
+
+from sqlalchemy import select
+from sqlalchemy.exc import (
+    IntegrityError,
+    SQLAlchemyError,
+)
 from sqlalchemy.orm import Session
 
 from app.journal.commands import (
     RecordJournalEntryCommand,
+    RegisterJournalReferenceCommand,
 )
 from app.journal.exceptions import (
     JournalPersistenceError,
+    JournalReferenceConflictError,
+    JournalReferencePersistenceError,
 )
-from app.journal.models import JournalEntry
+from app.journal.models import (
+    JournalEntry,
+    JournalReference,
+)
 from app.journal.validators import (
     validate_details,
     validate_event_code,
     validate_occurred_at,
+    validate_reference_display_name,
+    validate_reference_identity,
+    validate_reference_stable_key,
+    validate_reference_type,
     validate_summary,
 )
 
@@ -70,3 +86,222 @@ class JournalEntryService:
             ) from exc
 
         return entry
+
+class JournalReferenceService:
+    """Register stable Journal-owned identities.
+
+    Registration is idempotent. Repeated registration of the same
+    reference identity returns the existing JournalReference without
+    overwriting its historical display name.
+    """
+
+    def __init__(
+        self,
+        session: Session,
+    ) -> None:
+        self.session = session
+
+    def get_or_create(
+        self,
+        command: RegisterJournalReferenceCommand,
+    ) -> JournalReference:
+        """Return an existing reference or create one."""
+
+        reference_type = validate_reference_type(
+            command.reference_type
+        )
+        stable_key = validate_reference_stable_key(
+            command.stable_key
+        )
+        display_name = (
+            validate_reference_display_name(
+                command.display_name
+            )
+        )
+
+        validate_reference_identity(
+            source_id=command.source_id,
+            stable_key=stable_key,
+        )
+
+        existing_by_source = (
+            self._find_by_source(
+                reference_type=reference_type,
+                source_id=command.source_id,
+            )
+        )
+
+        existing_by_stable_key = (
+            self._find_by_stable_key(
+                reference_type=reference_type,
+                stable_key=stable_key,
+            )
+        )
+
+        existing = self._resolve_existing_reference(
+            source_id=command.source_id,
+            stable_key=stable_key,
+            existing_by_source=existing_by_source,
+            existing_by_stable_key=(
+                existing_by_stable_key
+            ),
+        )
+
+        if existing is not None:
+            return existing
+
+        reference = JournalReference(
+            reference_type=reference_type,
+            source_id=command.source_id,
+            stable_key=stable_key,
+            display_name=display_name,
+        )
+
+        self.session.add(reference)
+
+        try:
+            self.session.commit()
+        except IntegrityError as exc:
+            self.session.rollback()
+
+            concurrent_reference = (
+                self._find_existing(
+                    reference_type=reference_type,
+                    source_id=command.source_id,
+                    stable_key=stable_key,
+                )
+            )
+
+            if concurrent_reference is not None:
+                return concurrent_reference
+
+            raise JournalReferenceConflictError(
+                "The Journal Reference could not be "
+                "registered because its identity "
+                "conflicts with an existing reference."
+            ) from exc
+        except SQLAlchemyError as exc:
+            self.session.rollback()
+            raise JournalReferencePersistenceError(
+                "The Journal Reference could not be "
+                "registered."
+            ) from exc
+
+        return reference
+
+    def _find_existing(
+        self,
+        *,
+        reference_type: str,
+        source_id: uuid.UUID | None,
+        stable_key: str | None,
+    ) -> JournalReference | None:
+        existing_by_source = self._find_by_source(
+            reference_type=reference_type,
+            source_id=source_id,
+        )
+
+        existing_by_stable_key = (
+            self._find_by_stable_key(
+                reference_type=reference_type,
+                stable_key=stable_key,
+            )
+        )
+
+        return self._resolve_existing_reference(
+            source_id=source_id,
+            stable_key=stable_key,
+            existing_by_source=existing_by_source,
+            existing_by_stable_key=(
+                existing_by_stable_key
+            ),
+        )
+
+    def _find_by_source(
+        self,
+        *,
+        reference_type: str,
+        source_id: uuid.UUID | None,
+    ) -> JournalReference | None:
+        if source_id is None:
+            return None
+
+        return self.session.scalar(
+            select(JournalReference).where(
+                JournalReference.reference_type
+                == reference_type,
+                JournalReference.source_id
+                == source_id,
+            )
+        )
+
+    def _find_by_stable_key(
+        self,
+        *,
+        reference_type: str,
+        stable_key: str | None,
+    ) -> JournalReference | None:
+        if stable_key is None:
+            return None
+
+        return self.session.scalar(
+            select(JournalReference).where(
+                JournalReference.reference_type
+                == reference_type,
+                JournalReference.stable_key
+                == stable_key,
+            )
+        )
+
+    @staticmethod
+    def _resolve_existing_reference(
+        *,
+        source_id: uuid.UUID | None,
+        stable_key: str | None,
+        existing_by_source: (
+            JournalReference | None
+        ),
+        existing_by_stable_key: (
+            JournalReference | None
+        ),
+    ) -> JournalReference | None:
+        if (
+            existing_by_source is not None
+            and existing_by_stable_key is not None
+            and existing_by_source.id
+            != existing_by_stable_key.id
+        ):
+            raise JournalReferenceConflictError(
+                "The supplied source ID and stable key "
+                "identify different Journal References."
+            )
+
+        existing = (
+            existing_by_source
+            or existing_by_stable_key
+        )
+
+        if existing is None:
+            return None
+
+        if (
+            source_id is not None
+            and existing.source_id is not None
+            and existing.source_id != source_id
+        ):
+            raise JournalReferenceConflictError(
+                "The stable key is already associated "
+                "with a different source ID."
+            )
+
+        if (
+            stable_key is not None
+            and existing.stable_key is not None
+            and existing.stable_key != stable_key
+        ):
+            raise JournalReferenceConflictError(
+                "The source ID is already associated "
+                "with a different stable key."
+            )
+
+        return existing

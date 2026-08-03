@@ -2,6 +2,7 @@
 
 from app.journal.commands import (
     RecordJournalEntryCommand,
+    RegisterJournalReferenceCommand,
 )
 from app.journal.exceptions import (
     InvalidJournalEntryError,
@@ -11,9 +12,13 @@ from app.journal.exceptions import (
     JournalError,
     JournalPersistenceError,
 )
-from app.journal.models import JournalEntry
+from app.journal.models import (
+    JournalEntry,
+    JournalReference
+)
 from app.journal.services import (
     JournalEntryService,
+    JournalReferenceService,
 )
 
 
@@ -27,4 +32,11 @@ __all__ = [
     "JournalError",
     "JournalPersistenceError",
     "RecordJournalEntryCommand",
+    "InvalidJournalReferenceError",
+    "JournalReference",
+    "JournalReferenceConflictError",
+    "JournalReferenceNotFoundError",
+    "JournalReferencePersistenceError",
+    "JournalReferenceService",
+    "RegisterJournalReferenceCommand",
 ]

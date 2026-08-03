@@ -3,20 +3,34 @@
 from __future__ import annotations
 
 import re
+import uuid
 from datetime import datetime
 from app.journal.constants import (
     EVENT_CODE_MAX_LENGTH,
     JOURNAL_DETAILS_MAX_LENGTH,
     JOURNAL_EVENT_CODE_PATTERN,
+    JOURNAL_REFERENCE_DISPLAY_NAME_MAX_LENGTH,
+    JOURNAL_REFERENCE_STABLE_KEY_MAX_LENGTH,
+    JOURNAL_REFERENCE_STABLE_KEY_PATTERN,
+    JOURNAL_REFERENCE_TYPE_MAX_LENGTH,
+    JOURNAL_REFERENCE_TYPE_PATTERN,
     JOURNAL_SUMMARY_MAX_LENGTH,
 )
 from app.journal.exceptions import (
     InvalidJournalEntryError,
+    InvalidJournalReferenceError,
 )
-
 
 _EVENT_CODE_PATTERN = re.compile(
     JOURNAL_EVENT_CODE_PATTERN
+)
+
+_REFERENCE_TYPE_PATTERN = re.compile(
+    JOURNAL_REFERENCE_TYPE_PATTERN
+)
+
+_REFERENCE_STABLE_KEY_PATTERN = re.compile(
+    JOURNAL_REFERENCE_STABLE_KEY_PATTERN
 )
 
 
@@ -109,3 +123,98 @@ def validate_occurred_at(
         )
 
     return value
+
+def validate_reference_type(
+    value: str,
+) -> str:
+    reference_type = value.strip()
+
+    if not reference_type:
+        raise InvalidJournalReferenceError(
+            "A Journal Reference type is required."
+        )
+
+    if (
+        len(reference_type)
+        > JOURNAL_REFERENCE_TYPE_MAX_LENGTH
+    ):
+        raise InvalidJournalReferenceError(
+            "Journal Reference types must not exceed "
+            f"{JOURNAL_REFERENCE_TYPE_MAX_LENGTH} characters."
+        )
+
+    if not _REFERENCE_TYPE_PATTERN.fullmatch(
+        reference_type
+    ):
+        raise InvalidJournalReferenceError(
+            "Journal Reference types must use "
+            "lowercase snake_case."
+        )
+
+    return reference_type
+
+
+def validate_reference_display_name(
+    value: str,
+) -> str:
+    display_name = value.strip()
+
+    if not display_name:
+        raise InvalidJournalReferenceError(
+            "A Journal Reference display name is required."
+        )
+
+    if (
+        len(display_name)
+        > JOURNAL_REFERENCE_DISPLAY_NAME_MAX_LENGTH
+    ):
+        raise InvalidJournalReferenceError(
+            "Journal Reference display names must not exceed "
+            f"{JOURNAL_REFERENCE_DISPLAY_NAME_MAX_LENGTH} characters."
+        )
+
+    return display_name
+
+
+def validate_reference_stable_key(
+    value: str | None,
+) -> str | None:
+    if value is None:
+        return None
+
+    stable_key = value.strip()
+
+    if not stable_key:
+        return None
+
+    if (
+        len(stable_key)
+        > JOURNAL_REFERENCE_STABLE_KEY_MAX_LENGTH
+    ):
+        raise InvalidJournalReferenceError(
+            "Journal Reference stable keys must not exceed "
+            f"{JOURNAL_REFERENCE_STABLE_KEY_MAX_LENGTH} characters."
+        )
+
+    if not _REFERENCE_STABLE_KEY_PATTERN.fullmatch(
+        stable_key
+    ):
+        raise InvalidJournalReferenceError(
+            "Journal Reference stable keys must use "
+            "lowercase letters, numbers, colons, hyphens, "
+            "or underscores."
+        )
+
+    return stable_key
+
+
+def validate_reference_identity(
+    *,
+    source_id: uuid.UUID | None,
+    stable_key: str | None,
+) -> None:
+    if source_id is None and stable_key is None:
+        raise InvalidJournalReferenceError(
+            "A Journal Reference requires a source ID "
+            "or stable key."
+        )
