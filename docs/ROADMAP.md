@@ -124,6 +124,26 @@ The Desk platform defines operational ownership and scope throughout Response Co
 * [x] Hierarchy service tests.
 * [x] Lifecycle tests.
 
+#### Web administration — deferred
+
+- [ ] Build Desk administration routes.
+- [ ] Build Desk hierarchy/tree view.
+- [ ] Build create and edit forms.
+- [ ] Add Desk move workflow.
+- [ ] Add activation, deactivation and archival actions.
+- [ ] Add Desk detail view.
+- [ ] Add permissions and Desk-scope management.
+- [ ] Add HTMX interactions.
+- [ ] Add route and UI tests.
+
+#### Operational interface — future
+
+- [ ] Add active Desk selection and working context.
+- [ ] Add Desk dashboard.
+- [ ] Add Desk Activity Stream.
+- [ ] Add Desk Operational Log.
+- [ ] Add Desk-scoped notifications and work queues.
+
 ---
 
 ### 7.2 Event Journal
