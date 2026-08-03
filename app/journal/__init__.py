@@ -12,6 +12,9 @@ from app.journal.exceptions import (
     JournalPersistenceError,
 )
 from app.journal.models import JournalEntry
+from app.journal.services import (
+    JournalEntryService,
+)
 
 
 __all__ = [
@@ -19,6 +22,7 @@ __all__ = [
     "JournalEntry",
     "JournalEntryConflictError",
     "JournalEntryNotFoundError",
+    "JournalEntryService",
     "JournalEntryVisibilityError",
     "JournalError",
     "JournalPersistenceError",

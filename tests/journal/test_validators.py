@@ -1,13 +1,14 @@
 """Tests for Event Journal validators."""
 
 import pytest
-
+from datetime import datetime, timezone
 from app.journal.exceptions import (
     InvalidJournalEntryError,
 )
 from app.journal.validators import (
     validate_details,
     validate_event_code,
+    validate_occurred_at,
     validate_summary,
 )
 
@@ -69,3 +70,22 @@ def test_validate_details_strips_whitespace() -> None:
     assert validate_details(
         "  Additional context.  "
     ) == "Additional context."
+
+def test_validate_occurred_at_accepts_timezone_aware_value(
+) -> None:
+    value = datetime.now(
+        timezone.utc
+    )
+
+    assert validate_occurred_at(value) is value
+
+
+def test_validate_occurred_at_rejects_naive_value(
+) -> None:
+    with pytest.raises(
+        InvalidJournalEntryError,
+        match="timezone",
+    ):
+        validate_occurred_at(
+            datetime.now()
+        )

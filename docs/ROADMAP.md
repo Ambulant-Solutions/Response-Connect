@@ -168,7 +168,8 @@ The Event Journal records immutable Journal Entries describing operational occur
 - [x] Implement initial recording command.
 - [x] Implement initial validators.
 - [x] Create initial Journal migration.
-- [ ] 🚧 Implement Journal recording service.
+- [x] Implement initial Journal recording service.
+- [ ] 🚧 Add actor, subject, context, and Desk references.
 - [ ] Implement Journal query service.
 
 #### Testing
@@ -176,7 +177,7 @@ The Event Journal records immutable Journal Entries describing operational occur
 - [x] Reference Data definition tests.
 - [x] Validator tests.
 - [x] Initial model tests.
-- [ ] 🚧 Recording service tests.
+- [x] Recording service tests.
 - [ ] Query tests.
 - [ ] Architecture tests.
 

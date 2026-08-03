@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-
+from datetime import datetime
 from app.journal.constants import (
     EVENT_CODE_MAX_LENGTH,
     JOURNAL_DETAILS_MAX_LENGTH,
@@ -90,3 +90,22 @@ def validate_details(
         )
 
     return details
+
+def validate_occurred_at(
+    value: datetime,
+) -> datetime:
+    """Validate and return a timezone-aware occurrence time."""
+
+    if value.tzinfo is None:
+        raise InvalidJournalEntryError(
+            "Journal occurrence times must include "
+            "timezone information."
+        )
+
+    if value.utcoffset() is None:
+        raise InvalidJournalEntryError(
+            "Journal occurrence times must include "
+            "timezone information."
+        )
+
+    return value
