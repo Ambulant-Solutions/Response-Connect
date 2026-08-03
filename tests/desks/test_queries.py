@@ -363,3 +363,106 @@ def test_path_for_root_contains_only_root(
     ) == [
         root,
     ]
+
+def test_descendants_returns_all_descendants(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    operations = create_child(
+        parent=root,
+        code="operations",
+        name="Operations",
+    )
+    patient_transport = create_child(
+        parent=operations,
+        code="patient_transport",
+        name="Patient Transport",
+    )
+    devon = create_child(
+        parent=patient_transport,
+        code="devon_pts",
+        name="Devon Patient Transport",
+    )
+    create_child(
+        parent=root,
+        code="fleet",
+        name="Fleet",
+    )
+
+    results = desk_queries.descendants(
+        operations.id
+    )
+
+    assert {
+        desk.code
+        for desk in results
+    } == {
+        "patient_transport",
+        "devon_pts",
+    }
+
+
+def test_descendants_excludes_parent(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    operations = create_child(
+        parent=root,
+        code="operations",
+        name="Operations",
+    )
+
+    results = desk_queries.descendants(
+        operations.id
+    )
+
+    assert operations not in results
+
+
+def test_descendants_active_only_excludes_inactive(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    root = create_root()
+
+    operations = create_child(
+        parent=root,
+        code="operations",
+        name="Operations",
+    )
+
+    active = create_child(
+        parent=operations,
+        code="active",
+        name="Active",
+        is_active=True,
+    )
+    create_child(
+        parent=operations,
+        code="inactive",
+        name="Inactive",
+        is_active=False,
+    )
+
+    results = desk_queries.descendants(
+        operations.id,
+        active_only=True,
+    )
+
+    assert results == [active]
+
+
+def test_descendants_unknown_desk_raises_not_found(
+    app,
+    desk_queries: DeskQueryService,
+) -> None:
+    with pytest.raises(
+        DeskNotFoundError,
+    ):
+        desk_queries.descendants(
+            uuid.uuid4()
+        )

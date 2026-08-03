@@ -20,29 +20,66 @@ def _remove_test_processing_policies() -> None:
     db.session.commit()
 
 def _remove_test_desks() -> None:
+    """Remove all test Desks from the bottom of the hierarchy upward."""
+
     db.session.rollback()
 
-    test_desks = (
-        db.session.query(Desk)
-        .filter(
-            Desk.code.in_(
-                [
-                    "organisation",
-                    "company",
-                    "second_root",
-                    "invalid_root",
-                    "operations",
-                    "patient_transport",
-                    "orphan",
-                ]
+    while True:
+        test_desks = (
+            db.session.query(Desk)
+            .filter(
+                Desk.code.in_(
+                    [
+                        "organisation",
+                        "company",
+                        "second_root",
+                        "invalid_root",
+                        "operations",
+                        "patient_transport",
+                        "devon_pts",
+                        "fleet",
+                        "resources",
+                        "training",
+                        "active",
+                        "inactive",
+                        "orphan",
+                    ]
+                )
             )
+            .all()
         )
-        .all()
-    )
 
-    # Delete children before parents because parent deletion is restricted.
-    for desk in reversed(test_desks):
-        db.session.delete(desk)
+        if not test_desks:
+            break
+
+        test_ids = {
+            desk.id
+            for desk in test_desks
+        }
+
+        parent_ids = {
+            desk.parent_id
+            for desk in test_desks
+            if desk.parent_id is not None
+        }
+
+        leaf_desks = [
+            desk
+            for desk in test_desks
+            if desk.id not in parent_ids
+        ]
+
+        if not leaf_desks:
+            raise RuntimeError(
+                "Test Desk cleanup could not find "
+                "a leaf Desk. The test hierarchy may "
+                "contain a cycle."
+            )
+
+        for desk in leaf_desks:
+            db.session.delete(desk)
+
+        db.session.flush()
 
     db.session.commit()
 

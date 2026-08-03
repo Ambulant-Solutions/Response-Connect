@@ -14,10 +14,12 @@ from sqlalchemy.orm import Session
 
 from app.desks.commands import (
     CreateDeskCommand,
+    MoveDeskCommand,
     UpdateDeskCommand,
 )
 from app.desks.exceptions import (
     DeskConflictError,
+    DeskHierarchyError,
     DeskNotFoundError,
     DeskPersistenceError,
     InvalidDeskError,
@@ -208,6 +210,53 @@ class DeskService:
 
         return desk
 
+    def move(
+        self,
+        desk_id: uuid.UUID,
+        command: MoveDeskCommand,
+    ) -> Desk:
+        """Move a Desk beneath a new parent."""
+
+        desk = self._get_desk(desk_id)
+        new_parent = self._get_desk(
+            command.parent_id,
+            description="parent Desk",
+        )
+
+        if desk.is_root:
+            raise DeskHierarchyError(
+                "The root Desk cannot be moved."
+            )
+
+        if desk.id == new_parent.id:
+            raise DeskHierarchyError(
+                "A Desk cannot be moved beneath itself."
+            )
+
+        if desk.parent_id == new_parent.id:
+            return desk
+
+        if self._is_descendant(
+            possible_descendant_id=new_parent.id,
+            ancestor_id=desk.id,
+        ):
+            raise DeskHierarchyError(
+                "A Desk cannot be moved beneath one "
+                "of its descendants."
+            )
+
+        desk.parent = new_parent
+
+        try:
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            self.session.rollback()
+            raise DeskPersistenceError(
+                "The Desk could not be moved."
+            ) from exc
+
+        return desk
+
     def _get_desk(
         self,
         desk_id: uuid.UUID,
@@ -300,3 +349,35 @@ class DeskService:
             "The Desk could not be created because "
             "it conflicts with existing Desk data."
         ) from cause
+
+    def _is_descendant(
+        self,
+        *,
+        possible_descendant_id: uuid.UUID,
+        ancestor_id: uuid.UUID,
+    ) -> bool:
+        """Return whether one Desk is beneath another."""
+
+        current_id: uuid.UUID | None = (
+            possible_descendant_id
+        )
+        visited_ids: set[uuid.UUID] = set()
+
+        while current_id is not None:
+            if current_id in visited_ids:
+                raise DeskHierarchyError(
+                    "The Desk hierarchy contains a cycle."
+                )
+
+            visited_ids.add(current_id)
+
+            if current_id == ancestor_id:
+                return True
+
+            current_id = self.session.scalar(
+                select(Desk.parent_id).where(
+                    Desk.id == current_id
+                )
+            )
+
+        return False

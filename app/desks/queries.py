@@ -171,6 +171,64 @@ class DeskQueryService:
         path.reverse()
         return path
 
+    def descendants(
+        self,
+        desk_id: uuid.UUID,
+        *,
+        active_only: bool = False,
+    ) -> list[Desk]:
+        """Return every descendant beneath a Desk."""
+
+        self.get(desk_id)
+
+        descendants: list[Desk] = []
+        pending_parent_ids: list[uuid.UUID] = [
+            desk_id
+        ]
+        visited_ids: set[uuid.UUID] = {
+            desk_id
+        }
+
+        while pending_parent_ids:
+            parent_id = pending_parent_ids.pop(0)
+
+            statement = (
+                select(Desk)
+                .where(
+                    Desk.parent_id == parent_id
+                )
+                .order_by(
+                    Desk.name,
+                    Desk.code,
+                )
+            )
+
+            children = list(
+                self.session.scalars(
+                    statement
+                ).all()
+            )
+
+            for child in children:
+                if child.id in visited_ids:
+                    raise InvalidDeskError(
+                        "The Desk hierarchy contains a cycle."
+                    )
+
+                visited_ids.add(child.id)
+
+                if (
+                    not active_only
+                    or child.is_active
+                ):
+                    descendants.append(child)
+
+                pending_parent_ids.append(
+                    child.id
+                )
+
+        return descendants
+
     @staticmethod
     def _base_list_query() -> Select[tuple[Desk]]:
         return select(Desk).order_by(

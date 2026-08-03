@@ -94,13 +94,14 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 #### Hierarchy
 
-* [ ] Root Desk.
-* [ ] Parent/child hierarchy.
-* [ ] Prevent hierarchy cycles.
-* [ ] Prevent invalid parent assignment.
-* [ ] Desk activation/deactivation.
-* [ ] Desk movement.
-* [ ] Historical Desk preservation.
+* [x] Parent/child hierarchy.
+* [x] Prevent hierarchy cycles.
+* [x] Prevent invalid parent assignment.
+* [x] Desk movement.
+* [x] Descendant queries.
+* [x] Breadcrumb/path generation.
+* [ ] 🚧 Desk activation/deactivation.
+* [ ] Desk archival.
 
 #### Testing
 
