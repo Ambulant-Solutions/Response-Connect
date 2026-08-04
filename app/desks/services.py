@@ -398,10 +398,14 @@ class DeskService:
     def activate(
         self,
         desk_id: uuid.UUID,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Activate and return a Desk."""
+        """Activate a Desk and record the transition atomically."""
 
-        desk = self._get_desk(desk_id)
+        desk = self._get_desk(
+            desk_id
+        )
 
         if desk.archived_at is not None:
             raise DeskLifecycleError(
@@ -427,22 +431,51 @@ class DeskService:
         desk.is_active = True
 
         try:
+            self.session.flush()
+
+            self._record_lifecycle_change(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+                event_code=(
+                    DeskJournalEvents.ACTIVATED
+                ),
+                summary=(
+                    f"Desk '{desk.name}' was activated."
+                ),
+                field_name="is_active",
+                previous=False,
+                current=True,
+            )
+
             self.session.commit()
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be activated."
             ) from exc
+
+        except Exception:
+            self.session.rollback()
+            raise
 
         return desk
 
     def deactivate(
         self,
         desk_id: uuid.UUID,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Deactivate and return a Desk."""
+        """Deactivate a Desk and record the transition atomically."""
 
-        desk = self._get_desk(desk_id)
+        desk = self._get_desk(
+            desk_id
+        )
 
         if desk.is_root:
             raise DeskLifecycleError(
@@ -474,22 +507,51 @@ class DeskService:
         desk.is_active = False
 
         try:
+            self.session.flush()
+
+            self._record_lifecycle_change(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+                event_code=(
+                    DeskJournalEvents.DEACTIVATED
+                ),
+                summary=(
+                    f"Desk '{desk.name}' was deactivated."
+                ),
+                field_name="is_active",
+                previous=True,
+                current=False,
+            )
+
             self.session.commit()
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be deactivated."
             ) from exc
+
+        except Exception:
+            self.session.rollback()
+            raise
 
         return desk
 
     def archive(
         self,
         desk_id: uuid.UUID,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Archive and return a Desk."""
+        """Archive a Desk and record the transition atomically."""
 
-        desk = self._get_desk(desk_id)
+        desk = self._get_desk(
+            desk_id
+        )
 
         if desk.is_root:
             raise DeskLifecycleError(
@@ -518,17 +580,43 @@ class DeskService:
                 "cannot be archived."
             )
 
-        desk.archived_at = datetime.now(
+        archived_at = datetime.now(
             timezone.utc
         )
+        desk.archived_at = archived_at
 
         try:
+            self.session.flush()
+
+            self._record_lifecycle_change(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+                event_code=(
+                    DeskJournalEvents.ARCHIVED
+                ),
+                summary=(
+                    f"Desk '{desk.name}' was archived."
+                ),
+                field_name="archived_at",
+                previous=None,
+                current=archived_at.isoformat(),
+            )
+
             self.session.commit()
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be archived."
             ) from exc
+
+        except Exception:
+            self.session.rollback()
+            raise
 
         return desk
 
@@ -638,6 +726,44 @@ class DeskService:
                     "parent_name": (
                         current_parent.name
                     ),
+                },
+            },
+            commit=False,
+        )
+
+    def _record_lifecycle_change(
+        self,
+        *,
+        desk: Desk,
+        actor: JournalReferenceSpec,
+        event_code: str,
+        summary: str,
+        field_name: str,
+        previous: bool | str | None,
+        current: bool | str | None,
+    ) -> None:
+        """Record one Desk lifecycle state transition."""
+
+        self._journal.record(
+            event_code=event_code,
+            occurred_at=datetime.now(
+                timezone.utc
+            ),
+            actor=actor,
+            subject=self._desk_reference(
+                desk
+            ),
+            desk_id=desk.id,
+            summary=summary,
+            event_metadata={
+                "changed_fields": [
+                    field_name,
+                ],
+                "previous": {
+                    field_name: previous,
+                },
+                "current": {
+                    field_name: current,
                 },
             },
             commit=False,

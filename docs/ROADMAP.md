@@ -297,13 +297,15 @@ These items were intentionally deferred and should be completed during Phase 7.
 - [x] Inject the public `JournalService` into `DeskService`.
 - [x] Record `desk.created`.
 - [x] Record `desk.updated`.
-- [x] Capture structured update metadata.
-- [x] Ignore no-op updates.
 - [x] Record `desk.moved`.
-- [x] Capture previous and current parent metadata.
+- [x] Record `desk.activated`.
+- [x] Record `desk.deactivated`.
+- [x] Record `desk.archived`.
+- [x] Capture structured lifecycle metadata.
+- [x] Preserve idempotent lifecycle behaviour.
 - [x] Make Desk mutations and Journal recording atomic.
-- [ ] 🚧 Record Desk lifecycle transitions.
-- [ ] Record processing-policy changes.
+- [ ] Design and implement Desk restoration.
+- [ ] 🚧 Record processing-policy changes.
 
 ---
 

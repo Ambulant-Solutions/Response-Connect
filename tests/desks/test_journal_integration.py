@@ -111,6 +111,37 @@ def create_child_desk(
         actor=actor,
     )
 
+def create_lifecycle_desk(
+    *,
+    service: DeskService,
+    root: Desk,
+    actor: JournalReferenceSpec,
+) -> Desk:
+    """Create the Desk used by lifecycle integration tests."""
+
+    return service.create(
+        CreateDeskCommand(
+            code="lifecycle_desk",
+            name="Lifecycle Desk",
+            description="Desk used for lifecycle tests.",
+            parent_id=root.id,
+        ),
+        actor=actor,
+    )
+
+
+def commit_desk_state(
+    desk: Desk,
+    *,
+    is_active: bool | None = None,
+) -> None:
+    """Persist direct test setup without emitting Journal events."""
+
+    if is_active is not None:
+        desk.is_active = is_active
+
+    db.session.commit()
+
 
 def journal_entries() -> list[JournalEntry]:
     """Return all Journal Entries in occurrence order."""
@@ -872,5 +903,397 @@ def test_journal_failure_rolls_back_desk_move(
 
     assert persisted is not None
     assert persisted.parent_id == original_parent_id
+
+    journal.record.assert_called_once()
+
+def test_activating_desk_records_activated_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    commit_desk_state(
+        desk,
+        is_active=False,
+    )
+
+    activated = desk_service.activate(
+        desk.id,
+        actor=actor,
+    )
+
+    entries = journal_entries_for(
+        DeskJournalEvents.ACTIVATED
+    )
+
+    assert activated.is_active is True
+    assert len(entries) == 1
+
+    entry = entries[0]
+
+    assert entry.summary == (
+        "Desk 'Lifecycle Desk' was activated."
+    )
+    assert entry.desk_id == desk.id
+    assert entry.desk_display_name == (
+        "Lifecycle Desk"
+    )
+    assert entry.event_metadata == {
+        "changed_fields": [
+            "is_active",
+        ],
+        "previous": {
+            "is_active": False,
+        },
+        "current": {
+            "is_active": True,
+        },
+    }
+
+
+def test_activating_active_desk_does_not_record_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    returned = desk_service.activate(
+        desk.id,
+        actor=actor,
+    )
+
+    assert returned.is_active is True
+    assert journal_entries_for(
+        DeskJournalEvents.ACTIVATED
+    ) == []
+
+
+def test_deactivating_desk_records_deactivated_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    deactivated = desk_service.deactivate(
+        desk.id,
+        actor=actor,
+    )
+
+    entries = journal_entries_for(
+        DeskJournalEvents.DEACTIVATED
+    )
+
+    assert deactivated.is_active is False
+    assert len(entries) == 1
+
+    entry = entries[0]
+
+    assert entry.summary == (
+        "Desk 'Lifecycle Desk' was deactivated."
+    )
+    assert entry.desk_id == desk.id
+    assert entry.event_metadata == {
+        "changed_fields": [
+            "is_active",
+        ],
+        "previous": {
+            "is_active": True,
+        },
+        "current": {
+            "is_active": False,
+        },
+    }
+
+
+def test_deactivating_inactive_desk_does_not_record_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    commit_desk_state(
+        desk,
+        is_active=False,
+    )
+
+    returned = desk_service.deactivate(
+        desk.id,
+        actor=actor,
+    )
+
+    assert returned.is_active is False
+    assert journal_entries_for(
+        DeskJournalEvents.DEACTIVATED
+    ) == []
+
+
+def test_archiving_desk_records_archived_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    commit_desk_state(
+        desk,
+        is_active=False,
+    )
+
+    archived = desk_service.archive(
+        desk.id,
+        actor=actor,
+    )
+
+    entries = journal_entries_for(
+        DeskJournalEvents.ARCHIVED
+    )
+
+    assert archived.archived_at is not None
+    assert len(entries) == 1
+
+    entry = entries[0]
+
+    assert entry.summary == (
+        "Desk 'Lifecycle Desk' was archived."
+    )
+    assert entry.desk_id == desk.id
+
+    assert entry.event_metadata is not None
+    assert entry.event_metadata[
+        "changed_fields"
+    ] == [
+        "archived_at",
+    ]
+    assert entry.event_metadata[
+        "previous"
+    ] == {
+        "archived_at": None,
+    }
+    assert entry.event_metadata[
+        "current"
+    ] == {
+        "archived_at": (
+            archived.archived_at.isoformat()
+        ),
+    }
+
+
+def test_archiving_archived_desk_does_not_record_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    commit_desk_state(
+        desk,
+        is_active=False,
+    )
+
+    desk_service.archive(
+        desk.id,
+        actor=actor,
+    )
+
+    original_entries = journal_entries_for(
+        DeskJournalEvents.ARCHIVED
+    )
+
+    returned = desk_service.archive(
+        desk.id,
+        actor=actor,
+    )
+
+    assert returned.archived_at is not None
+    assert len(
+        journal_entries_for(
+            DeskJournalEvents.ARCHIVED
+        )
+    ) == len(original_entries)
+
+
+def test_lifecycle_entry_records_actor_subject_and_desk(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_lifecycle_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    desk_service.deactivate(
+        desk.id,
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.DEACTIVATED
+    )[0]
+
+    actor_reference = db.session.get(
+        JournalReference,
+        entry.actor_reference_id,
+    )
+    subject_reference = db.session.get(
+        JournalReference,
+        entry.subject_reference_id,
+    )
+
+    assert actor_reference is not None
+    assert actor_reference.stable_key == (
+        "test_system:desk_integration"
+    )
+
+    assert subject_reference is not None
+    assert subject_reference.reference_type == "desk"
+    assert subject_reference.source_id == desk.id
+
+    assert entry.context_reference_id is None
+    assert entry.desk_id == desk.id
+    assert entry.desk_display_name == (
+        "Lifecycle Desk"
+    )
+
+
+def test_journal_failure_rolls_back_desk_deactivation(
+    app,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    creation_service = DeskService(
+        session=db.session,
+        journal=JournalService(
+            session=db.session,
+        ),
+    )
+
+    desk = create_lifecycle_desk(
+        service=creation_service,
+        root=root_desk,
+        actor=actor,
+    )
+    desk_id = desk.id
+
+    journal = Mock(
+        spec=JournalService,
+    )
+    journal.record.side_effect = (
+        JournalPersistenceError(
+            "The Journal Entry could not be recorded."
+        )
+    )
+
+    service = DeskService(
+        session=db.session,
+        journal=journal,
+    )
+
+    with pytest.raises(
+        JournalPersistenceError,
+    ):
+        service.deactivate(
+            desk_id,
+            actor=actor,
+        )
+
+    db.session.expire_all()
+
+    persisted = db.session.get(
+        Desk,
+        desk_id,
+    )
+
+    assert persisted is not None
+    assert persisted.is_active is True
+
+    journal.record.assert_called_once()
+
+
+def test_journal_failure_rolls_back_desk_archive(
+    app,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    creation_service = DeskService(
+        session=db.session,
+        journal=JournalService(
+            session=db.session,
+        ),
+    )
+
+    desk = create_lifecycle_desk(
+        service=creation_service,
+        root=root_desk,
+        actor=actor,
+    )
+    desk.is_active = False
+    db.session.commit()
+
+    desk_id = desk.id
+
+    journal = Mock(
+        spec=JournalService,
+    )
+    journal.record.side_effect = (
+        JournalPersistenceError(
+            "The Journal Entry could not be recorded."
+        )
+    )
+
+    service = DeskService(
+        session=db.session,
+        journal=journal,
+    )
+
+    with pytest.raises(
+        JournalPersistenceError,
+    ):
+        service.archive(
+            desk_id,
+            actor=actor,
+        )
+
+    db.session.expire_all()
+
+    persisted = db.session.get(
+        Desk,
+        desk_id,
+    )
+
+    assert persisted is not None
+    assert persisted.archived_at is None
 
     journal.record.assert_called_once()
