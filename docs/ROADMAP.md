@@ -296,11 +296,11 @@ These items were intentionally deferred and should be completed during Phase 7.
 - [x] Add Desk Journal event-code definitions.
 - [x] Inject the public `JournalService` into `DeskService`.
 - [x] Record `desk.created`.
-- [x] Capture actor, Desk subject, and Desk context.
-- [x] Make Desk creation and Journal recording atomic.
-- [x] Add Desk Journal integration tests.
-- [ ] 🚧 Record `desk.updated`.
-- [ ] Record `desk.moved`.
+- [x] Record `desk.updated`.
+- [x] Capture structured update metadata.
+- [x] Ignore no-op updates.
+- [x] Make Desk mutations and Journal recording atomic.
+- [ ] 🚧 Record `desk.moved`.
 - [ ] Record Desk lifecycle transitions.
 - [ ] Record processing-policy changes.
 

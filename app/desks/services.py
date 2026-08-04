@@ -225,10 +225,14 @@ class DeskService:
         self,
         desk_id: uuid.UUID,
         command: UpdateDeskCommand,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Update editable Desk fields and return the Desk."""
+        """Update a Desk and record meaningful changes atomically."""
 
-        desk = self._get_desk(desk_id)
+        desk = self._get_desk(
+            desk_id
+        )
 
         name = validate_desk_name(
             command.name
@@ -237,18 +241,66 @@ class DeskService:
             command.description
         )
 
+        previous = {
+            "name": desk.name,
+            "description": desk.description,
+        }
+        current = {
+            "name": name,
+            "description": description,
+        }
+
+        changed_fields = [
+            field_name
+            for field_name in (
+                "name",
+                "description",
+            )
+            if previous[field_name]
+            != current[field_name]
+        ]
+
+        if not changed_fields:
+            return desk
+
         desk.name = name
         desk.description = description
 
         try:
+            self.session.flush()
+
+            self._record_updated(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+                changed_fields=changed_fields,
+                previous={
+                    field_name: previous[field_name]
+                    for field_name in changed_fields
+                },
+                current={
+                    field_name: current[field_name]
+                    for field_name in changed_fields
+                },
+            )
+
             self.session.commit()
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be updated."
             ) from exc
 
+        except Exception:
+            self.session.rollback()
+            raise
+
         return desk
+
 
     def move(
         self,
@@ -472,6 +524,38 @@ class DeskService:
             summary=(
                 f"Desk '{desk.name}' was created."
             ),
+            commit=False,
+        )
+
+    def _record_updated(
+        self,
+        *,
+        desk: Desk,
+        actor: JournalReferenceSpec,
+        changed_fields: list[str],
+        previous: dict[str, str | None],
+        current: dict[str, str | None],
+    ) -> None:
+        """Record meaningful changes to one Desk."""
+
+        self._journal.record(
+            event_code=DeskJournalEvents.UPDATED,
+            occurred_at=datetime.now(
+                timezone.utc
+            ),
+            actor=actor,
+            subject=self._desk_reference(
+                desk
+            ),
+            desk_id=desk.id,
+            summary=(
+                f"Desk '{desk.name}' was updated."
+            ),
+            event_metadata={
+                "changed_fields": changed_fields,
+                "previous": previous,
+                "current": current,
+            },
             commit=False,
         )
 

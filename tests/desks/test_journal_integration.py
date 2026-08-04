@@ -8,7 +8,10 @@ from unittest.mock import Mock
 import pytest
 from sqlalchemy import select
 
-from app.desks.commands import CreateDeskCommand
+from app.desks.commands import (
+    CreateDeskCommand,
+    UpdateDeskCommand,
+)
 from app.desks.events import DeskJournalEvents
 from app.desks.models import Desk
 from app.desks.services import DeskService
@@ -100,6 +103,17 @@ def journal_entries() -> list[JournalEntry]:
             )
         )
     )
+
+def journal_entries_for(
+    event_code: str,
+) -> list[JournalEntry]:
+    """Return Journal Entries matching one event code."""
+
+    return [
+        entry
+        for entry in journal_entries()
+        if entry.event_code == event_code
+    ]
 
 
 def test_creating_desk_records_one_journal_entry(
@@ -248,5 +262,288 @@ def test_journal_failure_rolls_back_desk_creation(
 
     assert failed_desk is None
     assert journal_entries() == []
+
+    journal.record.assert_called_once()
+
+def test_updating_desk_records_updated_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    updated = desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name="Operations Coordination",
+            description="Updated command and control.",
+        ),
+        actor=actor,
+    )
+
+    entries = journal_entries_for(
+        DeskJournalEvents.UPDATED
+    )
+
+    assert updated.name == (
+        "Operations Coordination"
+    )
+    assert updated.description == (
+        "Updated command and control."
+    )
+    assert len(entries) == 1
+
+
+def test_updated_entry_uses_expected_summary(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name="Operations Coordination",
+            description="Updated command and control.",
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.UPDATED
+    )[0]
+
+    assert entry.summary == (
+        "Desk 'Operations Coordination' was updated."
+    )
+
+
+def test_updated_entry_records_actor_subject_and_desk(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name="Operations Coordination",
+            description="Updated command and control.",
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.UPDATED
+    )[0]
+
+    actor_reference = db.session.get(
+        JournalReference,
+        entry.actor_reference_id,
+    )
+    subject_reference = db.session.get(
+        JournalReference,
+        entry.subject_reference_id,
+    )
+
+    assert actor_reference is not None
+    assert actor_reference.stable_key == (
+        "test_system:desk_integration"
+    )
+
+    assert subject_reference is not None
+    assert subject_reference.reference_type == "desk"
+    assert subject_reference.source_id == desk.id
+
+    assert entry.context_reference_id is None
+    assert entry.desk_id == desk.id
+    assert entry.desk_display_name == (
+        "Operations Coordination"
+    )
+
+def test_updated_entry_records_change_metadata(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name="Operations Coordination",
+            description="Updated command and control.",
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.UPDATED
+    )[0]
+
+    assert entry.event_metadata == {
+        "changed_fields": [
+            "name",
+            "description",
+        ],
+        "previous": {
+            "name": "Operations Control",
+            "description": (
+                "Operational command and control."
+            ),
+        },
+        "current": {
+            "name": "Operations Coordination",
+            "description": (
+                "Updated command and control."
+            ),
+        },
+    }
+
+
+def test_update_records_only_changed_fields(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name="Operations Coordination",
+            description=desk.description,
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.UPDATED
+    )[0]
+
+    assert entry.event_metadata == {
+        "changed_fields": [
+            "name",
+        ],
+        "previous": {
+            "name": "Operations Control",
+        },
+        "current": {
+            "name": "Operations Coordination",
+        },
+    }
+
+
+def test_no_op_update_does_not_record_journal_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    desk = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+
+    returned = desk_service.update(
+        desk.id,
+        UpdateDeskCommand(
+            name=desk.name,
+            description=desk.description,
+        ),
+        actor=actor,
+    )
+
+    assert returned.id == desk.id
+    assert journal_entries_for(
+        DeskJournalEvents.UPDATED
+    ) == []
+
+
+def test_journal_failure_rolls_back_desk_update(
+    app,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    creation_service = DeskService(
+        session=db.session,
+        journal=JournalService(
+            session=db.session,
+        ),
+    )
+
+    desk = create_operations_desk(
+        service=creation_service,
+        root=root_desk,
+        actor=actor,
+    )
+    desk_id = desk.id
+
+    journal = Mock(
+        spec=JournalService,
+    )
+    journal.record.side_effect = (
+        JournalPersistenceError(
+            "The Journal Entry could not be recorded."
+        )
+    )
+
+    update_service = DeskService(
+        session=db.session,
+        journal=journal,
+    )
+
+    with pytest.raises(
+        JournalPersistenceError,
+    ):
+        update_service.update(
+            desk_id,
+            UpdateDeskCommand(
+                name="Failed Update",
+                description="This must be rolled back.",
+            ),
+            actor=actor,
+        )
+
+    db.session.expire_all()
+
+    persisted = db.session.get(
+        Desk,
+        desk_id,
+    )
+
+    assert persisted is not None
+    assert persisted.name == "Operations Control"
+    assert persisted.description == (
+        "Operational command and control."
+    )
 
     journal.record.assert_called_once()
