@@ -1,0 +1,121 @@
+/* ============================================================
+   Page header
+   ============================================================ */
+
+.rc-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: clamp(1rem, 2vw, 2rem);
+    width: 100%;
+    min-width: 0;
+    padding: clamp(1rem, 1.5vw, 1.5rem);
+    border: 1px solid var(--rc-slate-200);
+    border-radius: var(--rc-panel-radius);
+    background: var(--rc-white);
+    box-shadow: var(--rc-shadow-panel);
+}
+
+.rc-page-header__identity {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.rc-page-header__icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 0.9rem;
+    background: var(--rc-sky-100);
+    color: var(--rc-teal-500);
+}
+
+.rc-page-header__icon iconify-icon {
+    width: 1.65rem;
+    height: 1.65rem;
+}
+
+.rc-page-header__content {
+    min-width: 0;
+}
+
+.rc-page-header__eyebrow {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--rc-teal-500);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.rc-page-header__title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem 1rem;
+}
+
+.rc-page-header__title {
+    margin: 0;
+    color: var(--rc-navy-950);
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1.15;
+}
+
+.rc-page-header__description {
+    max-width: 780px;
+    margin: 0.45rem 0 0;
+    color: var(--rc-slate-500);
+    line-height: 1.55;
+}
+
+.rc-page-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.rc-page-header__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
+}
+
+@media (max-width: 800px) {
+    .rc-page-header {
+        flex-direction: column;
+    }
+
+    .rc-page-header__actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .rc-page-header {
+        padding: 1rem;
+    }
+
+    .rc-page-header__identity {
+        gap: 0.75rem;
+    }
+
+    .rc-page-header__icon {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+
+    .rc-page-header__actions > * {
+        flex: 1 1 auto;
+    }
+}

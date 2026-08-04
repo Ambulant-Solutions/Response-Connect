@@ -1,4 +1,5 @@
 {% extends "org/org_base.html" %}
+{% from "components/page_header.html" import page_header %}
 
 
 {% macro status_badge(label, style) %}
@@ -87,41 +88,39 @@
     class="component-showcase"
     aria-labelledby="component-showcase-title"
 >
-    <header class="component-showcase__header">
+    {% set showcase_meta %}
+    <div class="component-showcase__notice">
+        <iconify-icon
+            icon="tabler:tools"
+            aria-hidden="true"
+        ></iconify-icon>
+
         <div>
-            <span class="eyebrow">
-                Development tools
+            <strong>Internal development page</strong>
+            <span>
+                Components shown here use demonstration data.
             </span>
-
-            <h1 id="component-showcase-title">
-                Administration UI components
-            </h1>
-
-            <p>
-                A living reference for the reusable layouts, controls and
-                display components used throughout Response Connect.
-            </p>
         </div>
+    </div>
+{% endset %}
 
-        <div class="component-showcase__notice">
-            <iconify-icon
-                icon="tabler:tools"
-                aria-hidden="true"
-            ></iconify-icon>
-
-            <div>
-                <strong>Internal development page</strong>
-                <span>
-                    Components shown here use demonstration data.
-                </span>
-            </div>
-        </div>
-    </header>
+{{ page_header(
+    title="Administration UI components",
+    description=(
+        "A living reference for the reusable layouts, controls and "
+        "display components used throughout Response Connect."
+    ),
+    eyebrow="Development tools",
+    icon="tabler:components",
+    meta=showcase_meta,
+    heading_id="component-showcase-title"
+) }}
 
     <nav
         class="component-showcase__nav"
         aria-label="Component sections"
     >
+        <a href="#page-header">Page header</a>
         <a href="#buttons">Buttons</a>
         <a href="#badges">Badges</a>
         <a href="#toolbar">Toolbar</a>
@@ -132,6 +131,78 @@
         <a href="#forms">Forms</a>
         <a href="#empty-states">Empty states</a>
     </nav>
+
+    <section
+    class="component-demo"
+    id="page-header"
+    aria-labelledby="page-header-demo-title"
+>
+    <header class="component-demo__header">
+        <div>
+            <span class="component-demo__eyebrow">
+                Page identity
+            </span>
+
+            <h2 id="page-header-demo-title">
+                Page header
+            </h2>
+
+            <p>
+                The standard title, description, status and action area
+                for Response Connect screens.
+            </p>
+        </div>
+    </header>
+
+    <div class="component-demo__surface">
+        {% set header_actions %}
+            <button
+                class="rc-button rc-button--secondary"
+                type="button"
+            >
+                <iconify-icon
+                    icon="tabler:refresh"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Refresh
+            </button>
+
+            <button
+                class="rc-button rc-button--primary"
+                type="button"
+            >
+                <iconify-icon
+                    icon="tabler:plus"
+                    aria-hidden="true"
+                ></iconify-icon>
+                New Desk
+            </button>
+        {% endset %}
+
+        {% set header_meta %}
+            <span class="rc-status-badge rc-status-badge--active">
+                <span
+                    class="rc-status-badge__dot"
+                    aria-hidden="true"
+                ></span>
+                4 active Desks
+            </span>
+        {% endset %}
+
+        {{ page_header(
+            title="Desk management",
+            description=(
+                "Manage the operational responsibility structure used "
+                "throughout the organisation."
+            ),
+            eyebrow="Organisation settings",
+            icon="tabler:hierarchy-2",
+            meta=header_meta,
+            actions=header_actions,
+            heading_id="showcase-desk-header"
+        ) }}
+    </div>
+</section>
 
     <div class="component-showcase__sections">
         <section

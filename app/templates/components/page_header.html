@@ -1,0 +1,61 @@
+{% macro page_header(
+    title,
+    description=None,
+    eyebrow=None,
+    icon=None,
+    actions=None,
+    meta=None,
+    heading_id=None,
+    classes=None
+) %}
+<header
+    class="rc-page-header{% if classes %} {{ classes }}{% endif %}"
+    {% if heading_id %}aria-labelledby="{{ heading_id }}"{% endif %}
+>
+    <div class="rc-page-header__identity">
+        {% if icon %}
+            <span class="rc-page-header__icon">
+                <iconify-icon
+                    icon="{{ icon }}"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </span>
+        {% endif %}
+
+        <div class="rc-page-header__content">
+            {% if eyebrow %}
+                <span class="rc-page-header__eyebrow">
+                    {{ eyebrow }}
+                </span>
+            {% endif %}
+
+            <div class="rc-page-header__title-row">
+                <h1
+                    class="rc-page-header__title"
+                    {% if heading_id %}id="{{ heading_id }}"{% endif %}
+                >
+                    {{ title }}
+                </h1>
+
+                {% if meta %}
+                    <div class="rc-page-header__meta">
+                        {{ meta | safe}}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if description %}
+                <p class="rc-page-header__description">
+                    {{ description }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if actions %}
+        <div class="rc-page-header__actions">
+            {{ actions | safe}}
+        </div>
+    {% endif %}
+</header>
+{% endmacro %}
