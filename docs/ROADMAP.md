@@ -299,9 +299,10 @@ These items were intentionally deferred and should be completed during Phase 7.
 - [x] Record `desk.updated`.
 - [x] Capture structured update metadata.
 - [x] Ignore no-op updates.
+- [x] Record `desk.moved`.
+- [x] Capture previous and current parent metadata.
 - [x] Make Desk mutations and Journal recording atomic.
-- [ ] 🚧 Record `desk.moved`.
-- [ ] Record Desk lifecycle transitions.
+- [ ] 🚧 Record Desk lifecycle transitions.
 - [ ] Record processing-policy changes.
 
 ---

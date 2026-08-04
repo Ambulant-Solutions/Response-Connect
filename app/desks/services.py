@@ -306,10 +306,14 @@ class DeskService:
         self,
         desk_id: uuid.UUID,
         command: MoveDeskCommand,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Move a Desk beneath a new parent."""
+        """Move a Desk and record the hierarchy change atomically."""
 
-        desk = self._get_desk(desk_id)
+        desk = self._get_desk(
+            desk_id
+        )
         new_parent = self._get_desk(
             command.parent_id,
             description="parent Desk",
@@ -354,15 +358,40 @@ class DeskService:
                 "of its descendants."
             )
 
+        previous_parent = desk.parent
+
+        if previous_parent is None:
+            raise DeskHierarchyError(
+                "A non-root Desk must have a parent."
+            )
+
         desk.parent = new_parent
 
         try:
+            self.session.flush()
+
+            self._record_moved(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+                previous_parent=previous_parent,
+                current_parent=new_parent,
+            )
+
             self.session.commit()
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be moved."
             ) from exc
+
+        except Exception:
+            self.session.rollback()
+            raise
 
         return desk
 
@@ -555,6 +584,61 @@ class DeskService:
                 "changed_fields": changed_fields,
                 "previous": previous,
                 "current": current,
+            },
+            commit=False,
+        )
+
+    def _record_moved(
+        self,
+        *,
+        desk: Desk,
+        actor: JournalReferenceSpec,
+        previous_parent: Desk,
+        current_parent: Desk,
+    ) -> None:
+        """Record a Desk hierarchy move."""
+
+        self._journal.record(
+            event_code=DeskJournalEvents.MOVED,
+            occurred_at=datetime.now(
+                timezone.utc
+            ),
+            actor=actor,
+            subject=self._desk_reference(
+                desk
+            ),
+            desk_id=desk.id,
+            summary=(
+                f"Desk '{desk.name}' was moved from "
+                f"'{previous_parent.name}' to "
+                f"'{current_parent.name}'."
+            ),
+            event_metadata={
+                "changed_fields": [
+                    "parent_id",
+                ],
+                "previous": {
+                    "parent_id": str(
+                        previous_parent.id
+                    ),
+                    "parent_code": (
+                        previous_parent.code
+                    ),
+                    "parent_name": (
+                        previous_parent.name
+                    ),
+                },
+                "current": {
+                    "parent_id": str(
+                        current_parent.id
+                    ),
+                    "parent_code": (
+                        current_parent.code
+                    ),
+                    "parent_name": (
+                        current_parent.name
+                    ),
+                },
             },
             commit=False,
         )

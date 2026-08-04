@@ -10,6 +10,7 @@ from sqlalchemy import select
 
 from app.desks.commands import (
     CreateDeskCommand,
+    MoveDeskCommand,
     UpdateDeskCommand,
 )
 from app.desks.events import DeskJournalEvents
@@ -87,6 +88,25 @@ def create_operations_desk(
             name="Operations Control",
             description="Operational command and control.",
             parent_id=root.id,
+        ),
+        actor=actor,
+    )
+
+def create_child_desk(
+    *,
+    service: DeskService,
+    parent: Desk,
+    code: str,
+    name: str,
+    actor: JournalReferenceSpec,
+) -> Desk:
+    """Create a child Desk used by hierarchy integration tests."""
+
+    return service.create(
+        CreateDeskCommand(
+            code=code,
+            name=name,
+            parent_id=parent.id,
         ),
         actor=actor,
     )
@@ -545,5 +565,312 @@ def test_journal_failure_rolls_back_desk_update(
     assert persisted.description == (
         "Operational command and control."
     )
+
+    journal.record.assert_called_once()
+
+def test_moving_desk_records_moved_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    operations = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    patient_transport = create_child_desk(
+        service=desk_service,
+        parent=root_desk,
+        code="patient_transport",
+        name="Patient Transport",
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=desk_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    moved = desk_service.move(
+        control.id,
+        MoveDeskCommand(
+            parent_id=patient_transport.id,
+        ),
+        actor=actor,
+    )
+
+    entries = journal_entries_for(
+        DeskJournalEvents.MOVED
+    )
+
+    assert moved.parent_id == patient_transport.id
+    assert len(entries) == 1
+
+
+def test_moved_entry_uses_expected_summary(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    operations = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    patient_transport = create_child_desk(
+        service=desk_service,
+        parent=root_desk,
+        code="patient_transport",
+        name="Patient Transport",
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=desk_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    desk_service.move(
+        control.id,
+        MoveDeskCommand(
+            parent_id=patient_transport.id,
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.MOVED
+    )[0]
+
+    assert entry.summary == (
+        "Desk 'Control' was moved from "
+        "'Operations Control' to 'Patient Transport'."
+    )
+
+
+def test_moved_entry_records_actor_subject_and_desk(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    operations = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    patient_transport = create_child_desk(
+        service=desk_service,
+        parent=root_desk,
+        code="patient_transport",
+        name="Patient Transport",
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=desk_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    desk_service.move(
+        control.id,
+        MoveDeskCommand(
+            parent_id=patient_transport.id,
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.MOVED
+    )[0]
+
+    actor_reference = db.session.get(
+        JournalReference,
+        entry.actor_reference_id,
+    )
+    subject_reference = db.session.get(
+        JournalReference,
+        entry.subject_reference_id,
+    )
+
+    assert actor_reference is not None
+    assert actor_reference.stable_key == (
+        "test_system:desk_integration"
+    )
+
+    assert subject_reference is not None
+    assert subject_reference.reference_type == "desk"
+    assert subject_reference.source_id == control.id
+
+    assert entry.context_reference_id is None
+    assert entry.desk_id == control.id
+    assert entry.desk_display_name == "Control"
+
+
+def test_moved_entry_records_parent_change_metadata(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    operations = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    patient_transport = create_child_desk(
+        service=desk_service,
+        parent=root_desk,
+        code="patient_transport",
+        name="Patient Transport",
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=desk_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    desk_service.move(
+        control.id,
+        MoveDeskCommand(
+            parent_id=patient_transport.id,
+        ),
+        actor=actor,
+    )
+
+    entry = journal_entries_for(
+        DeskJournalEvents.MOVED
+    )[0]
+
+    assert entry.event_metadata == {
+        "changed_fields": [
+            "parent_id",
+        ],
+        "previous": {
+            "parent_id": str(operations.id),
+            "parent_code": "operations_control",
+            "parent_name": "Operations Control",
+        },
+        "current": {
+            "parent_id": str(patient_transport.id),
+            "parent_code": "patient_transport",
+            "parent_name": "Patient Transport",
+        },
+    }
+
+
+def test_move_to_current_parent_does_not_record_journal_entry(
+    app,
+    desk_service: DeskService,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    operations = create_operations_desk(
+        service=desk_service,
+        root=root_desk,
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=desk_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    returned = desk_service.move(
+        control.id,
+        MoveDeskCommand(
+            parent_id=operations.id,
+        ),
+        actor=actor,
+    )
+
+    assert returned.parent_id == operations.id
+    assert journal_entries_for(
+        DeskJournalEvents.MOVED
+    ) == []
+
+
+def test_journal_failure_rolls_back_desk_move(
+    app,
+    root_desk: Desk,
+    actor: JournalReferenceSpec,
+) -> None:
+    creation_service = DeskService(
+        session=db.session,
+        journal=JournalService(
+            session=db.session,
+        ),
+    )
+
+    operations = create_operations_desk(
+        service=creation_service,
+        root=root_desk,
+        actor=actor,
+    )
+    patient_transport = create_child_desk(
+        service=creation_service,
+        parent=root_desk,
+        code="patient_transport",
+        name="Patient Transport",
+        actor=actor,
+    )
+    control = create_child_desk(
+        service=creation_service,
+        parent=operations,
+        code="control",
+        name="Control",
+        actor=actor,
+    )
+
+    control_id = control.id
+    original_parent_id = operations.id
+
+    journal = Mock(
+        spec=JournalService,
+    )
+    journal.record.side_effect = (
+        JournalPersistenceError(
+            "The Journal Entry could not be recorded."
+        )
+    )
+
+    move_service = DeskService(
+        session=db.session,
+        journal=journal,
+    )
+
+    with pytest.raises(
+        JournalPersistenceError,
+    ):
+        move_service.move(
+            control_id,
+            MoveDeskCommand(
+                parent_id=patient_transport.id,
+            ),
+            actor=actor,
+        )
+
+    db.session.expire_all()
+
+    persisted = db.session.get(
+        Desk,
+        control_id,
+    )
+
+    assert persisted is not None
+    assert persisted.parent_id == original_parent_id
 
     journal.record.assert_called_once()
