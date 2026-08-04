@@ -20,6 +20,10 @@ from app.journal.services import (
     JournalEntryService,
     JournalReferenceService,
 )
+from app.journal.service import (
+    JournalReferenceSpec,
+    JournalService,
+)
 
 
 __all__ = [
@@ -39,4 +43,6 @@ __all__ = [
     "JournalReferencePersistenceError",
     "JournalReferenceService",
     "RegisterJournalReferenceCommand",
+    "JournalReferenceSpec",
+    "JournalService",
 ]

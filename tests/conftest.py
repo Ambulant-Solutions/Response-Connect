@@ -23,39 +23,35 @@ def _remove_test_processing_policies() -> None:
     db.session.commit()
 
 def _remove_test_desks() -> None:
-    """Delete all test Desks from leaves to root."""
+    """Delete every Desk from the test database, leaves first."""
 
     db.session.rollback()
 
     while True:
-        test_desks = (
+        desks = (
             db.session.query(Desk)
-            .filter(
-                Desk.code.like("test_%")
-            )
             .all()
         )
 
-        if not test_desks:
+        if not desks:
             break
 
         parent_ids = {
             desk.parent_id
-            for desk in test_desks
+            for desk in desks
             if desk.parent_id is not None
         }
 
         leaf_desks = [
             desk
-            for desk in test_desks
+            for desk in desks
             if desk.id not in parent_ids
         ]
 
         if not leaf_desks:
             raise RuntimeError(
-                "Test Desk cleanup could not find a "
-                "leaf Desk. The test hierarchy may "
-                "contain a cycle."
+                "Desk test cleanup could not find a leaf "
+                "Desk. The hierarchy may contain a cycle."
             )
 
         for desk in leaf_desks:

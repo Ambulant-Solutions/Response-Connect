@@ -148,63 +148,70 @@ The Desk platform defines operational ownership and scope throughout Response Co
 
 ### 7.2 Event Journal
 
-The Event Journal records immutable Journal Entries describing operational occurrences.
+The Event Journal is the immutable operational record for Response Connect. Every significant occurrence within the platform is recorded as a Journal Entry, providing a complete audit and operational timeline across all modules.
 
 #### Architecture
 
 - [x] Write Event Journal and Operational Model chapter.
-- [x] Write Event Journal data model chapter.
-- [x] Finalise Journal terminology and package naming.
-- [x] Define initial Journal schema.
-- [x] Define classification and metadata models.
+- [x] Write Event Journal Data Model chapter.
+- [x] Finalise Journal terminology and package structure.
+- [x] Define the Journal platform architecture.
+- [x] Define the Journal Reference architecture.
+- [x] Introduce the public `JournalService` API.
 
 #### Core Platform
 
-- [x] Create Journal package.
-- [x] Define Journal Reference Data vocabulary.
-- [x] Implement initial Journal Entry model.
-- [x] Implement Journal constants.
+- [x] Create the Journal package.
+- [x] Implement Journal constants and reference data.
 - [x] Implement Journal exceptions.
-- [x] Implement initial recording command.
-- [x] Implement initial validators.
-- [x] Create initial Journal migration.
-- [x] Implement initial Journal recording service.
-- [ ] 🚧 Add actor, subject, context, and Desk references.
-- [ ] Implement Journal query service.
+- [x] Implement immutable Journal commands.
+- [x] Implement Journal validators.
+- [x] Implement the Journal Entry model.
+- [x] Implement the Journal Reference model.
+- [x] Implement Journal database migrations.
+- [x] Implement the Journal Reference service.
+- [x] Implement the Journal Entry service.
+- [x] Implement the public `JournalService`.
+- [x] Support actor, subject, context and Desk relationships.
+- [ ] Implement the Journal query service.
+- [ ] Integrate Journal recording throughout platform modules.
 
 #### Testing
 
-- [x] Reference Data definition tests.
+- [x] Reference data tests.
+- [x] Command tests.
 - [x] Validator tests.
-- [x] Initial model tests.
-- [x] Recording service tests.
-- [ ] Query tests.
-- [ ] Architecture tests.
+- [x] Journal Entry model tests.
+- [x] Journal Reference model tests.
+- [x] Journal Reference service tests.
+- [x] Journal Entry service tests.
+- [x] Public Journal service tests.
+- [ ] Query service tests.
+- [ ] Public API architecture tests.
 
-#### Journal Features
+#### Future Journal Features
 
-* [ ] Correlation IDs.
-* [ ] Causation IDs.
-* [ ] Event classifications.
-* [ ] Visibility model.
-* [ ] Severity model.
-* [ ] Source model.
-* [ ] Structured metadata.
-* [ ] Historical display snapshots.
+- [ ] Correlation IDs.
+- [ ] Causation IDs.
+- [ ] Event classifications.
+- [ ] Visibility model.
+- [ ] Severity model.
+- [ ] Source model.
+- [ ] Structured metadata.
+- [ ] Historical display snapshots.
+- [ ] Timeline projection API.
+- [ ] Full-text Journal search.
+- [ ] Event retention and archival policies.
 
-#### Stable Journal References
+#### Platform Integration
 
-- [x] Define the Journal Reference architecture.
-- [x] Replace raw polymorphic references in the data-model design.
-- [x] Defer the universal Resource abstraction.
-- [x] Implement the Journal Reference model.
-- [x] Implement Journal Reference commands and validators.
-- [x] Implement the idempotent Journal Reference service.
-- [x] Add Journal Reference model tests.
-- [x] Add Journal Reference validator tests.
-- [x] Add Journal Reference service tests.
-- [x] Create the Journal Reference migration.
-- [ ] 🚧 Add actor, subject, and context references to Journal Entries.
+- [ ] Integrate Desks with `JournalService`.
+- [ ] Integrate Workforce module.
+- [ ] Integrate Fleet module.
+- [ ] Integrate Event Medical module.
+- [ ] Integrate Patient Transport module.
+- [ ] Integrate Documents module.
+- [ ] Integrate Notifications module.
 
 ---
 

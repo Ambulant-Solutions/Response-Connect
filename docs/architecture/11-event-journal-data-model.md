@@ -2705,6 +2705,21 @@ This chapter establishes the following architectural decisions.
 27. The Journal must support both commit-owning and caller-owned transaction workflows.
 28. Activity Streams, Operational Logs, Audit Logs, and Security Logs are projections of the same stored Journal Entries.
 
+### Public API
+
+The Journal package exposes only:
+
+    JournalService
+
+Business modules must not import:
+
+- JournalEntryService
+- JournalReferenceService
+
+These remain internal implementation services.
+
+JournalService forms the stable public contract for the package.
+
 ---
 
 # Decision summary
