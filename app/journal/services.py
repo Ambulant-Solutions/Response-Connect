@@ -34,6 +34,7 @@ from app.journal.validators import (
     validate_reference_stable_key,
     validate_reference_type,
     validate_summary,
+    validate_event_metadata,
 )
 from app.desks import (
     Desk,
@@ -53,6 +54,8 @@ class JournalEntryService:
     def record(
         self,
         command: RecordJournalEntryCommand,
+        *,
+        commit: bool = True,
     ) -> JournalEntry:
         """Validate, persist, and return one Journal Entry."""
 
@@ -68,7 +71,9 @@ class JournalEntryService:
         details = validate_details(
             command.details
         )
-
+        event_metadata = validate_event_metadata(
+            command.event_metadata
+        )
         actor = self._get_reference(
             command.actor_reference_id,
             role="actor",
@@ -114,17 +119,20 @@ class JournalEntryService:
             ),
             summary=summary,
             details=details,
+            event_metadata=event_metadata,
         )
 
         self.session.add(entry)
 
         try:
-            self.session.commit()
+            if commit:
+                self.session.commit()
+            else:
+                self.session.flush()
         except SQLAlchemyError as exc:
             self.session.rollback()
             raise JournalPersistenceError(
-                "The Journal Entry could not be "
-                "recorded."
+                "The Journal Entry could not be recorded."
             ) from exc
 
         return entry
@@ -198,6 +206,8 @@ class JournalReferenceService:
     def get_or_create(
         self,
         command: RegisterJournalReferenceCommand,
+        *,
+        commit: bool = True,
     ) -> JournalReference:
         """Return an existing reference or create one."""
 
@@ -254,7 +264,10 @@ class JournalReferenceService:
         self.session.add(reference)
 
         try:
-            self.session.commit()
+            if commit:
+                self.session.commit()
+            else:
+                self.session.flush()
         except IntegrityError as exc:
             self.session.rollback()
 

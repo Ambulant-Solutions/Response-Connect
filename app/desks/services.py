@@ -32,6 +32,11 @@ from app.desks.validators import (
     validate_desk_description,
     validate_desk_name,
 )
+from app.desks.events import DeskJournalEvents
+from app.journal import (
+    JournalReferenceSpec,
+    JournalService,
+)
 
 
 class DeskService:
@@ -44,8 +49,16 @@ class DeskService:
     def __init__(
         self,
         session: Session,
+        *,
+        journal: JournalService | None = None,
     ) -> None:
         self.session = session
+        self._journal = (
+            journal
+            or JournalService(
+                session=session,
+            )
+        )
 
     def bootstrap_root(
         self,
@@ -123,8 +136,10 @@ class DeskService:
     def create(
         self,
         command: CreateDeskCommand,
+        *,
+        actor: JournalReferenceSpec | None = None,
     ) -> Desk:
-        """Create and return a Desk."""
+        """Create a Desk and record its creation atomically."""
 
         code = validate_desk_code(
             command.code
@@ -167,19 +182,42 @@ class DeskService:
         self.session.add(desk)
 
         try:
+            # The Desk requires an ID before it can be registered as the
+            # Journal subject and operational context.
+            self.session.flush()
+
+            self._record_created(
+                desk=desk,
+                actor=(
+                    actor
+                    or self._system_actor()
+                ),
+            )
+
+            # Desk and Journal records commit as one transaction.
             self.session.commit()
+
         except IntegrityError as exc:
             self.session.rollback()
+
             self._raise_create_conflict(
                 code=code,
                 is_root=command.is_root,
                 cause=exc,
             )
+
         except SQLAlchemyError as exc:
             self.session.rollback()
+
             raise DeskPersistenceError(
                 "The Desk could not be created."
             ) from exc
+
+        except Exception:
+            # Journal domain errors must propagate unchanged, but the Desk
+            # and any flushed Journal records must still be rolled back.
+            self.session.rollback()
+            raise
 
         return desk
 
@@ -413,6 +451,31 @@ class DeskService:
 
         return desk
 
+    def _record_created(
+        self,
+        *,
+        desk: Desk,
+        actor: JournalReferenceSpec,
+    ) -> None:
+        """Record the creation of one Desk."""
+
+        self._journal.record(
+            event_code=DeskJournalEvents.CREATED,
+            occurred_at=datetime.now(
+                timezone.utc
+            ),
+            actor=actor,
+            subject=self._desk_reference(
+                desk
+            ),
+            desk_id=desk.id,
+            summary=(
+                f"Desk '{desk.name}' was created."
+            ),
+            commit=False,
+        )
+
+
     def _get_desk(
         self,
         desk_id: uuid.UUID,
@@ -537,3 +600,25 @@ class DeskService:
             )
 
         return False
+
+    @staticmethod
+    def _desk_reference(
+        desk: Desk,
+    ) -> JournalReferenceSpec:
+        """Return the Journal identity for a Desk."""
+
+        return JournalReferenceSpec.from_source(
+            reference_type="desk",
+            source_id=desk.id,
+            display_name=desk.name,
+        )
+
+    @staticmethod
+    def _system_actor() -> JournalReferenceSpec:
+        """Return the default actor for legacy system-owned operations."""
+
+        return JournalReferenceSpec.from_stable_key(
+            reference_type="system",
+            stable_key="system",
+            display_name="Response Connect",
+        )

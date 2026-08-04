@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-
+from typing import Any
 from sqlalchemy import (
     CheckConstraint,
     ForeignKey,
@@ -15,7 +15,10 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import (
+    JSONB,
+    UUID,
+)
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
@@ -250,6 +253,11 @@ class JournalEntry(db.Model):
 
     details: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
+    )
+
+    event_metadata: Mapped[dict[str, Any] | None] = mapped_column(
+        JSONB,
         nullable=True,
     )
 

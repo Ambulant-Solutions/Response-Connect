@@ -54,6 +54,7 @@ def test_record_journal_entry_command_defaults_optional_fields(
     assert command.subject_reference_id is None
     assert command.context_reference_id is None
     assert command.desk_id is None
+    assert command.event_metadata is None
 
 
 def test_record_journal_entry_command_accepts_relationships(
@@ -147,3 +148,24 @@ def test_register_journal_reference_command_is_immutable(
         FrozenInstanceError
     ):
         command.display_name = "Changed"  # type: ignore[misc]
+
+
+def test_record_journal_entry_command_accepts_event_metadata(
+) -> None:
+    metadata = {
+        "changed_fields": [
+            "name",
+        ],
+    }
+
+    command = RecordJournalEntryCommand(
+        event_code="desk.updated",
+        occurred_at=datetime.now(
+            timezone.utc
+        ),
+        actor_reference_id=uuid.uuid4(),
+        summary="A Desk was updated.",
+        event_metadata=metadata,
+    )
+
+    assert command.event_metadata == metadata

@@ -5,6 +5,8 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
+from collections.abc import Mapping
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,7 @@ class RecordJournalEntryCommand:
     subject_reference_id: uuid.UUID | None = None
     context_reference_id: uuid.UUID | None = None
     desk_id: uuid.UUID | None = None
+    event_metadata: Mapping[str, Any] | None = None
 
 
 __all__ = [

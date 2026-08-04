@@ -64,6 +64,17 @@ Documentation
 
 Every completed task must be reflected in this roadmap before being committed.
 
+## Platform Principles
+
+Response Connect is built around a small number of reusable platform services.
+
+- Business modules communicate through public package APIs (`service.py`).
+- Internal implementation services remain package-private.
+- All significant operational activity is recorded in the immutable Event Journal.
+- Desks define the operational context for work.
+- Reference Data provides configurable vocabularies without code changes.
+- Every new feature is developed test-first where practical.
+
 ---
 
 # Active Roadmap
@@ -277,6 +288,21 @@ These items were intentionally deferred and should be completed during Phase 7.
 * [ ] Review service naming consistency.
 * [ ] Review transaction boundaries.
 * [ ] Review package documentation.
+
+---
+
+### 8.1 Desk → Journal Integration
+
+- [x] Add Desk Journal event-code definitions.
+- [x] Inject the public `JournalService` into `DeskService`.
+- [x] Record `desk.created`.
+- [x] Capture actor, Desk subject, and Desk context.
+- [x] Make Desk creation and Journal recording atomic.
+- [x] Add Desk Journal integration tests.
+- [ ] 🚧 Record `desk.updated`.
+- [ ] Record `desk.moved`.
+- [ ] Record Desk lifecycle transitions.
+- [ ] Record processing-policy changes.
 
 ---
 

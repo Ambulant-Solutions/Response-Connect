@@ -5,10 +5,14 @@ from __future__ import annotations
 import re
 import uuid
 from datetime import datetime
+import json
+from collections.abc import Mapping
+from typing import Any
 from app.journal.constants import (
     EVENT_CODE_MAX_LENGTH,
     JOURNAL_DETAILS_MAX_LENGTH,
     JOURNAL_EVENT_CODE_PATTERN,
+    JOURNAL_EVENT_METADATA_MAX_BYTES,
     JOURNAL_REFERENCE_DISPLAY_NAME_MAX_LENGTH,
     JOURNAL_REFERENCE_STABLE_KEY_MAX_LENGTH,
     JOURNAL_REFERENCE_STABLE_KEY_PATTERN,
@@ -218,3 +222,47 @@ def validate_reference_identity(
             "A Journal Reference requires a source ID "
             "or stable key."
         )
+
+def validate_event_metadata(
+    value: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """
+    Validate and copy optional structured Journal metadata.
+
+    Metadata must be a JSON-serialisable object at its top level.
+    """
+
+    if value is None:
+        return None
+
+    if not isinstance(value, Mapping):
+        raise InvalidJournalEntryError(
+            "Journal event metadata must be an object."
+        )
+
+    try:
+        encoded = json.dumps(
+            dict(value),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    except (
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise InvalidJournalEntryError(
+            "Journal event metadata must contain only "
+            "JSON-serialisable values."
+        ) from exc
+
+    if len(encoded) > JOURNAL_EVENT_METADATA_MAX_BYTES:
+        raise InvalidJournalEntryError(
+            "Journal event metadata must not exceed "
+            f"{JOURNAL_EVENT_METADATA_MAX_BYTES} bytes."
+        )
+
+    # Decode the validated JSON so the stored structure is detached from
+    # mutable objects supplied by the caller.
+    return json.loads(
+        encoded.decode("utf-8")
+    )
