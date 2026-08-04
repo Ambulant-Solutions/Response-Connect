@@ -1,24 +1,16 @@
-"""System-wide Event Journal platform."""
+"""Public interface for the system-wide Event Journal."""
 
-from app.journal.commands import (
-    RecordJournalEntryCommand,
-    RegisterJournalReferenceCommand,
-)
 from app.journal.exceptions import (
     InvalidJournalEntryError,
+    InvalidJournalReferenceError,
     JournalEntryConflictError,
     JournalEntryNotFoundError,
     JournalEntryVisibilityError,
     JournalError,
     JournalPersistenceError,
-)
-from app.journal.models import (
-    JournalEntry,
-    JournalReference
-)
-from app.journal.services import (
-    JournalEntryService,
-    JournalReferenceService,
+    JournalReferenceConflictError,
+    JournalReferenceNotFoundError,
+    JournalReferencePersistenceError,
 )
 from app.journal.service import (
     JournalReferenceSpec,
@@ -28,21 +20,15 @@ from app.journal.service import (
 
 __all__ = [
     "InvalidJournalEntryError",
-    "JournalEntry",
+    "InvalidJournalReferenceError",
     "JournalEntryConflictError",
     "JournalEntryNotFoundError",
-    "JournalEntryService",
     "JournalEntryVisibilityError",
     "JournalError",
     "JournalPersistenceError",
-    "RecordJournalEntryCommand",
-    "InvalidJournalReferenceError",
-    "JournalReference",
     "JournalReferenceConflictError",
     "JournalReferenceNotFoundError",
     "JournalReferencePersistenceError",
-    "JournalReferenceService",
-    "RegisterJournalReferenceCommand",
     "JournalReferenceSpec",
     "JournalService",
 ]
