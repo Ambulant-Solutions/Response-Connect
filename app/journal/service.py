@@ -9,7 +9,9 @@ from collections.abc import Mapping
 from typing import Any
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from collections.abc import Iterable
 
+from app.journal.queries import JournalQueryService
 from app.journal.commands import (
     RecordJournalEntryCommand,
     RegisterJournalReferenceCommand,
@@ -106,6 +108,10 @@ class JournalService:
             JournalEntryService(
                 session=session,
             )
+        )
+
+        self._query_service = JournalQueryService(
+            session=session,
         )
 
     def record(
@@ -235,6 +241,41 @@ class JournalService:
                 self._session.rollback()
 
             raise
+
+    def get_entry(
+        self,
+        entry_id: uuid.UUID,
+    ) -> JournalEntry:
+        """Return one Journal Entry."""
+
+        return self._query_service.get(
+            entry_id
+        )
+
+    def timeline(
+        self,
+        *,
+        desk_id: uuid.UUID | None = None,
+        actor_reference_id: uuid.UUID | None = None,
+        subject_reference_id: uuid.UUID | None = None,
+        context_reference_id: uuid.UUID | None = None,
+        event_codes: Iterable[str] | None = None,
+        occurred_from: datetime | None = None,
+        occurred_to: datetime | None = None,
+        limit: int = 50,
+    ) -> list[JournalEntry]:
+        """Return a filtered newest-first Journal timeline."""
+
+        return self._query_service.timeline(
+            desk_id=desk_id,
+            actor_reference_id=actor_reference_id,
+            subject_reference_id=subject_reference_id,
+            context_reference_id=context_reference_id,
+            event_codes=event_codes,
+            occurred_from=occurred_from,
+            occurred_to=occurred_to,
+            limit=limit,
+        )
 
     def _resolve_reference(
         self,

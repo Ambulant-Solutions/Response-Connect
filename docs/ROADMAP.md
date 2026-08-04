@@ -184,8 +184,12 @@ The Event Journal is the immutable operational record for Response Connect. Ever
 - [x] Implement the Journal Entry service.
 - [x] Implement the public `JournalService`.
 - [x] Support actor, subject, context and Desk relationships.
-- [ ] Implement the Journal query service.
-- [ ] Integrate Journal recording throughout platform modules.
+- [x] Implement the Journal query service.
+- [x] Expose Journal entry retrieval through `JournalService`.
+- [x] Expose filtered Journal timelines through `JournalService`.
+- [x] Support Desk, actor, subject, context, event-code and date filtering.
+- [x] Add safe timeline limits.
+- [x] Eager-load Journal display relationships.
 
 #### Testing
 
@@ -305,7 +309,6 @@ These items were intentionally deferred and should be completed during Phase 7.
 - [x] Preserve idempotent lifecycle behaviour.
 - [x] Make Desk mutations and Journal recording atomic.
 - [ ] Design and implement Desk restoration.
-- [ ] 🚧 Record processing-policy changes.
 
 ---
 

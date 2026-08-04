@@ -16,11 +16,3 @@ class DeskJournalEvents:
 
     ARCHIVED = "desk.archived"
     RESTORED = "desk.restored"
-
-    PROCESSING_POLICY_ASSIGNED = (
-        "desk.processing_policy.assigned"
-    )
-
-    PROCESSING_POLICY_REMOVED = (
-        "desk.processing_policy.removed"
-    )
