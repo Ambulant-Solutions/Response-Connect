@@ -1,0 +1,56 @@
+{% macro admin_toolbar(
+    title=None,
+    subtitle=None,
+    icon=None,
+    primary_actions=None,
+    secondary_actions=None,
+    filters=None,
+    classes=None
+) %}
+<div class="rc-admin-toolbar{% if classes %} {{ classes }}{% endif %}">
+    {% if title or subtitle or icon %}
+        <div class="rc-admin-toolbar__identity">
+            {% if icon %}
+                <span class="rc-admin-toolbar__icon">
+                    <iconify-icon
+                        icon="{{ icon }}"
+                        aria-hidden="true"
+                    ></iconify-icon>
+                </span>
+            {% endif %}
+
+            <div class="rc-admin-toolbar__identity-copy">
+                {% if title %}
+                    <strong>{{ title }}</strong>
+                {% endif %}
+
+                {% if subtitle %}
+                    <span>{{ subtitle }}</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if filters %}
+        <div class="rc-admin-toolbar__filters">
+            {{ filters | safe }}
+        </div>
+    {% endif %}
+
+    {% if secondary_actions or primary_actions %}
+        <div class="rc-admin-toolbar__actions">
+            {% if secondary_actions %}
+                <div class="rc-admin-toolbar__actions-group">
+                    {{ secondary_actions | safe }}
+                </div>
+            {% endif %}
+
+            {% if primary_actions %}
+                <div class="rc-admin-toolbar__actions-group">
+                    {{ primary_actions | safe }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}

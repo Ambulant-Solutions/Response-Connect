@@ -1,5 +1,6 @@
 {% extends "org/org_base.html" %}
 {% from "components/page_header.html" import page_header %}
+{% from "components/admin_toolbar.html" import admin_toolbar %}
 
 
 {% macro status_badge(label, style) %}
@@ -343,6 +344,81 @@
                 </div>
             </div>
         </section>
+
+{% set toolbar_filters %}
+    <label class="rc-toolbar-search">
+        <span class="sr-only">Search Desks</span>
+
+        <iconify-icon
+            icon="tabler:search"
+            aria-hidden="true"
+        ></iconify-icon>
+
+        <input
+            type="search"
+            name="q"
+            placeholder="Search Desks"
+            autocomplete="off"
+        >
+    </label>
+{% endset %}
+
+{% set toolbar_secondary_actions %}
+    <button
+        class="rc-button rc-button--secondary"
+        type="button"
+    >
+        <iconify-icon
+            icon="tabler:pencil"
+            aria-hidden="true"
+        ></iconify-icon>
+        Edit
+    </button>
+
+    <button
+        class="rc-button rc-button--secondary"
+        type="button"
+    >
+        <iconify-icon
+            icon="tabler:arrows-move"
+            aria-hidden="true"
+        ></iconify-icon>
+        Move
+    </button>
+
+    <button
+        class="rc-icon-button"
+        type="button"
+        aria-label="Refresh"
+    >
+        <iconify-icon
+            icon="tabler:refresh"
+            aria-hidden="true"
+        ></iconify-icon>
+    </button>
+{% endset %}
+
+{% set toolbar_primary_actions %}
+    <button
+        class="rc-button rc-button--primary"
+        type="button"
+    >
+        <iconify-icon
+            icon="tabler:plus"
+            aria-hidden="true"
+        ></iconify-icon>
+        New Desk
+    </button>
+{% endset %}
+
+{{ admin_toolbar(
+    title="Desk management",
+    subtitle="4 Desks",
+    icon="tabler:hierarchy-2",
+    filters=toolbar_filters,
+    secondary_actions=toolbar_secondary_actions,
+    primary_actions=toolbar_primary_actions
+) }}
 
         <section
             class="component-demo"

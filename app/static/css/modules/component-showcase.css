@@ -320,54 +320,7 @@
 }
 
 
-/* Administration toolbar */
 
-.rc-admin-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.9rem 1rem;
-    background: #ffffff;
-}
-
-.rc-admin-toolbar__identity {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-}
-
-.rc-admin-toolbar__identity > span {
-    display: flex;
-    flex-direction: column;
-}
-
-.rc-admin-toolbar__identity strong {
-    color: #0b1d3a;
-}
-
-.rc-admin-toolbar__identity span span {
-    color: #64748b;
-    font-size: 0.78rem;
-}
-
-.rc-admin-toolbar__icon {
-    display: grid;
-    place-items: center;
-    width: 2.55rem;
-    height: 2.55rem;
-    border-radius: 0.7rem;
-    background: #e6f2f7;
-    color: #0ea5a0;
-}
-
-.rc-admin-toolbar__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.5rem;
-}
 
 
 /* Split view */
@@ -941,15 +894,6 @@
         padding: 0.75rem;
     }
 
-    .rc-admin-toolbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .rc-admin-toolbar__actions {
-        justify-content: flex-start;
-        width: 100%;
-    }
 
     .rc-detail-header {
         flex-direction: column;
