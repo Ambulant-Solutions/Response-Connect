@@ -77,6 +77,20 @@ def index():
                         f"{'location' if active_location_count == 1 else 'locations'}"
                     ),
                 },
+                {
+                    "title": "UI component showcase",
+                    "description": (
+                        "Review the reusable administration interface "
+                        "components and interaction patterns."
+                    ),
+                    "icon": "tabler:components",
+                    "url": url_for(
+                        "org.settings.component_showcase"
+                    ),
+                    "status": "Development",
+                    "status_style": "next",
+                    "meta": "Internal style guide",
+                },
             ],
         },
         {
@@ -338,5 +352,132 @@ def index():
         "org/settings/index.html",
         organisation=organisation,
         settings_sections=settings_sections,
+        active_org_section="settings",
+    )
+
+@settings_bp.get(
+    "/dev/components",
+    strict_slashes=False,
+)
+@any_permission_required(
+    "org:manage",
+)
+def component_showcase():
+    """Display the internal administration UI component showcase."""
+
+    organisation = require_current_organisation()
+
+    sample_timeline = [
+        {
+            "icon": "tabler:plus",
+            "style": "success",
+            "title": "Desk created",
+            "summary": (
+                "Desk 'Operations Control' was created."
+            ),
+            "actor": "System Administrator",
+            "occurred_at": "Today at 09:12",
+        },
+        {
+            "icon": "tabler:pencil",
+            "style": "info",
+            "title": "Desk updated",
+            "summary": (
+                "The Desk name and description were updated."
+            ),
+            "actor": "Kieran Smith",
+            "occurred_at": "Today at 09:24",
+            "changes": [
+                {
+                    "label": "Name",
+                    "previous": "Operations",
+                    "current": "Operations Control",
+                },
+                {
+                    "label": "Description",
+                    "previous": "Operational services.",
+                    "current": (
+                        "Organisation-wide command and control."
+                    ),
+                },
+            ],
+        },
+        {
+            "icon": "tabler:arrows-move",
+            "style": "warning",
+            "title": "Desk moved",
+            "summary": (
+                "Desk 'Event Operations' was moved."
+            ),
+            "actor": "Kieran Smith",
+            "occurred_at": "Yesterday at 16:40",
+            "changes": [
+                {
+                    "label": "Parent Desk",
+                    "previous": "Organisation",
+                    "current": "Operations Control",
+                },
+            ],
+        },
+    ]
+
+    sample_tree = [
+        {
+            "name": organisation.name,
+            "icon": "tabler:building",
+            "status": "Active",
+            "status_style": "active",
+            "selected": False,
+            "children": [
+                {
+                    "name": "Operations Control",
+                    "icon": "tabler:headset",
+                    "status": "Active",
+                    "status_style": "active",
+                    "selected": True,
+                    "children": [
+                        {
+                            "name": "Event Operations",
+                            "icon": "tabler:building-circus",
+                            "status": "Active",
+                            "status_style": "active",
+                            "selected": False,
+                            "children": [],
+                        },
+                        {
+                            "name": "Patient Transport",
+                            "icon": "tabler:ambulance",
+                            "status": "Inactive",
+                            "status_style": "inactive",
+                            "selected": False,
+                            "children": [],
+                        },
+                    ],
+                },
+                {
+                    "name": "Clinical Governance",
+                    "icon": "tabler:stethoscope",
+                    "status": "Active",
+                    "status_style": "active",
+                    "selected": False,
+                    "children": [],
+                },
+                {
+                    "name": "Archived Desk",
+                    "icon": "tabler:archive",
+                    "status": "Archived",
+                    "status_style": "archived",
+                    "selected": False,
+                    "children": [],
+                },
+            ],
+        },
+    ]
+
+    return render_template(
+        "org/settings/dev/components.html",
+        organisation=organisation,
+        sample_tree=sample_tree,
+        sample_timeline=sample_timeline,
         active_org_section="settings",
     )

@@ -1,3 +1,30 @@
+@import url("./foundation/tokens.css");
+@import url("./foundation/reset.css");
+@import url("./foundation/typography.css");
+@import url("./foundation/layout.css");
+
+@import url("./components/buttons.css");
+@import url("./components/badges.css");
+@import url("./components/forms.css");
+@import url("./components/toolbar.css");
+@import url("./components/split-view.css");
+@import url("./components/tree.css");
+@import url("./components/detail-panel.css");
+@import url("./components/timeline.css");
+@import url("./components/drawer.css");
+@import url("./components/empty-state.css");
+
+@import url("./modules/organisation.css");
+@import url("./modules/settings.css");
+@import url("./modules/workforce.css");
+@import url("./modules/locations.css");
+@import url("./modules/roles.css");
+@import url("./modules/desks.css");
+@import url("./modules/component-showcase.css");
+
+@import url("./utilities/accessibility.css");
+@import url("./utilities/responsive.css");
+
 :root {
     color-scheme: dark;
 
@@ -351,9 +378,8 @@ svg {
 }
 
 .main-content {
-    width: min(100%, var(--rc-content-width));
-    margin: 0 auto;
-    padding: 2rem 1.25rem 3rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .main-content--workspace {
@@ -1857,6 +1883,11 @@ svg {
 
 .main-content {
     flex: 1 0 auto;
+}
+
+.main-content > section {
+    width: 100%;
+    min-width: 0;
 }
 
 .main-content--workspace {
@@ -5557,3 +5588,4 @@ a.settings-hub-card:hover .settings-hub-card__arrow {
         flex-direction: column;
     }
 }
+

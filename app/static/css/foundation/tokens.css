@@ -1,0 +1,41 @@
+:root {
+    /* Brand colours */
+    --rc-navy-950: #0b1d3a;
+    --rc-slate-700: #334155;
+    --rc-slate-600: #475569;
+    --rc-slate-500: #64748b;
+    --rc-slate-400: #94a3b8;
+    --rc-slate-300: #cbd5e1;
+    --rc-slate-200: #e2e8f0;
+    --rc-slate-100: #f1f5f9;
+
+    --rc-teal-500: #0ea5a0;
+    --rc-teal-600: #0b8f8b;
+    --rc-sky-100: #e6f2f7;
+    --rc-indigo-500: #6366f1;
+    --rc-neutral-50: #f4f6f8;
+    --rc-white: #ffffff;
+
+    /* Semantic colours */
+    --rc-success-bg: #dcfce7;
+    --rc-success-text: #166534;
+    --rc-warning-bg: #fef3c7;
+    --rc-warning-text: #92400e;
+    --rc-danger-600: #b91c1c;
+    --rc-danger-700: #991b1b;
+
+    /* Layout */
+    --rc-page-padding:
+        clamp(0.75rem, 1.5vw, 1.75rem);
+    --rc-panel-radius: 0.9rem;
+    --rc-control-radius: 0.62rem;
+
+    /* Elevation */
+    --rc-shadow-panel:
+        0 12px 30px rgba(11, 29, 58, 0.06);
+    --rc-shadow-overlay:
+        -18px 0 40px rgba(11, 29, 58, 0.2);
+
+    /* Motion */
+    --rc-transition-fast: 150ms ease;
+}
