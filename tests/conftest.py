@@ -23,7 +23,7 @@ def _remove_test_processing_policies() -> None:
     db.session.commit()
 
 def _remove_test_desks() -> None:
-    """Remove all test Desks from the bottom of the hierarchy upward."""
+    """Delete all test Desks from leaves to root."""
 
     db.session.rollback()
 
@@ -31,35 +31,13 @@ def _remove_test_desks() -> None:
         test_desks = (
             db.session.query(Desk)
             .filter(
-                Desk.code.in_(
-                    [
-                        "organisation",
-                        "company",
-                        "second_root",
-                        "invalid_root",
-                        "operations",
-                        "patient_transport",
-                        "devon_pts",
-                        "fleet",
-                        "resources",
-                        "training",
-                        "active",
-                        "inactive",
-                        "orphan",
-                        "archived",
-                    ]
-                )
+                Desk.code.like("test_%")
             )
             .all()
         )
 
         if not test_desks:
             break
-
-        test_ids = {
-            desk.id
-            for desk in test_desks
-        }
 
         parent_ids = {
             desk.parent_id
@@ -75,8 +53,8 @@ def _remove_test_desks() -> None:
 
         if not leaf_desks:
             raise RuntimeError(
-                "Test Desk cleanup could not find "
-                "a leaf Desk. The test hierarchy may "
+                "Test Desk cleanup could not find a "
+                "leaf Desk. The test hierarchy may "
                 "contain a cycle."
             )
 
@@ -88,23 +66,20 @@ def _remove_test_desks() -> None:
     db.session.commit()
 
 def _remove_test_journal_entries() -> None:
+    """Remove all Journal Entries before referenced records."""
+
     db.session.rollback()
 
     db.session.execute(
-        delete(JournalEntry).where(
-            JournalEntry.event_code.like(
-                "system.test_%"
-            )
-            | (
-                JournalEntry.event_code
-                == "desk.created"
-            )
-        )
+        delete(JournalEntry)
     )
 
     db.session.commit()
 
+
 def _remove_test_journal_references() -> None:
+    """Remove all Journal References after Journal Entries."""
+
     db.session.rollback()
 
     db.session.execute(

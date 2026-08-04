@@ -19,8 +19,9 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship
 )
-
+from app.desks.models import Desk
 from app.extensions import db
 from app.journal.constants import (
     EVENT_CODE_MAX_LENGTH,
@@ -152,6 +153,26 @@ class JournalEntry(db.Model):
             "event_code",
             "occurred_at",
         ),
+        Index(
+            "ix_journal_entries_actor_occurred_at",
+            "actor_reference_id",
+            "occurred_at",
+        ),
+        Index(
+            "ix_journal_entries_subject_occurred_at",
+            "subject_reference_id",
+            "occurred_at",
+        ),
+        Index(
+            "ix_journal_entries_context_occurred_at",
+            "context_reference_id",
+            "occurred_at",
+        ),
+        Index(
+            "ix_journal_entries_desk_occurred_at",
+            "desk_id",
+            "occurred_at",
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -177,6 +198,51 @@ class JournalEntry(db.Model):
         server_default=func.now(),
     )
 
+    actor_reference_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "journal_references.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    subject_reference_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "journal_references.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=True,
+        index=True,
+    )
+
+    context_reference_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "journal_references.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=True,
+        index=True,
+    )
+
+    desk_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "desks.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=True,
+        index=True,
+    )
+
+    desk_display_name: Mapped[str | None] = mapped_column(
+        String(200),
+        nullable=True,
+    )
+
     summary: Mapped[str] = mapped_column(
         String(JOURNAL_SUMMARY_MAX_LENGTH),
         nullable=False,
@@ -191,6 +257,27 @@ class JournalEntry(db.Model):
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
+    )
+
+    actor_reference: Mapped[JournalReference] = relationship(
+        "JournalReference",
+        foreign_keys=[actor_reference_id],
+    )
+
+    subject_reference: Mapped[JournalReference | None] = relationship(
+        "JournalReference",
+        foreign_keys=[subject_reference_id],
+    )
+
+    context_reference: Mapped[JournalReference | None] = relationship(
+        "JournalReference",
+        foreign_keys=[context_reference_id],
+    )
+
+
+    desk: Mapped[Desk | None] = relationship(
+        "Desk",
+        foreign_keys=[desk_id],
     )
 
     def __repr__(self) -> str:

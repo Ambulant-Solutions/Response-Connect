@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
-import uuid
 
 
 @dataclass(frozen=True)
@@ -23,5 +23,15 @@ class RecordJournalEntryCommand:
 
     event_code: str
     occurred_at: datetime
+    actor_reference_id: uuid.UUID
     summary: str
     details: str | None = None
+    subject_reference_id: uuid.UUID | None = None
+    context_reference_id: uuid.UUID | None = None
+    desk_id: uuid.UUID | None = None
+
+
+__all__ = [
+    "RecordJournalEntryCommand",
+    "RegisterJournalReferenceCommand",
+]

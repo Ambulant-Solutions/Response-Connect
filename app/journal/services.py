@@ -18,6 +18,7 @@ from app.journal.commands import (
 from app.journal.exceptions import (
     JournalPersistenceError,
     JournalReferenceConflictError,
+    JournalReferenceNotFoundError,
     JournalReferencePersistenceError,
 )
 from app.journal.models import (
@@ -34,14 +35,14 @@ from app.journal.validators import (
     validate_reference_type,
     validate_summary,
 )
+from app.desks import (
+    Desk,
+    DeskNotFoundError,
+)
 
 
 class JournalEntryService:
-    """Record immutable Journal Entries.
-
-    Public recording methods own their database transaction unless
-    explicitly documented otherwise.
-    """
+    """Record immutable Journal Entries."""
 
     def __init__(
         self,
@@ -68,9 +69,49 @@ class JournalEntryService:
             command.details
         )
 
+        actor = self._get_reference(
+            command.actor_reference_id,
+            role="actor",
+        )
+
+        subject = self._get_optional_reference(
+            command.subject_reference_id,
+            role="subject",
+        )
+
+        context = self._get_optional_reference(
+            command.context_reference_id,
+            role="context",
+        )
+
+        desk = self._get_optional_desk(
+            command.desk_id
+        )
+
         entry = JournalEntry(
             event_code=event_code,
             occurred_at=occurred_at,
+            actor_reference_id=actor.id,
+            subject_reference_id=(
+                subject.id
+                if subject is not None
+                else None
+            ),
+            context_reference_id=(
+                context.id
+                if context is not None
+                else None
+            ),
+            desk_id=(
+                desk.id
+                if desk is not None
+                else None
+            ),
+            desk_display_name=(
+                desk.name
+                if desk is not None
+                else None
+            ),
             summary=summary,
             details=details,
         )
@@ -82,10 +123,63 @@ class JournalEntryService:
         except SQLAlchemyError as exc:
             self.session.rollback()
             raise JournalPersistenceError(
-                "The Journal Entry could not be recorded."
+                "The Journal Entry could not be "
+                "recorded."
             ) from exc
 
         return entry
+
+    def _get_reference(
+        self,
+        reference_id: uuid.UUID,
+        *,
+        role: str,
+    ) -> JournalReference:
+        reference = self.session.get(
+            JournalReference,
+            reference_id,
+        )
+
+        if reference is None:
+            raise JournalReferenceNotFoundError(
+                f"The Journal {role} reference "
+                "could not be found."
+            )
+
+        return reference
+
+    def _get_optional_reference(
+        self,
+        reference_id: uuid.UUID | None,
+        *,
+        role: str,
+    ) -> JournalReference | None:
+        if reference_id is None:
+            return None
+
+        return self._get_reference(
+            reference_id,
+            role=role,
+        )
+
+    def _get_optional_desk(
+        self,
+        desk_id: uuid.UUID | None,
+    ) -> Desk | None:
+        if desk_id is None:
+            return None
+
+        desk = self.session.get(
+            Desk,
+            desk_id,
+        )
+
+        if desk is None:
+            raise DeskNotFoundError(
+                "The Journal Desk could not be found."
+            )
+
+        return desk
 
 class JournalReferenceService:
     """Register stable Journal-owned identities.
