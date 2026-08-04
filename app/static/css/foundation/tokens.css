@@ -1,20 +1,33 @@
 :root {
-    /* Brand colours */
-    --rc-navy-950: #0b1d3a;
-    --rc-slate-700: #334155;
-    --rc-slate-600: #475569;
-    --rc-slate-500: #64748b;
-    --rc-slate-400: #94a3b8;
-    --rc-slate-300: #cbd5e1;
-    --rc-slate-200: #e2e8f0;
-    --rc-slate-100: #f1f5f9;
+    color-scheme: dark;
 
-    --rc-teal-500: #0ea5a0;
-    --rc-teal-600: #0b8f8b;
-    --rc-sky-100: #e6f2f7;
-    --rc-indigo-500: #6366f1;
-    --rc-neutral-50: #f4f6f8;
-    --rc-white: #ffffff;
+    --rc-navy: #0b1d3a;
+    --rc-slate: #334155;
+    --rc-teal: #0ea5a0;
+    --rc-sky: #e6f2f7;
+    --rc-accent: #6366f1;
+    --rc-neutral: #f4f6f8;
+
+    --rc-bg: #071426;
+    --rc-surface: #10223d;
+    --rc-surface-raised: #172a46;
+    --rc-surface-hover: #1c3553;
+    --rc-border: #2b3f5b;
+    --rc-text: #f4f6f8;
+    --rc-text-muted: #aab7c8;
+    --rc-focus: #e6f2f7;
+    --rc-danger: #ef6f6c;
+    --rc-success: #42c7a5;
+
+    --rc-shadow-sm: 0 8px 24px rgb(0 0 0 / 18%);
+    --rc-shadow-lg: 0 24px 70px rgb(0 0 0 / 32%);
+
+    --rc-radius-sm: 0.6rem;
+    --rc-radius-md: 1rem;
+    --rc-radius-lg: 1.4rem;
+
+    --rc-content-width: 1200px;
+    --rc-topbar-height: 4.25rem;
 
     /* Semantic colours */
     --rc-success-bg: #dcfce7;
