@@ -1,0 +1,300 @@
+/* ============================================================
+   Administration workspace
+   ============================================================ */
+
+.rc-workspace {
+    display: grid;
+    grid-template-columns:
+        clamp(
+            var(--rc-sidebar-min-width),
+            var(--rc-sidebar-width),
+            var(--rc-sidebar-max-width)
+        )
+        minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--rc-workspace-min-height);
+    overflow: hidden;
+    color: var(--rc-slate);
+    background: var(--rc-workspace-background);
+    border: 1px solid var(--rc-workspace-border);
+    border-radius: var(--rc-panel-radius);
+    box-shadow: var(--rc-shadow-panel);
+}
+
+/*
+ * Use this modifier on full management screens.
+ *
+ * The parent page may override --rc-workspace-available-height when its
+ * surrounding header or navigation structure changes.
+ */
+.rc-workspace--viewport {
+    --rc-workspace-available-height:
+        calc(
+            100vh
+            - var(--rc-topbar-height)
+            - 14rem
+        );
+
+    height: max(
+        var(--rc-workspace-min-height),
+        var(--rc-workspace-available-height)
+    );
+}
+
+.rc-workspace__sidebar {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--rc-sidebar-background);
+    border-right: 1px solid var(--rc-workspace-border);
+}
+
+.rc-workspace__main {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--rc-workspace-background);
+}
+
+.rc-workspace__status {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    min-width: 0;
+    min-height: 2.25rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0.8rem;
+    color: #64748b;
+    background: #f8fafc;
+    border-top: 1px solid var(--rc-workspace-border);
+    font-size: 0.72rem;
+}
+
+
+/* Independently scrolling pane bodies */
+
+.rc-sidebar-body,
+.rc-workspace-body {
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+.rc-sidebar-body {
+    padding: 0.75rem;
+}
+
+.rc-workspace-body {
+    padding: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+
+/* Pane header */
+
+.rc-pane-header {
+    display: flex;
+    flex: 0 0 auto;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.5rem;
+    padding: 0.85rem 1rem;
+    background: #ffffff;
+    border-bottom: 1px solid var(--rc-workspace-border);
+}
+
+.rc-pane-header__identity {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.rc-pane-header__icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 2.45rem;
+    height: 2.45rem;
+    color: var(--rc-teal);
+    background: var(--rc-sky);
+    border-radius: 0.7rem;
+}
+
+.rc-pane-header__icon iconify-icon {
+    font-size: 1.25rem;
+}
+
+.rc-pane-header__copy {
+    min-width: 0;
+}
+
+.rc-pane-header__title {
+    overflow: hidden;
+    margin: 0;
+    color: var(--rc-navy);
+    font-size: 0.95rem;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rc-pane-header__subtitle {
+    overflow: hidden;
+    margin: 0.15rem 0 0;
+    color: #64748b;
+    font-size: 0.73rem;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rc-pane-header__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+
+/* Empty workspace */
+
+.rc-workspace-empty {
+    display: grid;
+    width: min(100%, 34rem);
+    min-height: 100%;
+    align-content: center;
+    justify-items: center;
+    margin: auto;
+    padding: clamp(2rem, 5vw, 4rem);
+    color: #64748b;
+    text-align: center;
+}
+
+.rc-workspace-empty__icon {
+    display: grid;
+    place-items: center;
+    width: 4.25rem;
+    height: 4.25rem;
+    margin-bottom: 1rem;
+    color: var(--rc-teal);
+    background: var(--rc-sky);
+    border-radius: 1.1rem;
+}
+
+.rc-workspace-empty__icon iconify-icon {
+    font-size: 2rem;
+}
+
+.rc-workspace-empty h3 {
+    margin: 0;
+    color: var(--rc-navy);
+    font-size: 1.2rem;
+}
+
+.rc-workspace-empty p {
+    max-width: 28rem;
+    margin: 0.5rem 0 0;
+    line-height: 1.55;
+}
+
+.rc-workspace-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-top: 1.15rem;
+}
+
+
+/* Scrollbars */
+
+.rc-sidebar-body,
+.rc-workspace-body {
+    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-width: thin;
+}
+
+.rc-sidebar-body::-webkit-scrollbar,
+.rc-workspace-body::-webkit-scrollbar {
+    width: 0.65rem;
+    height: 0.65rem;
+}
+
+.rc-sidebar-body::-webkit-scrollbar-thumb,
+.rc-workspace-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border: 0.15rem solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+}
+
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+    .rc-workspace,
+    .rc-workspace--viewport {
+        grid-template-columns: 1fr;
+        grid-template-rows:
+            minmax(16rem, 38vh)
+            minmax(24rem, 1fr)
+            auto;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .rc-workspace__sidebar {
+        grid-column: 1;
+        grid-row: 1;
+        border-right: 0;
+        border-bottom: 1px solid var(--rc-workspace-border);
+    }
+
+    .rc-workspace__main {
+        grid-column: 1;
+        grid-row: 2;
+        min-height: 24rem;
+    }
+
+    .rc-workspace__status {
+        grid-column: 1;
+        grid-row: 3;
+    }
+}
+
+@media (max-width: 560px) {
+    .rc-pane-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .rc-pane-header__actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .rc-workspace__status {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+}

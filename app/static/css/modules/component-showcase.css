@@ -920,3 +920,39 @@
         display: none;
     }
 }
+
+.rc-workspace--showcase {
+    height: clamp(36rem, 70vh, 48rem);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.rc-workspace-demo-list {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.rc-workspace-demo-list__item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.62rem 0.7rem;
+    color: var(--rc-slate);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--rc-control-radius);
+    text-align: left;
+    cursor: pointer;
+}
+
+.rc-workspace-demo-list__item:hover {
+    color: var(--rc-navy);
+    background: var(--rc-sky);
+}
+
+.rc-workspace-demo-list__item iconify-icon {
+    flex: 0 0 auto;
+    color: var(--rc-teal);
+}

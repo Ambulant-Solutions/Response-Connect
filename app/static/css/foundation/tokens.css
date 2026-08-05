@@ -51,4 +51,13 @@
 
     /* Motion */
     --rc-transition-fast: 150ms ease;
+
+    --rc-sidebar-width: 21rem;
+    --rc-sidebar-min-width: 17.5rem;
+    --rc-sidebar-max-width: 30rem;
+
+    --rc-workspace-min-height: 38rem;
+    --rc-workspace-border: #dbe3ea;
+    --rc-workspace-background: #ffffff;
+    --rc-sidebar-background: #f8fafc;
 }

@@ -1,6 +1,13 @@
 {% extends "org/org_base.html" %}
 {% from "components/page_header.html" import page_header %}
 {% from "components/admin_toolbar.html" import admin_toolbar %}
+{% from "components/workspace.html" import
+    workspace,
+    pane_header,
+    sidebar_body,
+    workspace_body,
+    workspace_empty
+%}
 
 
 {% macro status_badge(label, style) %}
@@ -125,6 +132,7 @@
         <a href="#buttons">Buttons</a>
         <a href="#badges">Badges</a>
         <a href="#toolbar">Toolbar</a>
+        <a href="#workspace">Workspace</a>
         <a href="#split-view">Split view</a>
         <a href="#tree">Tree</a>
         <a href="#detail-panel">Detail panel</a>
@@ -420,278 +428,127 @@
     primary_actions=toolbar_primary_actions
 ) }}
 
-        <section
-            class="component-demo"
-            id="toolbar"
-            aria-labelledby="toolbar-title"
-        >
-            <header class="component-demo__header">
-                <div>
-                    <span class="component-demo__eyebrow">
-                        Navigation and actions
-                    </span>
-                    <h2 id="toolbar-title">Administration toolbar</h2>
-                    <p>
-                        The standard action area above split-view
-                        administration screens.
-                    </p>
-                </div>
-            </header>
+<section
+    class="component-demo"
+    id="workspace"
+    aria-labelledby="workspace-demo-title"
+>
+    <header class="component-demo__header">
+        <div>
+            <span class="component-demo__eyebrow">
+                Application layout
+            </span>
 
-            <div class="component-demo__surface component-demo__surface--flush">
-                <div class="rc-admin-toolbar">
-                    <div class="rc-admin-toolbar__identity">
-                        <span class="rc-admin-toolbar__icon">
-                            <iconify-icon
-                                icon="tabler:hierarchy-2"
-                                aria-hidden="true"
-                            ></iconify-icon>
-                        </span>
+            <h2 id="workspace-demo-title">
+                Management workspace
+            </h2>
 
-                        <div>
-                            <strong>Desk management</strong>
-                            <span>4 Desks</span>
-                        </div>
-                    </div>
+            <p>
+                A reusable independently scrolling navigation and working
+                area for Response Connect management screens.
+            </p>
+        </div>
+    </header>
 
-                    <div class="rc-admin-toolbar__actions">
+    <div class="component-demo__surface component-demo__surface--flush">
+        {% set sidebar_header_actions %}
+            <button
+                class="rc-icon-button"
+                type="button"
+                aria-label="Create Desk"
+            >
+                <iconify-icon
+                    icon="tabler:plus"
+                    aria-hidden="true"
+                ></iconify-icon>
+            </button>
+        {% endset %}
+
+        {% set sample_sidebar %}
+            {{ pane_header(
+                title="Desks",
+                subtitle="4 operational responsibility boundaries",
+                icon="tabler:hierarchy-2",
+                actions=sidebar_header_actions,
+                heading_level=3,
+                heading_id="workspace-sidebar-title"
+            ) }}
+
+            {% set sidebar_demo_content %}
+                <div class="rc-workspace-demo-list">
+                    {% for index in range(1, 16) %}
                         <button
-                            class="rc-button rc-button--primary"
+                            class="rc-workspace-demo-list__item"
                             type="button"
                         >
                             <iconify-icon
-                                icon="tabler:plus"
+                                icon="tabler:folder"
                                 aria-hidden="true"
                             ></iconify-icon>
-                            New Desk
-                        </button>
 
-                        <button
-                            class="rc-button rc-button--secondary"
-                            type="button"
-                        >
-                            <iconify-icon
-                                icon="tabler:pencil"
-                                aria-hidden="true"
-                            ></iconify-icon>
-                            Edit
+                            <span>
+                                Sample Desk {{ index }}
+                            </span>
                         </button>
-
-                        <button
-                            class="rc-button rc-button--secondary"
-                            type="button"
-                        >
-                            <iconify-icon
-                                icon="tabler:arrows-move"
-                                aria-hidden="true"
-                            ></iconify-icon>
-                            Move
-                        </button>
-
-                        <button
-                            class="rc-icon-button"
-                            type="button"
-                            aria-label="Refresh"
-                        >
-                            <iconify-icon
-                                icon="tabler:refresh"
-                                aria-hidden="true"
-                            ></iconify-icon>
-                        </button>
-                    </div>
+                    {% endfor %}
                 </div>
-            </div>
-        </section>
+            {% endset %}
 
-        <section
-            class="component-demo"
-            id="split-view"
-            aria-labelledby="split-view-title"
-        >
-            <header class="component-demo__header">
-                <div>
-                    <span class="component-demo__eyebrow">
-                        Layout
-                    </span>
-                    <h2 id="split-view-title">
-                        Administration split view
-                    </h2>
-                    <p>
-                        The canonical list-or-tree and detail layout for
-                        administration screens.
-                    </p>
-                </div>
-            </header>
+            {{ sidebar_body(sidebar_demo_content) }}
+        {% endset %}
 
-            <div class="component-demo__surface component-demo__surface--flush">
-                <div class="rc-split-view">
-                    <aside
-                        class="rc-split-view__navigation"
-                        aria-label="Sample Desk hierarchy"
-                    >
-                        <div class="rc-split-view__pane-header">
-                            <div>
-                                <span>Organisation structure</span>
-                                <strong>Desks</strong>
-                            </div>
+        {% set empty_actions %}
+            <button
+                class="rc-button rc-button--primary"
+                type="button"
+            >
+                <iconify-icon
+                    icon="tabler:plus"
+                    aria-hidden="true"
+                ></iconify-icon>
+                Create Desk
+            </button>
+        {% endset %}
 
-                            <button
-                                class="rc-icon-button"
-                                type="button"
-                                aria-label="Add Desk"
-                            >
-                                <iconify-icon
-                                    icon="tabler:plus"
-                                    aria-hidden="true"
-                                ></iconify-icon>
-                            </button>
-                        </div>
+        {% set sample_main %}
+            {{ pane_header(
+                title="Desk details",
+                subtitle="Select an item from the navigation pane",
+                icon="tabler:layout-sidebar-right",
+                heading_level=3,
+                heading_id="workspace-main-title"
+            ) }}
 
-                        <div class="rc-split-view__search">
-                            <iconify-icon
-                                icon="tabler:search"
-                                aria-hidden="true"
-                            ></iconify-icon>
+            {% set empty_content %}
+                {{ workspace_empty(
+                    title="No Desk selected",
+                    description=(
+                        "Select a Desk from the sidebar to view its "
+                        "details and recent Journal activity."
+                    ),
+                    icon="tabler:hierarchy-off",
+                    actions=empty_actions
+                ) }}
+            {% endset %}
 
-                            <input
-                                type="search"
-                                placeholder="Search Desks"
-                                aria-label="Search Desks"
-                            >
-                        </div>
+            {{ workspace_body(empty_content) }}
+        {% endset %}
 
-                        <div class="rc-split-view__tree">
-                            {{ tree_nodes(sample_tree) }}
-                        </div>
-                    </aside>
+        {% set workspace_status %}
+            <span>4 active Desks</span>
+            <span>Last refreshed just now</span>
+        {% endset %}
 
-                    <article class="rc-split-view__detail">
-                        <header class="rc-detail-header">
-                            <div class="rc-detail-header__identity">
-                                <span class="rc-detail-header__icon">
-                                    <iconify-icon
-                                        icon="tabler:headset"
-                                        aria-hidden="true"
-                                    ></iconify-icon>
-                                </span>
+        {{ workspace(
+            sidebar_content=sample_sidebar,
+            workspace_content=sample_main,
+            status_content=workspace_status,
+            label="Desk management workspace example",
+            classes="rc-workspace--showcase"
+        ) }}
+    </div>
+</section>
 
-                                <div>
-                                    <span class="eyebrow">
-                                        Operational Desk
-                                    </span>
-
-                                    <h3>Operations Control</h3>
-
-                                    <p>
-                                        Organisation-wide command and
-                                        operational coordination.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {{ status_badge("Active", "active") }}
-                        </header>
-
-                        <div class="rc-detail-grid">
-                            <div class="rc-property">
-                                <span class="rc-property__label">
-                                    Code
-                                </span>
-                                <strong class="rc-property__value">
-                                    operations_control
-                                </strong>
-                            </div>
-
-                            <div class="rc-property">
-                                <span class="rc-property__label">
-                                    Parent Desk
-                                </span>
-                                <strong class="rc-property__value">
-                                    {{ organisation.name }}
-                                </strong>
-                            </div>
-
-                            <div class="rc-property">
-                                <span class="rc-property__label">
-                                    Child Desks
-                                </span>
-                                <strong class="rc-property__value">
-                                    2
-                                </strong>
-                            </div>
-
-                            <div class="rc-property">
-                                <span class="rc-property__label">
-                                    Created
-                                </span>
-                                <strong class="rc-property__value">
-                                    Today at 09:12
-                                </strong>
-                            </div>
-                        </div>
-
-                        <section
-                            class="rc-detail-section"
-                            aria-labelledby="split-timeline-title"
-                        >
-                            <header class="rc-detail-section__header">
-                                <div>
-                                    <h4 id="split-timeline-title">
-                                        Recent activity
-                                    </h4>
-                                    <p>
-                                        The latest Journal Entries for
-                                        this Desk.
-                                    </p>
-                                </div>
-
-                                <button
-                                    class="rc-button rc-button--ghost"
-                                    type="button"
-                                >
-                                    View all
-                                </button>
-                            </header>
-
-                            <div class="rc-timeline rc-timeline--compact">
-                                {% for item in sample_timeline[:2] %}
-                                    <article class="rc-timeline-item">
-                                        <div
-                                            class="
-                                                rc-timeline-item__marker
-                                                rc-timeline-item__marker--{{ item.style }}
-                                            "
-                                        >
-                                            <iconify-icon
-                                                icon="{{ item.icon }}"
-                                                aria-hidden="true"
-                                            ></iconify-icon>
-                                        </div>
-
-                                        <div class="rc-timeline-item__content">
-                                            <header>
-                                                <strong>
-                                                    {{ item.title }}
-                                                </strong>
-                                                <time>
-                                                    {{ item.occurred_at }}
-                                                </time>
-                                            </header>
-
-                                            <p>{{ item.summary }}</p>
-
-                                            <span class="rc-timeline-item__actor">
-                                                {{ item.actor }}
-                                            </span>
-                                        </div>
-                                    </article>
-                                {% endfor %}
-                            </div>
-                        </section>
-                    </article>
-                </div>
-            </div>
-        </section>
 
         <section
             class="component-demo"
